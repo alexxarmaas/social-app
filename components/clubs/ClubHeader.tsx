@@ -6,7 +6,7 @@ import { MdEdit, MdCameraAlt, MdCheck, MdClose, MdLocationOn, MdGroups, MdEvent 
 import { updateClub } from "@/app/actions/club";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { UploadButton } from "@/app/lib/uploadthing";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface ClubHeaderProps {
     club: any;
@@ -94,27 +94,14 @@ export default function ClubHeader({ club, isOwner, isAdmin, isMember }: ClubHea
 
                 {isEditing && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <UploadButton
-                            endpoint="clubImage"
-                            onClientUploadComplete={(res) => {
-                                if (res && res[0]) {
-                                    setCoverUrl(res[0].url);
-                                    toast.success("Portada actualizada");
-                                }
+                        <ImageUpload
+                            onUploadComplete={(url) => {
+                                setCoverUrl(url);
+                                toast.success("Portada actualizada");
                             }}
-                            onUploadError={(error: Error) => {
-                                toast.error(`Error: ${error.message}`);
-                            }}
-                            appearance={{
-                                button: "bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors flex items-center gap-2",
-                                allowedContent: "hidden"
-                            }}
-                            content={{
-                                button({ ready }) {
-                                    if (ready) return <><MdCameraAlt /> Cambiar Portada</>;
-                                    return "Cargando...";
-                                }
-                            }}
+                            type="club"
+                            label="Cambiar Portada"
+                            className="bg-white/20 hover:bg-white/30 text-white rounded-lg backdrop-blur-sm transition-colors"
                         />
                     </div>
                 )}
@@ -134,27 +121,14 @@ export default function ClubHeader({ club, isOwner, isAdmin, isMember }: ClubHea
                             />
                             {isEditing && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <UploadButton
-                                        endpoint="clubImage"
-                                        onClientUploadComplete={(res) => {
-                                            if (res && res[0]) {
-                                                setLogoUrl(res[0].url);
-                                                toast.success("Logo actualizado");
-                                            }
+                                    <ImageUpload
+                                        onUploadComplete={(url) => {
+                                            setLogoUrl(url);
+                                            toast.success("Logo actualizado");
                                         }}
-                                        onUploadError={(error: Error) => {
-                                            toast.error(`Error: ${error.message}`);
-                                        }}
-                                        appearance={{
-                                            button: "bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-colors",
-                                            allowedContent: "hidden"
-                                        }}
-                                        content={{
-                                            button({ ready }) {
-                                                if (ready) return <MdCameraAlt size={20} />;
-                                                return "...";
-                                            }
-                                        }}
+                                        type="club"
+                                        label=""
+                                        className="bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-colors p-2"
                                     />
                                 </div>
                             )}

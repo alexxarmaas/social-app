@@ -6,7 +6,7 @@ import { MdAdd, MdClose, MdFavorite, MdFavoriteBorder, MdDelete } from "react-ic
 import { getEventPhotos, uploadEventPhoto } from "@/app/actions/gallery";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { UploadButton } from "@/app/lib/uploadthing";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface EventGalleryProps {
     eventId: string;
@@ -122,27 +122,13 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
                                     <Image src={uploadedUrl} alt="Preview" fill className="object-contain" />
                                 ) : (
                                     <div className="text-center p-4">
-                                        <UploadButton
-                                            endpoint="galleryImage"
-                                            onClientUploadComplete={(res) => {
-                                                if (res && res[0]) {
-                                                    setUploadedUrl(res[0].url);
-                                                    toast.success("Imagen cargada");
-                                                }
+                                        <ImageUpload
+                                            onUploadComplete={(url) => {
+                                                setUploadedUrl(url);
+                                                toast.success("Imagen cargada");
                                             }}
-                                            onUploadError={(error: Error) => {
-                                                toast.error(`Error: ${error.message}`);
-                                            }}
-                                            appearance={{
-                                                button: "bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-zinc-200 transition-colors",
-                                                allowedContent: "hidden"
-                                            }}
-                                            content={{
-                                                button({ ready }) {
-                                                    if (ready) return "Seleccionar Imagen";
-                                                    return "Cargando...";
-                                                }
-                                            }}
+                                            type="event"
+                                            label="Seleccionar Imagen"
                                         />
                                     </div>
                                 )}

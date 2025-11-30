@@ -1,21 +1,9 @@
-import { PrismaClient } from '@/app/generated/prisma/client';
-import { PrismaLibSql } from '@prisma/adapter-libsql';
-
-import { createClient } from "@libsql/client";
-
-const libsql = createClient({
-    url: process.env.DATABASE_URL || "file:./dev.db",
-    authToken: process.env.TURSO_AUTH_TOKEN,
-});
-
-const adapter = new PrismaLibSql(libsql as any);
+import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = globalThis as unknown as {
     prisma_v3: PrismaClient | undefined;
 };
 
-export const prisma = globalForPrisma.prisma_v3 ?? new PrismaClient({ adapter });
+export const prisma = globalForPrisma.prisma_v3 ?? new PrismaClient({});
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma_v3 = prisma;
-
-// Force recompile: v2

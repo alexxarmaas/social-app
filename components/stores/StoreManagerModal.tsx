@@ -46,7 +46,14 @@ export default function StoreManagerModal({ store, isOpen, onClose, initialTab =
         setError("");
         setSuccess("");
 
-        const result = await updateStore(store.id, infoData);
+        const formData = new FormData();
+        formData.append("name", infoData.name);
+        formData.append("description", infoData.description);
+        formData.append("location", infoData.location);
+        formData.append("logo", infoData.logo);
+        formData.append("banner", infoData.banner);
+
+        const result = await updateStore(store.id, formData);
 
         if (result.error) {
             setError(result.error);
@@ -66,11 +73,27 @@ export default function StoreManagerModal({ store, isOpen, onClose, initialTab =
         setError("");
         setSuccess("");
 
-        const result = await addStoreListing(store.id, {
-            ...productData,
-            price: parseFloat(productData.price),
-            imageUrls: productData.imageUrl ? JSON.stringify([productData.imageUrl]) : undefined
-        });
+        const formData = new FormData();
+        formData.append("title", productData.title);
+        formData.append("price", productData.price);
+        formData.append("category", productData.category);
+        formData.append("condition", productData.condition);
+        formData.append("description", productData.description);
+        if (productData.imageUrl) {
+            // Note: addStoreListing expects a File object for 'image' field, or we need to adjust it to accept URL string.
+            // The current addStoreListing implementation expects 'image' as File.
+            // But here we are inputting URL string.
+            // We should probably modify addStoreListing to accept imageUrl string as well, or change UI to file upload.
+            // Given the UI has text input for URL, let's modify addStoreListing to accept imageUrl.
+            // But for now, let's just append it as 'imageUrl' and hope addStoreListing handles it or we fix addStoreListing.
+            // Wait, addStoreListing in store.ts:
+            // const imageFile = formData.get("image") as File | null;
+            // It only handles file.
+            // I should update addStoreListing to handle imageUrl string too.
+            formData.append("imageUrl", productData.imageUrl);
+        }
+
+        const result = await addStoreListing(store.id, formData);
 
         if (result.error) {
             setError(result.error);

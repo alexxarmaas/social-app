@@ -6,7 +6,7 @@ import Link from "next/link";
 import { MdEmail, MdPerson, MdLock, MdStore, MdGroups, MdArrowForward, MdAddPhotoAlternate } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import { UploadButton } from "@/app/lib/uploadthing";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -198,27 +198,14 @@ export default function RegisterPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <UploadButton
-                                            endpoint="imageUploader"
-                                            onClientUploadComplete={(res) => {
-                                                if (res && res[0]) {
-                                                    setFormData({ ...formData, avatarUrl: res[0].url });
-                                                    toast.success("Avatar subido");
-                                                }
+                                        <ImageUpload
+                                            onUploadComplete={(url) => {
+                                                setFormData({ ...formData, avatarUrl: url });
+                                                toast.success("Avatar subido");
                                             }}
-                                            onUploadError={(error: Error) => {
-                                                toast.error(`Error: ${error.message}`);
-                                            }}
-                                            appearance={{
-                                                button: "bg-zinc-800 text-white text-sm px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors",
-                                                allowedContent: "hidden"
-                                            }}
-                                            content={{
-                                                button({ ready }) {
-                                                    if (ready) return "Subir Avatar";
-                                                    return "Cargando...";
-                                                }
-                                            }}
+                                            type="avatar"
+                                            label="Subir Avatar"
+                                            className="bg-zinc-800 text-white text-sm rounded-lg hover:bg-zinc-700 transition-colors"
                                         />
                                     </div>
                                 </div>
@@ -235,27 +222,14 @@ export default function RegisterPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <UploadButton
-                                            endpoint="imageUploader"
-                                            onClientUploadComplete={(res) => {
-                                                if (res && res[0]) {
-                                                    setFormData({ ...formData, bannerUrl: res[0].url });
-                                                    toast.success("Banner subido");
-                                                }
+                                        <ImageUpload
+                                            onUploadComplete={(url) => {
+                                                setFormData({ ...formData, bannerUrl: url });
+                                                toast.success("Banner subido");
                                             }}
-                                            onUploadError={(error: Error) => {
-                                                toast.error(`Error: ${error.message}`);
-                                            }}
-                                            appearance={{
-                                                button: "w-full bg-zinc-800 text-white text-sm py-2 rounded-lg hover:bg-zinc-700 transition-colors",
-                                                allowedContent: "hidden"
-                                            }}
-                                            content={{
-                                                button({ ready }) {
-                                                    if (ready) return "Subir Banner";
-                                                    return "Cargando...";
-                                                }
-                                            }}
+                                            type="misc"
+                                            label="Subir Banner"
+                                            className="w-full bg-zinc-800 text-white text-sm rounded-lg hover:bg-zinc-700 transition-colors"
                                         />
                                     </div>
                                 </div>

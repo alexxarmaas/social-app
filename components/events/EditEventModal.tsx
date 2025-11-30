@@ -5,7 +5,7 @@ import { MdClose, MdSave, MdImage, MdLocationOn, MdAccessTime, MdAttachMoney, Md
 import { updateEvent } from "@/app/actions/event";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import { UploadButton } from "@/app/lib/uploadthing";
+import ImageUpload from "@/components/ui/ImageUpload";
 import dynamic from "next/dynamic";
 
 const LocationPicker = dynamic(() => import("../map/LocationPicker"), {
@@ -33,6 +33,8 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         imageUrl: ""
     });
 
+    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
+
     useEffect(() => {
         if (event) {
             const date = new Date(event.startDate);
@@ -47,6 +49,9 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                 price: event.price || 0,
                 imageUrl: event.imageUrl || ""
             });
+            if (event.latitude && event.longitude) {
+                setCoordinates({ lat: event.latitude, lng: event.longitude });
+            }
         }
     }, [event]);
 
@@ -65,6 +70,11 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         data.append("price", formData.price.toString());
         if (formData.imageUrl) data.append("imageUrl", formData.imageUrl);
 
+        if (coordinates) {
+            data.append("latitude", coordinates.lat.toString());
+            data.append("longitude", coordinates.lng.toString());
+        }
+
         const result = await updateEvent(event.id, data);
 
         if (result.error) {
@@ -76,6 +86,12 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         }
         setLoading(false);
     };
+    // ... (skipping unchanged parts)
+    <LocationPicker
+        onLocationSelect={(lat, lng) => setCoordinates({ lat, lng })}
+        initialLat={coordinates?.lat}
+        initialLng={coordinates?.lng}
+    />
 
     if (!isOpen) return null;
 
@@ -108,27 +124,13 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                                     </>
                                 ) : (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <UploadButton
-                                            endpoint="eventImage"
-                                            onClientUploadComplete={(res) => {
-                                                if (res && res[0]) {
-                                                    setFormData({ ...formData, imageUrl: res[0].url });
-                                                    toast.success("Imagen cargada");
-                                                }
+                                        <ImageUpload
+                                            onUploadComplete={(url) => {
+                                                setFormData({ ...formData, imageUrl: url });
+                                                toast.success("Imagen cargada");
                                             }}
-                                            onUploadError={(error: Error) => {
-                                                toast.error(`Error: ${error.message}`);
-                                            }}
-                                            appearance={{
-                                                button: "bg-slate-700 text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-600 transition-colors",
-                                                allowedContent: "hidden"
-                                            }}
-                                            content={{
-                                                button({ ready }) {
-                                                    if (ready) return "Subir Imagen";
-                                                    return "Cargando...";
-                                                }
-                                            }}
+                                            type="event"
+                                            label="Subir Imagen"
                                         />
                                         <p className="text-slate-500 text-sm mt-2">Recomendado: 1920x1080</p>
                                     </div>
@@ -194,8 +196,9 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                             </div>
                             <div className="h-[200px] rounded-xl overflow-hidden border border-slate-700">
                                 <LocationPicker
-                                    value={formData.location}
-                                    onChange={(loc) => setFormData({ ...formData, location: loc })}
+                                    onLocationSelect={(lat, lng) => setCoordinates({ lat, lng })}
+                                    initialLat={coordinates?.lat}
+                                    initialLng={coordinates?.lng}
                                 />
                             </div>
                         </div>

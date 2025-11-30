@@ -21,7 +21,7 @@ export default async function CalendarPage() {
             {/* Events Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events && events.length > 0 ? (
-                    events.map((event) => (
+                    events.map((event: any) => (
                         <EventCard key={event.id} event={event} currentUserId={session?.user?.id} />
                     ))
                 ) : (

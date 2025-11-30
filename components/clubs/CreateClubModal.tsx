@@ -5,6 +5,7 @@ import { createClub } from "@/app/actions/club";
 import { MdClose, MdGroups, MdImage, MdDescription, MdCategory } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface CreateClubModalProps {
     isOpen: boolean;
@@ -13,6 +14,8 @@ interface CreateClubModalProps {
 
 export default function CreateClubModal({ isOpen, onClose }: CreateClubModalProps) {
     const [loading, setLoading] = useState(false);
+    const [logoUrl, setLogoUrl] = useState("");
+    const [coverUrl, setCoverUrl] = useState("");
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,14 +23,16 @@ export default function CreateClubModal({ isOpen, onClose }: CreateClubModalProp
         setLoading(true);
 
         const formData = new FormData(e.currentTarget);
+        formData.append("logoUrl", logoUrl);
+        formData.append("coverUrl", coverUrl);
         const result = await createClub(formData);
 
         if (result.error) {
             toast.error(result.error);
-        } else if (result.success && result.clubId) {
+        } else if (result.club) {
             toast.success("¡Club creado con éxito!");
             onClose();
-            router.push(`/clubs/${result.clubId}`);
+            router.push(`/clubs/${result.club.id}`);
         }
 
         setLoading(false);
@@ -102,13 +107,12 @@ export default function CreateClubModal({ isOpen, onClose }: CreateClubModalProp
                     <div>
                         <label className="block text-slate-400 text-sm font-medium mb-1">Logo del Club</label>
                         <div className="relative">
-                            <input
-                                type="file"
-                                name="logo"
-                                accept="image/*"
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 pl-10 text-slate-300 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 transition-colors"
+                            <ImageUpload
+                                onUploadComplete={(url) => setLogoUrl(url)}
+                                type="club"
+                                label="Subir Logo"
+                                className="w-full bg-slate-800 border border-slate-700 rounded-lg text-slate-300"
                             />
-                            <MdImage className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                         </div>
                     </div>
 
@@ -116,13 +120,12 @@ export default function CreateClubModal({ isOpen, onClose }: CreateClubModalProp
                     <div>
                         <label className="block text-slate-400 text-sm font-medium mb-1">Imagen de Portada</label>
                         <div className="relative">
-                            <input
-                                type="file"
-                                name="cover"
-                                accept="image/*"
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 pl-10 text-slate-300 file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 transition-colors"
+                            <ImageUpload
+                                onUploadComplete={(url) => setCoverUrl(url)}
+                                type="club"
+                                label="Subir Portada"
+                                className="w-full bg-slate-800 border border-slate-700 rounded-lg text-slate-300"
                             />
-                            <MdImage className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                         </div>
                     </div>
 

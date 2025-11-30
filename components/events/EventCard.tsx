@@ -207,9 +207,6 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
                 isOpen={showEditModal}
                 onClose={() => setShowEditModal(false)}
                 event={event}
-                onUpdate={() => {
-                    // Optional: trigger a refresh if needed, but revalidatePath should handle it
-                }}
             />
         </div>
     );

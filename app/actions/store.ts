@@ -241,11 +241,14 @@ export async function addStoreListing(storeId: string, formData: FormData) {
         const condition = formData.get("condition") as string;
         const description = formData.get("description") as string;
         const imageFile = formData.get("image") as File | null;
+        const imageUrlInput = formData.get("imageUrl") as string;
 
         let imageUrls = undefined;
         if (imageFile && imageFile.size > 0) {
             const url = await saveFile(imageFile);
             imageUrls = JSON.stringify([url]);
+        } else if (imageUrlInput) {
+            imageUrls = JSON.stringify([imageUrlInput]);
         }
 
         const listing = await prisma.marketplaceListing.create({

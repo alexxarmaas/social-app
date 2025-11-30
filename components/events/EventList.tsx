@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CreateEventModal from "./CreateEventModal";
 import Image from "next/image";
-import { joinEvent } from "@/app/actions/event";
+import { rsvpEvent } from "@/app/actions/event";
 import { deleteClubEvent, leaveClubEvent } from "@/app/actions/club";
 import { MdEdit, MdDelete, MdExitToApp, MdCheckCircle } from "react-icons/md";
 
@@ -26,9 +26,9 @@ export default function EventList({ events, adminClubs }: EventListProps) {
             // Actually, let's stick to the generic joinEvent for now if it works, OR import joinClubEvent.
             // The user wants "create, modify and delete". Join is already there.
             // Let's use the generic joinEvent for simplicity unless it breaks.
-            await joinEvent(id);
+            await rsvpEvent(id, 'going');
         } else {
-            await joinEvent(id);
+            await rsvpEvent(id, 'going');
         }
         setLoadingId(null);
     };
@@ -124,7 +124,7 @@ export default function EventList({ events, adminClubs }: EventListProps) {
                 ))}
             </div>
 
-            {showModal && <CreateEventModal onClose={() => setShowModal(false)} adminClubs={adminClubs} />}
+            {showModal && <CreateEventModal onClose={() => setShowModal(false)} userAdminClubs={adminClubs} />}
         </>
     );
 }
