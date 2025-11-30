@@ -55,6 +55,42 @@ export async function getEvents(filter?: string, clubId?: string) {
     }
 }
 
+export async function getEvent(eventId: string) {
+    try {
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: {
+                club: {
+                    select: { name: true, imageUrl: true }
+                },
+                attendees: {
+                    where: { status: 'going' },
+                    include: {
+                        user: {
+                            select: { id: true, username: true, avatar: true }
+                        }
+                    }
+                },
+                creator: {
+                    select: { id: true, username: true, name: true, avatar: true }
+                },
+                _count: {
+                    select: { attendees: { where: { status: 'going' } } }
+                }
+            }
+        });
+
+        if (!event) {
+            return { error: "Evento no encontrado" };
+        }
+
+        return { event };
+    } catch (error) {
+        console.error("Error fetching event:", error);
+        return { error: "Error al cargar el evento" };
+    }
+}
+
 export async function createEvent(formData: FormData) {
     const session = await getServerSession(authOptions);
 
