@@ -4,10 +4,7 @@ import WebsiteNav from "@/components/WebsiteNav";
 
 export default function WhoAreWePage() {
     const team = [
-        { name: "Alex Rodriguez", role: "Founder & CEO", icon: MdPerson, specialty: "JDM Enthusiast" },
-        { name: "Sarah Chen", role: "CTO", icon: MdComputer, specialty: "European Cars" },
-        { name: "Mike Johnson", role: "Community Manager", icon: MdBuild, specialty: "American Muscle" },
-        { name: "Emma Davis", role: "Head of Events", icon: MdPalette, specialty: "Classic Cars" },
+        { name: "Alejandro Arnas", role: "Founder & CEO", icon: MdPerson, specialty: "JDM Enthusiast" },
     ];
 
     return (
@@ -18,7 +15,7 @@ export default function WhoAreWePage() {
             {/* Content */}
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-5xl font-bold text-white mb-8">Quiénes Somos</h1>
+                    <h1 className="text-5xl font-bold text-white mb-8">Tramassso</h1>
 
                     <div className="space-y-8">
                         <p className="text-slate-300 text-lg">
@@ -55,7 +52,7 @@ export default function WhoAreWePage() {
                         </div>
 
                         <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-8 text-white mt-12">
-                            <h2 className="text-3xl font-bold mb-4">Únete a Nuestra Jornada</h2>
+                            <h2 className="text-3xl font-bold mb-4">Forma parte de nuestra comunidad</h2>
                             <p className="mb-6">
                                 Siempre buscamos personas apasionadas para unirse a nuestra comunidad. Ya sea como miembro o parte de nuestro equipo, hay un lugar para ti en Tramassso.
                             </p>

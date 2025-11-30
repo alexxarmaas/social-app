@@ -4,8 +4,8 @@ import WebsiteNav from "@/components/WebsiteNav";
 
 export default function GetAppPage() {
     const features = [
-        { icon: MdPhoneAndroid, title: "Móvil Primero", description: "Funciona genial en tu teléfono mientras estás en el garaje" },
-        { icon: MdFlashOn, title: "Carga Rápida", description: "Porque a nadie le gusta esperar" },
+        { icon: MdPhoneAndroid, title: "Llevalo contigo", description: "Funciona genial en tu teléfono mientras estás en el garaje" },
+        { icon: MdFlashOn, title: "Velocidad", description: "Porque a nadie le gusta esperar" },
         { icon: MdNotifications, title: "Notificaciones", description: "Recibe alertas de eventos y mensajes (cuando tú quieras)" },
         { icon: MdPhotoCamera, title: "Compartir Fotos", description: "Muestra tu coche en alta resolución" },
         { icon: MdMap, title: "Encontrar Eventos", description: "Descubre quedadas y exposiciones cerca de ti" },
@@ -21,7 +21,7 @@ export default function GetAppPage() {
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="text-6xl mb-6 flex justify-center text-red-500"><MdPhoneAndroid size={64} /></div>
-                    <h1 className="text-5xl font-bold text-white mb-4">Obtén Tramassso</h1>
+                    <h1 className="text-5xl font-bold text-white mb-4">Descarga Tramassso</h1>
                     <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
                         Lleva la comunidad de coches contigo. ¡Disponible pronto en iOS y Android!
                     </p>

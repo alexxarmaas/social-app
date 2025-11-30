@@ -19,7 +19,7 @@ export default function AboutPage() {
                         </p>
 
                         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
-                            <h2 className="text-3xl font-bold text-white mb-4">Nuestra Misión</h2>
+                            <h2 className="text-3xl font-bold text-white mb-4">Nuestro Objetivo</h2>
                             <p className="text-slate-300">
                                 Crear la plataforma más completa y atractiva para entusiastas del motor, donde cada miembro pueda mostrar su pasión, aprender de otros y participar en la vibrante comunidad automotriz.
                             </p>
@@ -28,7 +28,7 @@ export default function AboutPage() {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700">
                                 <div className="text-4xl mb-4 text-red-500 flex justify-center"><MdFlag size={40} /></div>
-                                <h3 className="text-xl font-bold text-white mb-2">Nuestra Visión</h3>
+                                <h3 className="text-xl font-bold text-white mb-2">Nuestra Meta</h3>
                                 <p className="text-slate-400">
                                     Ser la plataforma de referencia donde cada entusiasta del motor se sienta en casa, sin importar su preferencia automotriz.
                                 </p>
@@ -44,7 +44,7 @@ export default function AboutPage() {
                         </div>
 
                         <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl p-8 text-white">
-                            <h2 className="text-3xl font-bold mb-4">Únete a Nuestra Comunidad</h2>
+                            <h2 className="text-3xl font-bold mb-4">Forma parte de nuestra comunidad</h2>
                             <p className="mb-6">
                                 Ya sea que te gusten los JDM, el lujo europeo, el muscle americano o los vehículos eléctricos, Tramassso es tu hogar. ¡Únete a miles de entusiastas hoy!
                             </p>
