@@ -48,5 +48,8 @@
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
+  },
+  "overrides": {
+    "libsql": "0.5.22"
   }
 }
