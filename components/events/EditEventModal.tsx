@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { MdClose, MdSave, MdImage, MdLocationOn, MdAccessTime, MdAttachMoney, MdPeople } from "react-icons/md";
 import { updateEvent } from "@/app/actions/event";
 import { toast } from "react-hot-toast";
@@ -21,6 +22,7 @@ interface EditEventModalProps {
 
 export default function EditEventModal({ isOpen, onClose, event }: EditEventModalProps) {
     const [loading, setLoading] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -34,6 +36,10 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
     });
 
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (event) {
@@ -86,17 +92,18 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
         }
         setLoading(false);
     };
-    // ... (skipping unchanged parts)
-    <LocationPicker
-        onLocationSelect={(lat, lng) => setCoordinates({ lat, lng })}
-        initialLat={coordinates?.lat}
-        initialLng={coordinates?.lng}
-    />
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
-    return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    const modalContent = (
+        <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
             <div className="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="flex justify-between items-center pb-4 border-b border-slate-800">
@@ -274,4 +281,6 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }
