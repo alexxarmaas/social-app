@@ -66,7 +66,7 @@ export default async function EventPage({ params }: { params: { id: string } }) 
 
                     {/* Gallery */}
                     <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
-                        <EventGallery eventId={event.id} canUpload={canUpload} />
+                        <EventGallery eventId={event.id} isAttendee={isAttendee} isCreator={isCreator} canUpload={canUpload} />
                     </div>
                 </div>
 
