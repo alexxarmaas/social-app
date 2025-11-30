@@ -4,26 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-
-// Helper to save file
-async function saveFile(file: File, type: string): Promise<string> {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = Date.now() + "_" + file.name.replaceAll(" ", "_");
-
-    const uploadDir = path.join(process.cwd(), "public/uploads", type);
-    try {
-        await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-        // Ignore if exists
-    }
-
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    return `/uploads/${type}/${filename}`;
-}
+import { uploadFileToBlob } from "@/app/lib/blob";
 
 export async function getUserProfile() {
     const session = await getServerSession(authOptions);
@@ -79,33 +60,28 @@ export async function updateProfile(formData: FormData) {
         const bannerFile = formData.get("banner") as File | null;
 
         console.log("Updating profile for user:", session.user.id);
-        console.log("Name:", name);
-        console.log("Bio:", bio);
-        console.log("Location:", location);
-        console.log("Avatar file:", avatarFile?.name, avatarFile?.size);
-        console.log("Banner file:", bannerFile?.name, bannerFile?.size);
 
         const data: any = { name, bio, location };
 
         if (avatarFile && typeof avatarFile === "object" && avatarFile.size > 0) {
             console.log("Saving avatar file...");
             try {
-                data.avatar = await saveFile(avatarFile, "avatar");
+                data.avatar = await uploadFileToBlob(avatarFile, "avatar");
                 console.log("Avatar saved:", data.avatar);
             } catch (error) {
                 console.error("Error saving avatar:", error);
-                return { error: "Error al guardar el avatar: " + (error instanceof Error ? error.message : "Error desconocido") };
+                return { error: "Error al guardar el avatar" };
             }
         }
 
         if (bannerFile && typeof bannerFile === "object" && bannerFile.size > 0) {
             console.log("Saving banner file...");
             try {
-                data.banner = await saveFile(bannerFile, "banner");
+                data.banner = await uploadFileToBlob(bannerFile, "banner");
                 console.log("Banner saved:", data.banner);
             } catch (error) {
                 console.error("Error saving banner:", error);
-                return { error: "Error al guardar el banner: " + (error instanceof Error ? error.message : "Error desconocido") };
+                return { error: "Error al guardar el banner" };
             }
         }
 
@@ -121,8 +97,6 @@ export async function updateProfile(formData: FormData) {
     } catch (error) {
         console.error("Error updating profile:", error);
         if (error instanceof Error) {
-            console.error("Error message:", error.message);
-            console.error("Error stack:", error.stack);
             return { error: "Error al actualizar el perfil: " + error.message };
         }
         return { error: "Error al actualizar el perfil" };
@@ -144,7 +118,7 @@ export async function addCar(formData: FormData) {
 
         let imageUrl = null;
         if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
-            imageUrl = await saveFile(imageFile, "car");
+            imageUrl = await uploadFileToBlob(imageFile, "car");
         }
 
         await prisma.car.create({
@@ -192,7 +166,7 @@ export async function updateCar(formData: FormData) {
         const data: any = { make, model, year, modifications };
 
         if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
-            data.imageUrl = await saveFile(imageFile, "car");
+            data.imageUrl = await uploadFileToBlob(imageFile, "car");
         }
 
         await prisma.car.update({

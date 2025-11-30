@@ -2,29 +2,9 @@
 import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { authOptions } from "@/app/lib/auth";
 import { createNotification } from "./notification";
-
-// Helper to save file
-async function saveFile(file: File, type: string = "post"): Promise<string> {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = Date.now() + "_" + file.name.replaceAll(" ", "_");
-
-    const uploadDir = path.join(process.cwd(), "public/uploads", type);
-    try {
-        await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-        // Ignore if exists
-    }
-
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    return `/uploads/${type}/${filename}`;
-}
-
+import { uploadFileToBlob } from "@/app/lib/blob";
 
 export async function createPost(formData: FormData) {
     // Get user session
@@ -38,7 +18,7 @@ export async function createPost(formData: FormData) {
         let imageUrl: string | null = null;
         const imageFile = formData.get("image") as File | null;
         if (imageFile && typeof imageFile === "object") {
-            imageUrl = await saveFile(imageFile, "post");
+            imageUrl = await uploadFileToBlob(imageFile, "post");
         }
 
         const clubId = formData.get("clubId") as string | null;

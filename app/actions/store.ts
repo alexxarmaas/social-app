@@ -4,27 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-
-export async function saveFile(file: File): Promise<string> {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Create unique filename
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "")}`;
-
-    // Ensure uploads directory exists
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    // Save file
-    const filepath = join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    return `/uploads/${filename}`;
-}
+import { uploadFileToBlob } from "@/app/lib/blob";
 
 export async function getStores(search?: string) {
     try {
@@ -127,12 +107,12 @@ export async function createStore(formData: FormData) {
 
         let logoUrl = "";
         if (logoFile && logoFile.size > 0) {
-            logoUrl = await saveFile(logoFile);
+            logoUrl = await uploadFileToBlob(logoFile, "store-logo");
         }
 
         let bannerUrl = "";
         if (bannerFile && bannerFile.size > 0) {
-            bannerUrl = await saveFile(bannerFile);
+            bannerUrl = await uploadFileToBlob(bannerFile, "store-banner");
         }
 
         const store = await prisma.store.create({
@@ -195,12 +175,12 @@ export async function updateStore(storeId: string, formData: FormData) {
 
         const logoFile = formData.get("logo") as File | null;
         if (logoFile && logoFile.size > 0) {
-            data.logo = await saveFile(logoFile);
+            data.logo = await uploadFileToBlob(logoFile, "store-logo");
         }
 
         const bannerFile = formData.get("banner") as File | null;
         if (bannerFile && bannerFile.size > 0) {
-            data.banner = await saveFile(bannerFile);
+            data.banner = await uploadFileToBlob(bannerFile, "store-banner");
         }
 
         const updatedStore = await prisma.store.update({
@@ -245,7 +225,7 @@ export async function addStoreListing(storeId: string, formData: FormData) {
 
         let imageUrls = undefined;
         if (imageFile && imageFile.size > 0) {
-            const url = await saveFile(imageFile);
+            const url = await uploadFileToBlob(imageFile, "store-listing");
             imageUrls = JSON.stringify([url]);
         } else if (imageUrlInput) {
             imageUrls = JSON.stringify([imageUrlInput]);
@@ -308,7 +288,7 @@ export async function updateStoreListing(listingId: string, formData: FormData) 
 
         const imageFile = formData.get("image") as File | null;
         if (imageFile && imageFile.size > 0) {
-            const url = await saveFile(imageFile);
+            const url = await uploadFileToBlob(imageFile, "store-listing");
             data.imageUrls = JSON.stringify([url]);
         }
 

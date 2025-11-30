@@ -4,25 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-
-async function saveFile(file: File, type: string): Promise<string> {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = Date.now() + "_" + file.name.replaceAll(" ", "_");
-
-    const uploadDir = path.join(process.cwd(), "public/uploads", type);
-    try {
-        await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-        // Ignore if exists
-    }
-
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    return `/uploads/${type}/${filename}`;
-}
+import { uploadFileToBlob } from "@/app/lib/blob";
 
 export async function getListings(category?: string, search?: string) {
     try {
@@ -77,7 +59,7 @@ export async function createListing(formData: FormData) {
 
         let imageUrls = null;
         if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
-            const url = await saveFile(imageFile, "marketplace");
+            const url = await uploadFileToBlob(imageFile, "marketplace");
             imageUrls = JSON.stringify([url]); // Schema expects String? but implies JSON array based on comment
         }
 
