@@ -141,6 +141,7 @@ model Club {
   name        String   @unique
   description String?
   category    String // e.g., "JDM", "European", "American Muscle", "Classic", "Tuner"
+  location    String?
   imageUrl    String?
   coverImage  String?
   instagram   String?
