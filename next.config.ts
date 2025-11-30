@@ -4,9 +4,20 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
-      allowedOrigins: ["xbrq3trg-3000.uks1.devtunnels.ms", "localhost:3000"],
     },
     serverComponentsExternalPackages: ["bcryptjs"],
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
 };
 

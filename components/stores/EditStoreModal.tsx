@@ -137,7 +137,8 @@ export default function EditStoreModal({ store, isOpen, onClose }: EditStoreModa
                             </label>
                             <LocationPicker
                                 onLocationSelect={(lat, lng) => setCoordinates({ lat, lng })}
-                                initialPosition={coordinates ? [coordinates.lat, coordinates.lng] : undefined}
+                                initialLat={coordinates?.lat}
+                                initialLng={coordinates?.lng}
                             />
                         </div>
 

@@ -6,13 +6,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // User model for authentication and profiles
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   email     String   @unique
   username  String   @unique
   password  String // Hashed password
@@ -52,7 +52,7 @@ model User {
 
 // Car model for user vehicles
 model Car {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   make          String
   model         String
   year          Int
@@ -71,7 +71,7 @@ model Car {
 
 // Post model for user content
 model Post {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   content   String
   imageUrl  String?
   createdAt DateTime @default(now())
@@ -90,7 +90,7 @@ model Post {
 
 // Comment model for post interactions
 model Comment {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -104,7 +104,7 @@ model Comment {
 
 // Like model for post engagement
 model Like {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
 
   userId String
@@ -118,7 +118,7 @@ model Like {
 
 // Notification model
 model Notification {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   type      String // LIKE, COMMENT, FOLLOW, SYSTEM
   message   String
   read      Boolean  @default(false)
@@ -136,7 +136,7 @@ model Notification {
 
 // Club model for car clubs/groups
 model Club {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   category    String // e.g., "JDM", "European", "American Muscle", "Classic", "Tuner"
@@ -161,7 +161,7 @@ model Club {
 
 // Club membership junction table
 model ClubMember {
-  id       String   @id @default(cuid())
+  id       String   @id @default(uuid())
   role     String   @default("member") // "admin", "moderator", "member"
   status   String   @default("pending") // "pending", "approved", "rejected"
   joinedAt DateTime @default(now())
@@ -177,7 +177,7 @@ model ClubMember {
 
 // Event model for car meets, shows, races
 model Event {
-  id          String    @id @default(cuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
   location    String
@@ -207,7 +207,7 @@ model Event {
 
 // Event attendee junction table
 model EventAttendee {
-  id       String   @id @default(cuid())
+  id       String   @id @default(uuid())
   status   String   @default("going") // "going", "interested", "not_going"
   ticketCode String? @unique
   checkedIn Boolean  @default(false)
@@ -224,7 +224,7 @@ model EventAttendee {
 
 // Marketplace listing for cars and parts
 model MarketplaceListing {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   title       String
   description String
   price       Float
@@ -245,7 +245,7 @@ model MarketplaceListing {
 
 // Store model for marketplace stores
 model Store {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   logo        String?
@@ -268,7 +268,7 @@ model Store {
 
 // Follow model
 model Follow {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
 
   followerId  String
@@ -282,7 +282,7 @@ model Follow {
 
 // Conversation model for direct messaging
 model Conversation {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -292,7 +292,7 @@ model Conversation {
 
 // Message model for direct messages
 model Message {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   content   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -306,7 +306,7 @@ model Message {
 
 // Club Message model for group chat
 model ClubMessage {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
 
@@ -319,7 +319,7 @@ model ClubMessage {
 
 // Event Photo model for gallery
 model EventPhoto {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   url       String
   caption   String?
   createdAt DateTime @default(now())

@@ -124,7 +124,11 @@ export default function EventList({ events, adminClubs }: EventListProps) {
                 ))}
             </div>
 
-            {showModal && <CreateEventModal onClose={() => setShowModal(false)} userAdminClubs={adminClubs} />}
+            <CreateEventModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                userAdminClubs={adminClubs}
+            />
         </>
     );
 }
