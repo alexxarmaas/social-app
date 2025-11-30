@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && next build",
+    "build": "prisma db push && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "@prisma/adapter-libsql": "^7.0.0",
     "@prisma/client": "^7.0.0",
     "@types/bcryptjs": "^2.4.6",
