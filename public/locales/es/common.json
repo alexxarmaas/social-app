@@ -1,0 +1,35 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Sobre Nosotros",
+    "who_are_we": "Quiénes Somos",
+    "get_app": "Descargar App",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse"
+  },
+  "hero": {
+    "title_prefix": "La Mejor Comunidad de",
+    "title_suffix": "Entusiastas del Motor",
+    "description": "Conecta con otros amantes de los coches, únete a clubs, asiste a eventos y compra/vende coches y piezas. Tu pasión automotriz empieza aquí.",
+    "start_free": "Comenzar Gratis",
+    "download_app": "Descargar App"
+  },
+  "features": {
+    "social_feed": "Feed Social",
+    "social_feed_desc": "Comparte tus proyectos, modificaciones y aventuras con la comunidad",
+    "car_clubs": "Clubs de Coches",
+    "car_clubs_desc": "Únete a clubs JDM, Europeos, Muscle y más para conectar con entusiastas",
+    "events": "Calendario de Eventos",
+    "events_desc": "Descubre quedadas, exhibiciones, carreras y rodadas cerca de ti",
+    "marketplace": "Marketplace",
+    "marketplace_desc": "Compra y vende coches, piezas, llantas y accesorios con otros entusiastas"
+  },
+  "stats": {
+    "active_users": "Usuarios Activos",
+    "car_clubs": "Clubs de Coches",
+    "monthly_events": "Eventos Mensuales"
+  },
+  "footer": {
+    "copyright": "© 2025 Tramassso. La mejor comunidad de entusiastas del motor. Hecho con pasión ❤️"
+  }
+}

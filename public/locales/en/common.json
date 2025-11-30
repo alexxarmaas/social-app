@@ -1,0 +1,35 @@
+{
+    "nav": {
+        "home": "Home",
+        "about": "About Us",
+        "who_are_we": "Who Are We",
+        "get_app": "Get the App",
+        "login": "Login",
+        "register": "Register"
+    },
+    "hero": {
+        "title_prefix": "The Best Community of",
+        "title_suffix": "Car Enthusiasts",
+        "description": "Connect with other car lovers, join clubs, attend events, and buy/sell cars and parts. Your automotive passion starts here.",
+        "start_free": "Start for Free",
+        "download_app": "Get the App"
+    },
+    "features": {
+        "social_feed": "Social Feed",
+        "social_feed_desc": "Share your projects, mods, and adventures with the community",
+        "car_clubs": "Car Clubs",
+        "car_clubs_desc": "Join JDM, European, Muscle clubs and more to connect with enthusiasts",
+        "events": "Event Calendar",
+        "events_desc": "Discover meetups, shows, races, and track days near you",
+        "marketplace": "Marketplace",
+        "marketplace_desc": "Buy and sell cars, parts, wheels, and accessories with other enthusiasts"
+    },
+    "stats": {
+        "active_users": "Active Users",
+        "car_clubs": "Car Clubs",
+        "monthly_events": "Monthly Events"
+    },
+    "footer": {
+        "copyright": "© 2025 Tramassso. The best community of car enthusiasts. Made with passion ❤️"
+    }
+}
