@@ -12,9 +12,10 @@ interface EventGalleryProps {
     eventId: string;
     isAttendee: boolean;
     isCreator: boolean;
+    canUpload: boolean;
 }
 
-export default function EventGallery({ eventId, isAttendee, isCreator }: EventGalleryProps) {
+export default function EventGallery({ eventId, isAttendee, isCreator, canUpload }: EventGalleryProps) {
     const { data: session } = useSession();
     const [photos, setPhotos] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,7 +123,7 @@ export default function EventGallery({ eventId, isAttendee, isCreator }: EventGa
                                 ) : (
                                     <div className="text-center p-4">
                                         <UploadButton
-                                            endpoint="eventGalleryImage"
+                                            endpoint="galleryImage"
                                             onClientUploadComplete={(res) => {
                                                 if (res && res[0]) {
                                                     setUploadedUrl(res[0].url);
