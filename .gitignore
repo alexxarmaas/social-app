@@ -149,15 +149,4 @@ yarn-error.log*
 *.tsbuildinfo
 
 /app/generated/prisma
-prisma/schema.prisma
 public/uploads
-
-.env
-.env.local
-.env.example
-*.db
-*.d.ts
-*.d.ts.map
-.gitignore
-yarn.lock
-package-lock.json
