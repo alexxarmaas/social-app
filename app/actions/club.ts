@@ -32,10 +32,31 @@ export async function getClub(clubId: string) {
     }
 }
 
-export async function getClubMembers(clubId: string) {
+export async function getClubMembers(clubId: string, includePending: boolean = false) {
     try {
+        const session = await getServerSession(authOptions);
+        const currentUserId = session?.user?.id;
+
+        let statusFilter: any = "approved";
+
+        if (includePending && currentUserId) {
+            // Verify if user is admin
+            const membership = await prisma.clubMember.findUnique({
+                where: {
+                    userId_clubId: {
+                        userId: currentUserId,
+                        clubId
+                    }
+                }
+            });
+
+            if (membership?.role === "admin") {
+                statusFilter = { in: ["approved", "pending"] };
+            }
+        }
+
         const members = await prisma.clubMember.findMany({
-            where: { clubId, status: "approved" },
+            where: { clubId, status: statusFilter },
             include: {
                 user: {
                     select: {

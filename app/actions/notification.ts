@@ -4,7 +4,6 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
-import { pusherServer } from "@/app/lib/pusher";
 
 export async function getNotifications() {
     const session = await getServerSession(authOptions);
@@ -122,13 +121,6 @@ export async function createNotification(
                 }
             }
         });
-
-        // Trigger Pusher event
-        try {
-            await pusherServer.trigger(`user-${userId}`, "new-notification", notification);
-        } catch (pusherError) {
-            console.error("Pusher notification trigger error:", pusherError);
-        }
 
     } catch (error) {
         console.error("Error creating notification:", error);

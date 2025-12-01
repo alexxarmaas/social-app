@@ -4,7 +4,6 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
-import { pusherServer } from "@/app/lib/pusher";
 
 export async function getConversations() {
     const session = await getServerSession(authOptions);
@@ -176,13 +175,7 @@ export async function sendMessage(conversationId: string | null, recipientId: st
             data: { updatedAt: new Date() },
         });
 
-        // Trigger Pusher event
-        try {
-            await pusherServer.trigger(`conversation-${convId}`, "new-message", message);
-        } catch (pusherError) {
-            console.error("Pusher trigger error:", pusherError);
-            // Continue execution even if Pusher fails
-        }
+
 
         revalidatePath("/messages");
         return { success: true, message, conversationId: convId };

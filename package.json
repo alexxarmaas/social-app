@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/db-switch.js local && prisma generate && next dev",
+    "build": "node scripts/db-switch.js prod && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "node scripts/db-switch.js prod && prisma generate"
   },
   "dependencies": {
     "@prisma/client": "6.19.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/leaflet": "^1.9.21",
+    "@vercel/analytics": "^1.6.0",
     "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
@@ -24,8 +25,6 @@
     "next": "16.0.4",
     "next-auth": "^4.24.13",
     "prisma": "6.19.0",
-    "pusher": "^5.2.0",
-    "pusher-js": "^8.4.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hot-toast": "^2.6.0",

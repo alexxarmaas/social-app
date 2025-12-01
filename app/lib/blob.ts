@@ -1,4 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
+// Force update
+
+import fs from 'fs';
+import path from 'path';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -7,6 +11,32 @@ cloudinary.config({
 });
 
 export async function uploadToBlob(file: File, folder: string = 'uploads') {
+    // Local Development Storage or if Cloudinary keys are missing
+    if (process.env.NODE_ENV === 'development' || !process.env.CLOUDINARY_CLOUD_NAME) {
+        try {
+            const bytes = await file.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads', folder);
+
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+
+            const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+            const filepath = path.join(uploadDir, filename);
+
+            fs.writeFileSync(filepath, buffer);
+
+            const url = `/uploads/${folder}/${filename}`;
+            return { url, error: null };
+        } catch (error) {
+            console.error('Local upload error:', error);
+            return { url: null, error: 'Failed to save file locally' };
+        }
+    }
+
+    // Production Cloudinary Storage
     try {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);

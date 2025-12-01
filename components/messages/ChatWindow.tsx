@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Pusher from "pusher-js";
+
 import Image from "next/image";
 import { getMessages, sendMessage, markConversationAsRead } from "@/app/actions/message";
 import { MdSend, MdChevronLeft } from "react-icons/md";
@@ -30,27 +30,8 @@ export default function ChatWindow({
             loadMessages();
         }, 3000);
 
-        // Pusher subscription
-        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY || "key", {
-            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "eu",
-        });
-
-        const channel = pusher.subscribe(`conversation-${conversationId}`);
-        channel.bind("new-message", (data: any) => {
-            setMessages((prev) => {
-                // Avoid duplicates if we already added it optimistically
-                if (prev.find(m => m.id === data.id)) return prev;
-                return [...prev, data];
-            });
-            // Mark as read immediately if we are viewing
-            if (data.senderId !== currentUser.id) {
-                markConversationAsRead(conversationId);
-            }
-        });
-
         return () => {
             clearInterval(interval);
-            pusher.unsubscribe(`conversation-${conversationId}`);
         };
     }, [conversationId]);
 

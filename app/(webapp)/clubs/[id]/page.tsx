@@ -17,7 +17,14 @@ export default async function ClubPage({ params }: { params: { id: string } }) {
         notFound();
     }
 
-    const { members } = await getClubMembers(id);
+    const currentUser = {
+        isMember: userMembership?.status === 'approved',
+        isPending: userMembership?.status === 'pending',
+        isAdmin: userMembership?.role === 'admin',
+        id: currentUserId
+    };
+
+    const { members } = await getClubMembers(id, currentUser.isAdmin);
 
     // Fetch events for this club (including private ones)
     const { events } = await getEvents('upcoming', id);
@@ -26,12 +33,7 @@ export default async function ClubPage({ params }: { params: { id: string } }) {
     // Fetch club garage cars
     const { cars: clubCars } = await getClubMembersCars(id);
 
-    const currentUser = {
-        isMember: userMembership?.status === 'approved',
-        isPending: userMembership?.status === 'pending',
-        isAdmin: userMembership?.role === 'admin',
-        id: currentUserId
-    };
+
 
     return (
         <div className="min-h-screen pb-20">
