@@ -50,10 +50,20 @@ export async function getClubMembers(clubId: string, includePending: boolean = f
                 }
             });
 
+            console.log("getClubMembers Debug:", {
+                clubId,
+                currentUserId,
+                includePending,
+                userRole: membership?.role,
+                userStatus: membership?.status
+            });
+
             if (membership?.role === "admin") {
                 statusFilter = { in: ["approved", "pending"] };
             }
         }
+
+        console.log("getClubMembers Filter:", statusFilter);
 
         const members = await prisma.clubMember.findMany({
             where: { clubId, status: statusFilter },
@@ -68,6 +78,8 @@ export async function getClubMembers(clubId: string, includePending: boolean = f
                 }
             }
         });
+
+        console.log("getClubMembers Found:", members.length);
         return { members };
     } catch (error) {
         return { error: "Error al obtener miembros" };
