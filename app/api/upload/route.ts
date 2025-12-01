@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { uploadToBlob } from '@/app/lib/blob';
 
 export async function POST(request: NextRequest) {
     try {
@@ -11,17 +11,17 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        // Upload to Vercel Blob
-        const blob = await put(`${type}/${Date.now()}-${file.name}`, file, {
-            access: 'public',
-        });
+        // Upload to Cloudinary
+        const { url, error } = await uploadToBlob(file, type);
 
-        return NextResponse.json({ url: blob.url });
+        if (error) {
+            return NextResponse.json({ error }, { status: 500 });
+        }
+
+        return NextResponse.json({ url });
     } catch (error) {
         console.error('Upload error:', error);
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 }
-
-export const runtime = 'edge';
 
