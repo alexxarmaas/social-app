@@ -125,17 +125,19 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
             {editingCar && <EditCarModal car={editingCar} onClose={() => setEditingCar(null)} />}
             {selectedImage && (
                 <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
-                    <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col md:flex-row gap-6" onClick={e => e.stopPropagation()}>
-                        <div className="relative flex-1 aspect-video md:aspect-auto bg-black rounded-xl overflow-hidden">
-                            <Image
-                                src={selectedImage.imageUrl}
-                                alt={selectedImage.model}
-                                fill
-                                className="object-contain"
-                            />
+                    <div className="relative w-full max-w-[95vw] md:max-w-7xl max-h-[92vh] flex flex-col md:flex-row gap-6" onClick={e => e.stopPropagation()}>
+                        <div className="relative flex-1 w-full max-h-[88vh] bg-black rounded-xl overflow-hidden">
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src={selectedImage.imageUrl}
+                                    alt={selectedImage.model}
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
                         </div>
                         <div className="w-full md:w-80 bg-zinc-900 rounded-xl p-6 flex flex-col h-fit">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-start justify-between mb-4">
                                 <div>
                                     <p className="text-white font-bold text-sm">{selectedImage.make} {selectedImage.model}</p>
                                     <p className="text-zinc-500 text-xs">{selectedImage.year}</p>
