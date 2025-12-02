@@ -137,17 +137,6 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                             </div>
                         </div>
                         <div className="w-full md:w-80 bg-zinc-900 rounded-xl p-6 flex flex-col h-fit">
-                            <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <p className="text-white font-bold text-sm">{selectedImage.make} {selectedImage.model}</p>
-                                    <p className="text-zinc-500 text-xs">{selectedImage.year}</p>
-                                </div>
-                            </div>
-
-                            {selectedImage.modifications && (
-                                <p className="text-zinc-300 text-sm mb-6" style={{ whiteSpace: 'pre-line' }}>{selectedImage.modifications}</p>
-                            )}
-
                             <button
                                 onClick={() => setSelectedImage(null)}
                                 className="mt-auto w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg font-medium transition-colors"
