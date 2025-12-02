@@ -52,7 +52,7 @@ export default function Sidebar({ session }: { session: any }) {
                 <div className="flex items-center gap-3 px-4 py-3 bg-slate-800/50 rounded-xl">
                     <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden relative flex items-center justify-center">
                         {session?.user?.image ? (
-                            <img src={session.user.image} alt="User" className="w-full h-full object-contain" />
+                            <img src={session.user.image} alt="User" className="w-full h-full object-fill" />
                         ) : (
                             <MdPerson size={24} className="text-slate-400" />
                         )}

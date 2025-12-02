@@ -120,7 +120,7 @@ export default function EditEventModal({ isOpen, onClose, event }: EditEventModa
                             <div className="relative aspect-video bg-slate-800 rounded-xl overflow-hidden border-2 border-dashed border-slate-700 group hover:border-red-500 transition-colors">
                                 {formData.imageUrl ? (
                                     <>
-                                        <Image src={formData.imageUrl} alt="Preview" fill className="object-contain" />
+                                        <Image src={formData.imageUrl} alt="Preview" fill className="object-fill" />
                                         <button
                                             type="button"
                                             onClick={() => setFormData({ ...formData, imageUrl: "" })}

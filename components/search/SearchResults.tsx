@@ -50,7 +50,7 @@ export default function SearchResults({ users = [], cars = [], clubs = [], loadi
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-full bg-slate-700 overflow-hidden relative flex-shrink-0">
                                         {user.avatar ? (
-                                            <Image src={user.avatar} alt={user.name || user.username} fill className="object-contain" />
+                                            <Image src={user.avatar} alt={user.name || user.username} fill className="object-fill" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-xl">
                                                 <MdPerson />
@@ -94,7 +94,7 @@ export default function SearchResults({ users = [], cars = [], clubs = [], loadi
                             >
                                 <div className="relative h-40 bg-slate-700">
                                     {car.imageUrl ? (
-                                        <Image src={car.imageUrl} alt={`${car.make} ${car.model}`} fill className="object-contain" />
+                                        <Image src={car.imageUrl} alt={`${car.make} ${car.model}`} fill className="object-fill" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-4xl text-slate-600">
                                             <MdDirectionsCar size={48} />
@@ -115,7 +115,7 @@ export default function SearchResults({ users = [], cars = [], clubs = [], loadi
                                     >
                                         <div className="w-6 h-6 rounded-full bg-slate-700 overflow-hidden relative">
                                             {car.owner.avatar ? (
-                                                <Image src={car.owner.avatar} alt={car.owner.name} fill className="object-contain" />
+                                                <Image src={car.owner.avatar} alt={car.owner.name} fill className="object-fill" />
                                             ) : (
                                                 <MdPerson />
                                             )}

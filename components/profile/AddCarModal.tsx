@@ -70,7 +70,7 @@ export default function AddCarModal({ onClose }: AddCarModalProps) {
                         <label className="block text-slate-400 text-sm mb-1">Foto</label>
                         <div className="relative h-40 bg-slate-700/50 rounded-lg border-2 border-dashed border-slate-600 flex items-center justify-center cursor-pointer hover:border-red-500 transition-colors overflow-hidden">
                             {preview ? (
-                                <Image src={preview} alt="Preview" fill className="object-contain" />
+                                <Image src={preview} alt="Preview" fill className="object-fill" />
                             ) : (
                                 <span className="text-slate-400">Click para subir foto</span>
                             )}

@@ -171,7 +171,7 @@ export default function EditStoreModal({ store, isOpen, onClose }: EditStoreModa
                                 <div className="flex items-center gap-4">
                                     <div className="relative w-16 h-16 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden flex-shrink-0">
                                         {logoPreview ? (
-                                            <Image src={logoPreview} alt="Logo Preview" fill className="object-contain" unoptimized />
+                                            <Image src={logoPreview} alt="Logo Preview" fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-slate-500">
                                                 <MdImage size={24} />
@@ -189,7 +189,7 @@ export default function EditStoreModal({ store, isOpen, onClose }: EditStoreModa
                                 <div className="flex items-center gap-4">
                                     <div className="relative w-full h-16 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden">
                                         {bannerPreview ? (
-                                            <Image src={bannerPreview} alt="Banner Preview" fill className="object-contain" unoptimized />
+                                            <Image src={bannerPreview} alt="Banner Preview" fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-slate-500">
                                                 <MdImage size={24} />

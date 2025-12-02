@@ -70,7 +70,7 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
             {/* Image */}
             <div className="aspect-video bg-slate-700 relative">
                 {event.imageUrl ? (
-                    <Image src={event.imageUrl} alt={event.title} fill className="object-contain" unoptimized />
+                    <Image src={event.imageUrl} alt={event.title} fill className="object-fill" unoptimized />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-slate-800 to-slate-900">
                         🗓️
@@ -121,7 +121,7 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
                             {event.attendees.slice(0, 5).map((attendee: any, i: number) => (
                                 <div key={i} className="w-6 h-6 rounded-full border border-slate-800 bg-slate-700 relative overflow-hidden">
                                     {attendee.user.avatar && (
-                                        <Image src={attendee.user.avatar} alt="User" fill className="object-contain" unoptimized />
+                                        <Image src={attendee.user.avatar} alt="User" fill className="object-fill" unoptimized />
                                     )}
                                 </div>
                             ))}

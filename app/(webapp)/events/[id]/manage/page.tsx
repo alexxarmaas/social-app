@@ -93,7 +93,7 @@ export default function ManageEventPage() {
                                     src={attendee.user.avatar}
                                     alt={attendee.user.username}
                                     fill
-                                    className="object-contain"
+                                    className="object-fill"
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-slate-500">

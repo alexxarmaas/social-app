@@ -84,7 +84,7 @@ export default function CommentModal({ postId, onClose, onCommentChange }: Comme
                             <div key={comment.id} className="flex gap-3">
                                 <div className="w-8 h-8 rounded-full bg-slate-700 overflow-hidden flex-shrink-0 relative">
                                     {comment.author.avatar ? (
-                                        <Image src={comment.author.avatar} alt={comment.author.name} fill className="object-contain" unoptimized />
+                                        <Image src={comment.author.avatar} alt={comment.author.name} fill className="object-fill" unoptimized />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-sm">👤</div>
                                     )}

@@ -41,7 +41,7 @@ export default async function ProfilePage() {
                                 src={user.banner}
                                 alt="Banner"
                                 fill
-                                className="object-contain"
+                                className="object-fill"
                                 unoptimized
                             />
                         )}
@@ -57,7 +57,7 @@ export default async function ProfilePage() {
                                         src={user.avatar}
                                         alt={user.name || user.username}
                                         fill
-                                        className="object-contain"
+                                        className="object-fill"
                                         unoptimized
                                     />
                                 ) : (
@@ -134,7 +134,7 @@ export default async function ProfilePage() {
                                 <Link href={`/clubs/${membership.club.id}`} key={membership.club.id} className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 p-4 flex items-center gap-4 hover:bg-slate-800 transition-colors">
                                     <div className="w-12 h-12 rounded-lg bg-slate-700 overflow-hidden relative flex-shrink-0">
                                         {membership.club.imageUrl ? (
-                                            <Image src={membership.club.imageUrl} alt={membership.club.name} fill className="object-contain" />
+                                            <Image src={membership.club.imageUrl} alt={membership.club.name} fill className="object-fill" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-slate-500"><MdGroups /></div>
                                         )}
@@ -161,7 +161,7 @@ export default async function ProfilePage() {
                                     <div className="flex">
                                         <div className="w-24 bg-slate-700 relative">
                                             {attendance.event.image ? (
-                                                <Image src={attendance.event.image} alt={attendance.event.title} fill className="object-contain" />
+                                                <Image src={attendance.event.image} alt={attendance.event.title} fill className="object-fill" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-500"><MdEvent size={24} /></div>
                                             )}

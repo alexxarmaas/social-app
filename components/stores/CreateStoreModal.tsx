@@ -135,7 +135,7 @@ export default function CreateStoreModal({ isOpen, onClose }: CreateStoreModalPr
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
                                 {logoPreview ? (
-                                    <Image src={logoPreview} alt="Logo Preview" fill className="object-contain p-2" />
+                                    <Image src={logoPreview} alt="Logo Preview" fill className="object-fill p-2" />
                                 ) : (
                                     <div className="flex flex-col items-center text-slate-500">
                                         <MdImage size={24} className="mb-1" />
@@ -155,7 +155,7 @@ export default function CreateStoreModal({ isOpen, onClose }: CreateStoreModalPr
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
                                 {bannerPreview ? (
-                                    <Image src={bannerPreview} alt="Banner Preview" fill className="object-contain" />
+                                    <Image src={bannerPreview} alt="Banner Preview" fill className="object-fill" />
                                 ) : (
                                     <div className="flex flex-col items-center text-slate-500">
                                         <MdImage size={24} className="mb-1" />

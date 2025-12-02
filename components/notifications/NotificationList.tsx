@@ -86,7 +86,7 @@ export default function NotificationList() {
                                 <div className="flex items-center gap-2">
                                     <div className="w-6 h-6 rounded-full bg-slate-700 overflow-hidden relative">
                                         {notification.actor.avatar ? (
-                                            <Image src={notification.actor.avatar} alt={notification.actor.name} fill className="object-contain" unoptimized />
+                                            <Image src={notification.actor.avatar} alt={notification.actor.name} fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-xs">👤</div>
                                         )}

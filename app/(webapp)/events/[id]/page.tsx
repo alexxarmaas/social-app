@@ -26,7 +26,7 @@ export default async function EventPage({ params }: { params: { id: string } }) 
                     src={event.imageUrl || "/images/event-placeholder.jpg"}
                     alt={event.title}
                     fill
-                    className="object-contain"
+                    className="object-fill"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 max-w-7xl mx-auto">
@@ -114,7 +114,7 @@ export default async function EventPage({ params }: { params: { id: string } }) 
                             <div className="flex items-center gap-3">
                                 <div className="relative w-12 h-12 rounded-full overflow-hidden bg-slate-800">
                                     {event.creator.avatar ? (
-                                        <Image src={event.creator.avatar} alt={event.creator.username} fill className="object-contain" />
+                                        <Image src={event.creator.avatar} alt={event.creator.username} fill className="object-fill" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-slate-500 font-bold text-xl">
                                             {event.creator.username[0].toUpperCase()}

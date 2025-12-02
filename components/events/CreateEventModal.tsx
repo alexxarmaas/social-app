@@ -212,7 +212,7 @@ export default function CreateEventModal({ isOpen, onClose, userAdminClubs = [] 
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             />
                             {previewUrl ? (
-                                <Image src={previewUrl} alt="Preview" fill className="object-contain" />
+                                <Image src={previewUrl} alt="Preview" fill className="object-fill" />
                             ) : (
                                 <div className="flex flex-col items-center text-slate-500">
                                     <MdImage size={48} className="mb-2" />

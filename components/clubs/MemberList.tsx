@@ -32,7 +32,7 @@ export default function MemberList({ members, clubId, isAdmin }: MemberListProps
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden relative">
                                         {member.user.avatar ? (
-                                            <Image src={member.user.avatar} alt={member.user.username} fill className="object-contain" unoptimized />
+                                            <Image src={member.user.avatar} alt={member.user.username} fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">👤</div>
                                         )}
@@ -70,7 +70,7 @@ export default function MemberList({ members, clubId, isAdmin }: MemberListProps
                             <Link href={`/profile/${member.user.username}`} className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden relative">
                                     {member.user.avatar ? (
-                                        <Image src={member.user.avatar} alt={member.user.username} fill className="object-contain" unoptimized />
+                                        <Image src={member.user.avatar} alt={member.user.username} fill className="object-fill" unoptimized />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">👤</div>
                                     )}

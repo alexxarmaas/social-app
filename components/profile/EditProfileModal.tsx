@@ -84,7 +84,7 @@ export default function EditProfileModal({ user, onClose }: EditProfileModalProp
                             <label className="block text-slate-400 text-sm mb-2">Banner de Portada</label>
                             <div className="relative h-32 rounded-lg bg-slate-700 overflow-hidden group cursor-pointer border-2 border-dashed border-slate-600 hover:border-red-500 transition-colors">
                                 {bannerPreview ? (
-                                    <Image src={bannerPreview} alt="Banner" fill className="object-contain" unoptimized />
+                                    <Image src={bannerPreview} alt="Banner" fill className="object-fill" unoptimized />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-500">
                                         <MdImage size={32} />
@@ -112,7 +112,7 @@ export default function EditProfileModal({ user, onClose }: EditProfileModalProp
                         <div className="flex justify-center -mt-12 relative z-10">
                             <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-700 group cursor-pointer">
                                 {avatarPreview ? (
-                                    <Image src={avatarPreview} alt="Avatar" fill className="object-contain" unoptimized />
+                                    <Image src={avatarPreview} alt="Avatar" fill className="object-fill" unoptimized />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-2xl">👤</div>
                                 )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MdClose } from "react-icons/md";
 import AddCarModal from "./AddCarModal";
 import EditCarModal from "./EditCarModal";
 import Image from "next/image";
@@ -15,6 +16,7 @@ interface GarageGridProps {
 export default function GarageGrid({ cars, isOwner = false, hideHeader = false }: { cars: any[], isOwner?: boolean, hideHeader?: boolean }) {
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any | null>(null);
+    const [selectedImage, setSelectedImage] = useState<any | null>(null);
 
     const handleDelete = async (id: string) => {
         if (confirm("¿Estás seguro de que quieres eliminar este coche?")) {
@@ -45,7 +47,9 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                     <div key={car.id} className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden group">
                         <div className="relative h-48 bg-slate-700">
                             {car.imageUrl ? (
-                                <Image src={car.imageUrl} alt={car.model} fill className="object-contain" />
+                                <div onClick={() => setSelectedImage(car)} className="w-full h-full cursor-pointer">
+                                    <Image src={car.imageUrl} alt={car.model} fill className="object-fill" />
+                                </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-4xl text-slate-600">
                                     <MdDirectionsCar size={48} />
@@ -78,7 +82,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                     <div className="flex items-center gap-2 bg-slate-700/50 rounded-full pr-3 pl-1 py-1">
                                         <div className="w-6 h-6 rounded-full overflow-hidden relative bg-slate-600">
                                             {car.owner.avatar ? (
-                                                <Image src={car.owner.avatar} alt={car.owner.username} fill className="object-contain" />
+                                                <Image src={car.owner.avatar} alt={car.owner.username} fill className="object-fill" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-xs text-white font-bold">
                                                     {car.owner.name?.[0] || car.owner.username?.[0]}
@@ -92,7 +96,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                 )}
                             </div>
                             {car.modifications && (
-                                <p className="text-slate-300 text-sm mt-2 border-t border-slate-700 pt-2">
+                                <p className="text-slate-300 text-sm mt-2 border-t border-slate-700 pt-2 " style={{ whiteSpace: 'pre-line' }}>
                                     <span className="text-slate-500 text-xs uppercase font-bold block mb-1">Mods</span>
                                     {car.modifications}
                                 </p>
@@ -119,6 +123,42 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
 
             {showAddModal && <AddCarModal onClose={() => setShowAddModal(false)} />}
             {editingCar && <EditCarModal car={editingCar} onClose={() => setEditingCar(null)} />}
+            {selectedImage && (
+                <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+                    <div className="relative max-w-5xl w-full max-h-[90vh] flex flex-col md:flex-row gap-6" onClick={e => e.stopPropagation()}>
+                        <div className="relative flex-1 aspect-video md:aspect-auto bg-black rounded-xl overflow-hidden">
+                            <Image
+                                src={selectedImage.imageUrl}
+                                alt={selectedImage.model}
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                        <div className="w-full md:w-80 bg-zinc-900 rounded-xl p-6 flex flex-col h-fit">
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <p className="text-white font-bold text-sm">{selectedImage.make} {selectedImage.model}</p>
+                                    <p className="text-zinc-500 text-xs">{selectedImage.year}</p>
+                                </div>
+                                <button onClick={() => setSelectedImage(null)} className="text-zinc-400 hover:text-white">
+                                    <MdClose size={24} />
+                                </button>
+                            </div>
+
+                            {selectedImage.modifications && (
+                                <p className="text-zinc-300 text-sm mb-6" style={{ whiteSpace: 'pre-line' }}>{selectedImage.modifications}</p>
+                            )}
+
+                            <button
+                                onClick={() => setSelectedImage(null)}
+                                className="mt-auto w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg font-medium transition-colors"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

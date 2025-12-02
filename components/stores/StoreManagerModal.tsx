@@ -203,7 +203,7 @@ export default function StoreManagerModal({ store, isOpen, onClose, initialTab =
                                         />
                                         {infoData.logo && (
                                             <div className="w-10 h-10 rounded bg-slate-800 relative overflow-hidden flex-shrink-0 border border-slate-700">
-                                                <Image src={infoData.logo} alt="Preview" fill className="object-contain" unoptimized />
+                                                <Image src={infoData.logo} alt="Preview" fill className="object-fill" unoptimized />
                                             </div>
                                         )}
                                     </div>

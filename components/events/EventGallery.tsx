@@ -97,7 +97,7 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
                                 src={photo.url}
                                 alt={photo.caption || "Event photo"}
                                 fill
-                                className="object-contain transition-transform duration-300 group-hover:scale-110"
+                                className="object-fill transition-transform duration-300 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
                         </div>
@@ -119,7 +119,7 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
                         <div className="space-y-4">
                             <div className="relative aspect-video bg-zinc-800 rounded-xl overflow-hidden border border-white/10 flex items-center justify-center group">
                                 {uploadedUrl ? (
-                                    <Image src={uploadedUrl} alt="Preview" fill className="object-contain" />
+                                    <Image src={uploadedUrl} alt="Preview" fill className="object-fill" />
                                 ) : (
                                     <div className="text-center p-4">
                                         <ImageUpload
@@ -172,14 +172,14 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
                                 src={selectedPhoto.url}
                                 alt={selectedPhoto.caption || "Event photo"}
                                 fill
-                                className="object-contain"
+                                className="object-fill"
                             />
                         </div>
                         <div className="w-full md:w-80 bg-zinc-900 rounded-xl p-6 flex flex-col h-fit">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
                                     {selectedPhoto.uploader.avatar ? (
-                                        <Image src={selectedPhoto.uploader.avatar} alt={selectedPhoto.uploader.username} fill className="object-contain" />
+                                        <Image src={selectedPhoto.uploader.avatar} alt={selectedPhoto.uploader.username} fill className="object-fill" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-zinc-500 text-xs">
                                             {selectedPhoto.uploader.username[0]}

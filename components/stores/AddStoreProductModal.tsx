@@ -186,7 +186,7 @@ export default function AddStoreProductModal({ store, isOpen, onClose }: AddStor
                             <div className="flex items-center gap-4">
                                 <div className="relative w-20 h-20 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden flex-shrink-0">
                                     {imagePreview ? (
-                                        <Image src={imagePreview} alt="Preview" fill className="object-contain" unoptimized />
+                                        <Image src={imagePreview} alt="Preview" fill className="object-fill" unoptimized />
                                     ) : (
                                         <div className="flex items-center justify-center h-full text-slate-500">
                                             <MdImage size={32} />

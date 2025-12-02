@@ -93,7 +93,7 @@ export default async function DashboardPage() {
                                                     src={JSON.parse(post.imageUrls)[0]}
                                                     alt="Post"
                                                     fill
-                                                    className="object-contain"
+                                                    className="object-fill"
                                                     unoptimized
                                                 />
                                             ) : (

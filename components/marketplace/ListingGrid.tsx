@@ -30,7 +30,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                         <div key={listing.id} className="w-full max-w-xs sm:max-w-full sm:w-auto bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden hover:border-red-500/50 transition-colors group box-border relative mx-auto">
                             <div className="aspect-[4/3] sm:aspect-square bg-slate-700 relative">
                                 {mainImage ? (
-                                    <Image src={mainImage} alt={listing.title} fill className="object-contain" unoptimized />
+                                    <Image src={mainImage} alt={listing.title} fill className="object-fill" unoptimized />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-4xl">📦</div>
                                 )}
@@ -43,7 +43,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                                 <p className="text-slate-400 text-xs mt-1 truncate">{listing.description}</p>
                                 <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
                                     <div className="w-4 h-4 rounded-full bg-slate-600 relative overflow-hidden">
-                                        {listing.seller.avatar && <Image src={listing.seller.avatar} alt="Seller" fill className="object-contain" unoptimized />}
+                                        {listing.seller.avatar && <Image src={listing.seller.avatar} alt="Seller" fill className="object-fill" unoptimized />}
                                     </div>
                                     <span>{listing.seller.username}</span>
                                 </div>

@@ -178,7 +178,7 @@ export default function MarketplacePage() {
                                     {/* Banner (if exists) or Default Gradient */}
                                     <div className="h-24 bg-gradient-to-r from-slate-800 to-slate-700 relative">
                                         {store.banner && (
-                                            <Image src={store.banner} alt="Banner" fill className="object-contain opacity-50" unoptimized />
+                                            <Image src={store.banner} alt="Banner" fill className="object-fill opacity-50" unoptimized />
                                         )}
                                     </div>
 
@@ -186,7 +186,7 @@ export default function MarketplacePage() {
                                         {/* Logo */}
                                         <div className="absolute -top-10 left-4 w-20 h-20 bg-slate-900 rounded-xl border-4 border-slate-900 overflow-hidden flex items-center justify-center">
                                             {store.logo ? (
-                                                <Image src={store.logo} alt={store.name} fill className="object-contain" unoptimized />
+                                                <Image src={store.logo} alt={store.name} fill className="object-fill" unoptimized />
                                             ) : (
                                                 <MdStore className="text-4xl text-slate-600" />
                                             )}
@@ -207,7 +207,7 @@ export default function MarketplacePage() {
                                         <div className="mt-4 flex items-center justify-between border-t border-slate-700 pt-3">
                                             <div className="flex items-center gap-2 text-xs text-slate-500">
                                                 <div className="w-5 h-5 rounded-full bg-slate-700 relative overflow-hidden">
-                                                    {store.owner.avatar && <Image src={store.owner.avatar} alt="Owner" fill className="object-contain" unoptimized />}
+                                                    {store.owner.avatar && <Image src={store.owner.avatar} alt="Owner" fill className="object-fill" unoptimized />}
                                                 </div>
                                                 <span>{store.owner.username}</span>
                                             </div>

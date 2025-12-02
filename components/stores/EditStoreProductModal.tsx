@@ -111,7 +111,7 @@ export default function EditStoreProductModal({ isOpen, onClose, product }: Edit
                                             src={imagePreview}
                                             alt="Preview"
                                             fill
-                                            className="object-contain"
+                                            className="object-fill"
                                             unoptimized
                                         />
                                     ) : (

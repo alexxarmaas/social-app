@@ -58,7 +58,7 @@ export default function EventList({ events, adminClubs }: EventListProps) {
                     <div key={event.id} className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden flex flex-col md:flex-row relative group">
                         <div className="md:w-48 h-32 md:h-auto bg-slate-700 relative">
                             {event.imageUrl ? (
-                                <Image src={event.imageUrl} alt={event.title} fill className="object-contain" />
+                                <Image src={event.imageUrl} alt={event.title} fill className="object-fill" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-4xl">📅</div>
                             )}
@@ -97,7 +97,7 @@ export default function EventList({ events, adminClubs }: EventListProps) {
                                 <div className="flex -space-x-2">
                                     {event.attendees.map((attendee: any, i: number) => (
                                         <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-800 bg-slate-700 relative overflow-hidden">
-                                            {attendee.user.avatar && <Image src={attendee.user.avatar} alt="User" fill className="object-contain" />}
+                                            {attendee.user.avatar && <Image src={attendee.user.avatar} alt="User" fill className="object-fill" />}
                                         </div>
                                     ))}
                                     {event._count.attendees > 3 && (

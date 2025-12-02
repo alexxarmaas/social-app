@@ -101,7 +101,7 @@ export default function VerifyTicketPage() {
                                 src={attendee.user.avatar}
                                 alt={attendee.user.username}
                                 fill
-                                className="object-contain"
+                                className="object-fill"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-slate-500">

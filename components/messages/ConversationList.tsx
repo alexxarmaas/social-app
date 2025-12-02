@@ -38,7 +38,7 @@ export default function ConversationList({
                                         src={conv.otherUser.avatar}
                                         alt={conv.otherUser.name}
                                         fill
-                                        className="object-contain"
+                                        className="object-fill"
                                         unoptimized
                                     />
                                 ) : (

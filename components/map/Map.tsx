@@ -138,7 +138,7 @@ export default function Map({ events = [], stores = [] }: MapProps) {
                                 <div className="min-w-[200px]">
                                     <div className="relative h-32 w-full mb-2 rounded overflow-hidden">
                                         {event.imageUrl ? (
-                                            <Image src={event.imageUrl} alt={event.title} fill className="object-contain" unoptimized />
+                                            <Image src={event.imageUrl} alt={event.title} fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="w-full h-full bg-slate-800 flex items-center justify-center text-2xl">🗓️</div>
                                         )}
@@ -165,7 +165,7 @@ export default function Map({ events = [], stores = [] }: MapProps) {
                                 <div className="min-w-[200px]">
                                     <div className="relative h-32 w-full mb-2 rounded overflow-hidden">
                                         {store.banner ? (
-                                            <Image src={store.banner} alt={store.name} fill className="object-contain" unoptimized />
+                                            <Image src={store.banner} alt={store.name} fill className="object-fill" unoptimized />
                                         ) : (
                                             <div className="w-full h-full bg-slate-800 flex items-center justify-center text-2xl">🏪</div>
                                         )}

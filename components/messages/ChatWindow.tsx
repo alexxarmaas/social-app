@@ -105,7 +105,7 @@ export default function ChatWindow({
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden relative flex-shrink-0 border border-slate-600">
                         {otherUser.avatar ? (
-                            <Image src={otherUser.avatar} alt={otherUser.name} fill className="object-contain" unoptimized />
+                            <Image src={otherUser.avatar} alt={otherUser.name} fill className="object-fill" unoptimized />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-lg">👤</div>
                         )}

@@ -45,7 +45,7 @@ export default function PostCard({ post }: PostCardProps) {
                 <div className="flex items-center gap-3">
                     <Link href={`/profile/${post.author?.username}`} className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold overflow-hidden relative hover:opacity-80 transition-opacity">
                         {post.author?.avatar ? (
-                            <Image src={post.author.avatar} alt={post.author.name || post.author.username} fill className="object-contain" unoptimized />
+                            <Image src={post.author.avatar} alt={post.author.name || post.author.username} fill className="object-fill" unoptimized />
                         ) : (
                             (post.author?.name?.[0] || post.author?.username?.[0] || "U")
                         )}
@@ -74,7 +74,7 @@ export default function PostCard({ post }: PostCardProps) {
                         src={post.imageUrl}
                         alt="Post content"
                         fill
-                        className="object-contain"
+                        className="object-fill"
                         unoptimized
                     />
                 </div>

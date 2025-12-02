@@ -58,7 +58,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                 src={user.banner}
                                 alt="Banner"
                                 fill
-                                className="object-contain"
+                                className="object-fill"
                                 unoptimized
                             />
                         )}
@@ -74,7 +74,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                         src={user.avatar}
                                         alt={user.name || user.username}
                                         fill
-                                        className="object-contain"
+                                        className="object-fill"
                                         unoptimized
                                     />
                                 ) : (
@@ -88,27 +88,6 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                 <div>
                                     <h2 className="text-white font-bold text-2xl">{user.name || user.username}</h2>
                                     <p className="text-slate-400">@{user.username}</p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <form action={handleFollow}>
-                                        <button
-                                            className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${user.isFollowing
-                                                ? "bg-slate-700 text-white hover:bg-red-500/20 hover:text-red-500"
-                                                : "bg-white text-slate-900 hover:bg-slate-200"
-                                                }`}
-                                        >
-                                            {user.isFollowing ? (
-                                                <>
-                                                    <MdPersonRemove /> Siguiendo
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <MdPersonAdd /> Seguir
-                                                </>
-                                            )}
-                                        </button>
-                                    </form>
-                                    <MessageButton userId={user.id} />
                                 </div>
                             </div>
 
@@ -137,6 +116,27 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                     <span className="text-slate-500 text-xs uppercase">Siguiendo</span>
                                 </div>
                             </div>
+                                                            <div className="flex gap-2">
+                                    <form action={handleFollow}>
+                                        <button
+                                            className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${user.isFollowing
+                                                ? "bg-slate-700 text-white hover:bg-red-500/20 hover:text-red-500"
+                                                : "bg-white text-slate-900 hover:bg-slate-200"
+                                                }`}
+                                        >
+                                            {user.isFollowing ? (
+                                                <>
+                                                    <MdPersonRemove /> Siguiendo
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MdPersonAdd /> Seguir
+                                                </>
+                                            )}
+                                        </button>
+                                    </form>
+                                    <MessageButton userId={user.id} />
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                 <a href={`/clubs/${membership.club.id}`} key={membership.club.id} className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 p-4 flex items-center gap-4 hover:bg-slate-800 transition-colors">
                                     <div className="w-12 h-12 rounded-lg bg-slate-700 overflow-hidden relative flex-shrink-0">
                                         {membership.club.imageUrl ? (
-                                            <Image src={membership.club.imageUrl} alt={membership.club.name} fill className="object-contain" />
+                                            <Image src={membership.club.imageUrl} alt={membership.club.name} fill className="object-fill" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-slate-500"><MdGroups /></div>
                                         )}
@@ -197,7 +197,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                     <div className="flex">
                                         <div className="w-24 bg-slate-700 relative">
                                             {attendance.event.image ? (
-                                                <Image src={attendance.event.image} alt={attendance.event.title} fill className="object-contain" />
+                                                <Image src={attendance.event.image} alt={attendance.event.title} fill className="object-fill" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-500"><MdEvent size={24} /></div>
                                             )}

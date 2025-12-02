@@ -124,7 +124,7 @@ export default function ClubsPage() {
                                             {/* Club Icon */}
                                             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center text-2xl sm:text-3xl overflow-hidden relative flex-shrink-0">
                                                 {club.imageUrl ? (
-                                                    <img src={club.imageUrl} alt={club.name} className="w-full h-full object-contain" />
+                                                    <img src={club.imageUrl} alt={club.name} className="w-full h-full object-fill" />
                                                 ) : (
                                                     <MdGroups className="text-white" />
                                                 )}

@@ -63,7 +63,7 @@ export default function CreatePost() {
                 src={session.user.image}
                 alt={session.user.name || "User"}
                 fill
-                className="object-contain"
+                className="object-fill"
                 unoptimized
               />
             ) : (
@@ -84,7 +84,7 @@ export default function CreatePost() {
                   src={preview}
                   alt="Preview"
                   fill
-                  className="object-contain"
+                  className="object-fill"
                 />
                 <button
                   type="button"

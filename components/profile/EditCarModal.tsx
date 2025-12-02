@@ -78,7 +78,7 @@ export default function EditCarModal({ car, onClose }: EditCarModalProps) {
                         <label className="block text-slate-400 text-sm mb-1">Foto</label>
                         <div className="relative h-40 bg-slate-700/50 rounded-lg border-2 border-dashed border-slate-600 flex items-center justify-center cursor-pointer hover:border-red-500 transition-colors overflow-hidden">
                             {preview ? (
-                                <Image src={preview} alt="Preview" fill className="object-contain" />
+                                <Image src={preview} alt="Preview" fill className="object-fill" />
                             ) : (
                                 <div className="flex flex-col items-center text-slate-400">
                                     <MdCloudUpload size={32} />

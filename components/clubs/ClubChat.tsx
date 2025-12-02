@@ -89,7 +89,7 @@ export default function ClubChat({ clubId, currentUser }: ClubChatProps) {
                             <div key={msg.id} className={`flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
                                 <div className="w-8 h-8 rounded-full bg-slate-700 overflow-hidden relative flex-shrink-0">
                                     {msg.sender.avatar ? (
-                                        <Image src={msg.sender.avatar} alt={msg.sender.username} fill className="object-contain" />
+                                        <Image src={msg.sender.avatar} alt={msg.sender.username} fill className="object-fill" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
                                             {msg.sender.username?.[0]?.toUpperCase()}

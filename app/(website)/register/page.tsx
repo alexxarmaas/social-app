@@ -191,7 +191,7 @@ export default function RegisterPage() {
                                     <div className="flex items-center gap-4">
                                         <div className="relative w-16 h-16 rounded-full overflow-hidden bg-zinc-800 border border-white/10">
                                             {formData.avatarUrl ? (
-                                                <Image src={formData.avatarUrl} alt="Avatar" fill className="object-contain" />
+                                                <Image src={formData.avatarUrl} alt="Avatar" fill className="object-fill" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-zinc-500">
                                                     <MdPerson size={24} />
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                                     <div className="space-y-2">
                                         <div className="relative w-full h-24 rounded-lg overflow-hidden bg-zinc-800 border border-white/10">
                                             {formData.bannerUrl ? (
-                                                <Image src={formData.bannerUrl} alt="Banner" fill className="object-contain" />
+                                                <Image src={formData.bannerUrl} alt="Banner" fill className="object-fill" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-zinc-500">
                                                     <MdAddPhotoAlternate size={24} />

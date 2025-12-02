@@ -32,7 +32,7 @@ export default async function StoreDetailsPage({ params }: { params: Promise<{ i
             {/* Banner */}
             <div className="h-48 md:h-64 bg-gradient-to-r from-slate-800 to-slate-700 relative">
                 {store.banner && (
-                    <Image src={store.banner} alt="Banner" fill className="object-contain opacity-80" unoptimized />
+                    <Image src={store.banner} alt="Banner" fill className="object-fill opacity-80" unoptimized />
                 )}
                 <Link
                     href="/marketplace"
@@ -55,7 +55,7 @@ export default async function StoreDetailsPage({ params }: { params: Promise<{ i
                 <div className="relative -mt-16 mb-8 flex flex-col md:flex-row items-start md:items-end gap-6">
                     <div className="w-32 h-32 bg-slate-900 rounded-2xl border-4 border-slate-900 overflow-hidden relative flex-shrink-0 flex items-center justify-center">
                         {store.logo ? (
-                            <Image src={store.logo} alt={store.name} fill className="object-contain" unoptimized />
+                            <Image src={store.logo} alt={store.name} fill className="object-fill" unoptimized />
                         ) : (
                             <MdStore className="text-6xl text-slate-600" />
                         )}
@@ -83,7 +83,7 @@ export default async function StoreDetailsPage({ params }: { params: Promise<{ i
                         <span>Propietario:</span>
                         <div className="flex items-center gap-2 text-white">
                             <div className="w-6 h-6 rounded-full bg-slate-700 relative overflow-hidden">
-                                {store.owner.avatar && <Image src={store.owner.avatar} alt="Owner" fill className="object-contain" unoptimized />}
+                                {store.owner.avatar && <Image src={store.owner.avatar} alt="Owner" fill className="object-fill" unoptimized />}
                             </div>
                             <span>{store.owner.username}</span>
                         </div>
