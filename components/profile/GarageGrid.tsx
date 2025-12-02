@@ -124,26 +124,30 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
             {showAddModal && <AddCarModal onClose={() => setShowAddModal(false)} />}
             {editingCar && <EditCarModal car={editingCar} onClose={() => setEditingCar(null)} />}
             {selectedImage && (
-                <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
-                    <div className="relative w-full max-w-[95vw] md:max-w-7xl max-h-[92vh] flex flex-col md:flex-row gap-6" onClick={e => e.stopPropagation()}>
-                        <div className="relative flex-1 w-full max-h-[88vh] bg-black rounded-xl overflow-hidden">
-                            <div className="relative w-full h-full">
-                                <Image
-                                    src={selectedImage.imageUrl}
-                                    alt={selectedImage.model}
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
+                <div 
+                    className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <div 
+                        className="relative w-full max-w-full max-h-full flex flex-col items-center justify-center" 
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="relative w-full max-w-md h-auto aspect-video bg-black rounded-xl overflow-hidden">
+                            <Image
+                                src={selectedImage.imageUrl}
+                                alt={selectedImage.model}
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 640px) 100vw, 50vw"
+                                priority={true}
+                            />
                         </div>
-                        <div className="w-full md:w-80 bg-zinc-900 rounded-xl p-6 flex flex-col h-fit">
-                            <button
-                                onClick={() => setSelectedImage(null)}
-                                className="mt-auto w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg font-medium transition-colors"
-                            >
-                                Cerrar
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => setSelectedImage(null)}
+                            className="mt-4 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors"
+                        >
+                            Cerrar
+                        </button>
                     </div>
                 </div>
             )}
