@@ -125,32 +125,36 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
             {editingCar && <EditCarModal car={editingCar} onClose={() => setEditingCar(null)} />}
             {selectedImage && (
                 <div 
-                    className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-2 md:p-4"
                     onClick={() => setSelectedImage(null)}
                 >
                     <div 
-                        className="relative w-full max-w-full max-h-full flex flex-col items-center justify-center" 
+                        className="relative w-full h-full flex flex-col items-center justify-center max-w-4xl mx-auto" 
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="relative w-full max-w-md h-auto aspect-video bg-black rounded-xl overflow-hidden">
+                        {/* Imagen fullscreen */}
+                        <div className="relative w-full h-[85vh] md:h-[90vh] bg-black rounded-2xl overflow-hidden flex items-center justify-center">
                             <Image
                                 src={selectedImage.imageUrl}
                                 alt={selectedImage.model}
                                 fill
-                                className="object-contain"
-                                sizes="(max-width: 640px) 100vw, 50vw"
+                                className="object-contain max-w-full max-h-full"
+                                sizes="100vw"
                                 priority={true}
                             />
                         </div>
+                        
+                        {/* Botón cerrar abajo */}
                         <button
                             onClick={() => setSelectedImage(null)}
-                            className="mt-4 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-medium transition-colors"
+                            className="mt-4 md:mt-6 px-8 py-3 bg-zinc-800/90 hover:bg-zinc-700 text-white rounded-xl font-semibold text-base shadow-lg transition-all backdrop-blur-sm border border-zinc-700"
                         >
                             Cerrar
                         </button>
                     </div>
                 </div>
             )}
+
         </>
     );
 }
