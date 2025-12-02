@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getClubs, joinClub } from "@/app/actions/club";
+import { getClubs, joinClub, leaveClub } from "@/app/actions/club";
 import CreateClubModal from "@/components/clubs/CreateClubModal";
 import { MdGroups, MdAdd } from "react-icons/md";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function ClubsPage() {
     const [clubs, setClubs] = useState<any[]>([]);
     const [joinedClubIds, setJoinedClubIds] = useState<Set<string>>(new Set());
+    const [pendingClubIds, setPendingClubIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [search, setSearch] = useState("");
@@ -31,6 +32,14 @@ export default function ClubsPage() {
             setClubs(result.clubs);
             if (result.userJoinedClubIds) {
                 setJoinedClubIds(new Set(result.userJoinedClubIds));
+            } else {
+                setJoinedClubIds(new Set());
+            }
+
+            if (result.userPendingClubIds) {
+                setPendingClubIds(new Set(result.userPendingClubIds));
+            } else {
+                setPendingClubIds(new Set());
             }
         }
         setLoading(false);
@@ -41,7 +50,16 @@ export default function ClubsPage() {
         if (result.error) {
             alert(result.error);
         } else {
-            loadClubs(); // Reload to update member counts
+            loadClubs(); // Reload to update member counts and pending state
+        }
+    };
+
+    const handleCancelRequest = async (clubId: string) => {
+        const result = await leaveClub(clubId);
+        if (result.error) {
+            alert(result.error);
+        } else {
+            loadClubs();
         }
     };
 
@@ -113,6 +131,7 @@ export default function ClubsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {clubs.map((club: any) => {
                             const isMember = joinedClubIds.has(club.id);
+                            const isPending = pendingClubIds.has(club.id);
                             return (
                                 <Link
                                     key={club.id}
@@ -146,6 +165,23 @@ export default function ClubsPage() {
                                                 >
                                                     Ver Club
                                                 </button>
+                                            ) : isPending ? (
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <button
+                                                        className="px-4 py-2 bg-slate-600 text-white rounded-lg font-semibold cursor-default"
+                                                    >
+                                                        Esperando
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleCancelRequest(club.id);
+                                                        }}
+                                                        className="text-xs text-slate-300 hover:text-white underline"
+                                                    >
+                                                        Eliminar solicitud
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button
                                                     onClick={(e) => {

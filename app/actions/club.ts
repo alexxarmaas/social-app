@@ -116,8 +116,9 @@ export async function getClubs(search?: string, category?: string) {
         });
 
         let userJoinedClubIds: string[] = [];
+        let userPendingClubIds: string[] = [];
         if (currentUserId) {
-            const memberships = await prisma.clubMember.findMany({
+            const approved = await prisma.clubMember.findMany({
                 where: {
                     userId: currentUserId,
                     status: "approved"
@@ -126,10 +127,21 @@ export async function getClubs(search?: string, category?: string) {
                     clubId: true
                 }
             });
-            userJoinedClubIds = memberships.map(m => m.clubId);
+            userJoinedClubIds = approved.map(m => m.clubId);
+
+            const pending = await prisma.clubMember.findMany({
+                where: {
+                    userId: currentUserId,
+                    status: "pending"
+                },
+                select: {
+                    clubId: true
+                }
+            });
+            userPendingClubIds = pending.map(m => m.clubId);
         }
 
-        return { clubs, userJoinedClubIds };
+        return { clubs, userJoinedClubIds, userPendingClubIds };
     } catch (error) {
         return { error: "Error al obtener clubs" };
     }
