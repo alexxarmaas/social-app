@@ -116,7 +116,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                                     <span className="text-slate-500 text-xs uppercase">Siguiendo</span>
                                 </div>
                             </div>
-                                                            <div className="flex gap-2">
+                                <div className="flex gap-2 mt-6 content-center">
                                     <form action={handleFollow}>
                                         <button
                                             className={`px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${user.isFollowing

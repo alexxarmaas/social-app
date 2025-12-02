@@ -48,7 +48,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                         <div className="relative h-48 bg-slate-700">
                             {car.imageUrl ? (
                                 <div onClick={() => setSelectedImage(car)} className="w-full h-full cursor-pointer">
-                                    <Image src={car.imageUrl} alt={car.model} fill className="object-fill" />
+                                    <Image src={car.imageUrl} alt={car.model} fill className="object-fit" />
                                 </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-4xl text-slate-600">
