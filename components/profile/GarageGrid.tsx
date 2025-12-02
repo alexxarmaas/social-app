@@ -48,7 +48,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                         <div className="relative h-48 bg-slate-700">
                             {car.imageUrl ? (
                                 <div onClick={() => setSelectedImage(car)} className="w-full h-full cursor-pointer">
-                                    <Image src={car.imageUrl} alt={car.model} fill className="object-fit" />
+                                    <Image src={car.imageUrl} alt={car.model} fill className="object-contain object-center" />
                                 </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-4xl text-slate-600">
@@ -82,7 +82,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                     <div className="flex items-center gap-2 bg-slate-700/50 rounded-full pr-3 pl-1 py-1">
                                         <div className="w-6 h-6 rounded-full overflow-hidden relative bg-slate-600">
                                             {car.owner.avatar ? (
-                                                <Image src={car.owner.avatar} alt={car.owner.username} fill className="object-fill" />
+                                                <Image src={car.owner.avatar} alt={car.owner.username} fill className="object-cover object-center" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-xs text-white font-bold">
                                                     {car.owner.name?.[0] || car.owner.username?.[0]}
@@ -140,9 +140,6 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                     <p className="text-white font-bold text-sm">{selectedImage.make} {selectedImage.model}</p>
                                     <p className="text-zinc-500 text-xs">{selectedImage.year}</p>
                                 </div>
-                                <button onClick={() => setSelectedImage(null)} className="text-zinc-400 hover:text-white">
-                                    <MdClose size={24} />
-                                </button>
                             </div>
 
                             {selectedImage.modifications && (
