@@ -20,13 +20,13 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
     const router = useRouter();
 
     const handleContactSeller = async (listing: any) => {
-        const sellerId = listing.seller?.sellerId;
+        const sellerId = listing.sellerId;
         if (!sellerId) {
             toast.error('Vendedor no disponible');
             return;
         }
 
-        const prefill = `Hola ${listing.seller.username}, estoy interesado en ${listing.title}, ¿podrías darme mas información?`;
+        const prefill = `Hola ${listing.sellerId.username}, estoy interesado en ${listing.title}, ¿podrías darme mas información?`;
 
         try {
             const result = await startConversation(sellerId);
