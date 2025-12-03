@@ -1,14 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const nextPath = searchParams?.get("next") || "/feed";
+    const [nextPath, setNextPath] = useState<string>('/feed');
+
+    // Read `next` from URL on the client to avoid CSR bailout during prerender
+    useEffect(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const next = params.get('next');
+            if (next) setNextPath(next);
+        } catch (err) {
+            // ignore
+        }
+    }, []);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
