@@ -25,7 +25,7 @@ export default function WhoAreWePage() {
                         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
                             <h2 className="text-3xl font-bold text-white mb-6">Nuestra Historia</h2>
                             <p className="text-slate-300 mb-4">
-                                Tramassso nació de una idea simple: los entusiastas del motor necesitaban un espacio dedicado para conectar, compartir y crecer juntos. Lo que comenzó como encuentros de fin de semana en estacionamientos ha evolucionado a una comunidad global de más de 50,000 miembros.
+                                Tramassso nació de una idea simple: los entusiastas del motor necesitaban un espacio dedicado para conectar, compartir y crecer juntos. Lo que comenzó como encuentros de fin de semana en estacionamientos ha evolucionado a una comunidad que cada día va en aumento.
                             </p>
                             <p className="text-slate-300">
                                 Hemos construido esta plataforma con la misma atención al detalle que aplicamos a nuestras propias construcciones: cada función, cada interacción, diseñada pensando en la comunidad automotriz.

@@ -78,12 +78,15 @@ export default function CreateClubModal({ isOpen, onClose }: CreateClubModalProp
                                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 pl-10 text-white focus:outline-none focus:border-red-500 transition-colors appearance-none"
                             >
                                 <option value="JDM">JDM</option>
-                                <option value="European">Europeos</option>
-                                <option value="American">American Muscle</option>
+                                <option value="VAG">VAG</option>
+                                <option value="American">Americanos</option>
                                 <option value="Classic">Clásicos</option>
-                                <option value="Tuner">Tuner / Stance</option>
+                                <option value="Tuner">Tuner / Multimarca</option>
                                 <option value="Offroad">4x4 / Offroad</option>
-                                <option value="Racing">Racing / Track</option>
+                                <option value="PSA">PSA</option>
+                                <option value="BMW">BMW / Mercedes</option>
+                                <option value="Opel">Opel</option>
+                                <option value="Motorcycles">Motocicletas</option>
                             </select>
                             <MdCategory className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                         </div>

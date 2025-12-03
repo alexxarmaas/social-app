@@ -15,7 +15,20 @@ export default function ClubsPage() {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("Todas");
 
-    const categories = ["Todas", "JDM", "European", "American Muscle", "Classic", "Tuner", "Off-Road"];
+    const categories = [
+        "Todas", 
+        "JDM", 
+        "VAG", 
+        "American", 
+        "Classic", 
+        "Tuner", 
+        "Off-Road",
+        "PSA",
+        "BMW/Mercedes",
+        "Opel",
+        "Motorcycles"
+    ];
+
 
     useEffect(() => {
         const timer = setTimeout(() => {

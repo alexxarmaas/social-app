@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const nextPath = searchParams?.get("next") || "/feed";
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -27,7 +29,7 @@ export default function LoginPage() {
             if (res?.error) {
                 setError("Credenciales inválidas");
             } else {
-                router.push("/feed");
+                router.push(nextPath);
             }
         } catch (err) {
             setError("Error al iniciar sesión");

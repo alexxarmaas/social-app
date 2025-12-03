@@ -1,9 +1,9 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { MdSpeed, MdGroups, MdStore, MdEvent, MdSecurity, MdDevices } from "react-icons/md";
 import WebsiteNav from "@/components/WebsiteNav";
+import WebsiteStats from "@/components/WebsiteStats";
+import ProtectedLink from "@/components/ProtectedLink";
 
 export default function HomePage() {
   return (
@@ -106,10 +106,10 @@ export default function HomePage() {
             <div>
               <h4 className="font-bold text-white mb-4">Plataforma</h4>
               <ul className="space-y-2 text-slate-400">
-                <li><Link href="/feed" className="hover:text-red-500 transition-colors">Feed</Link></li>
-                <li><Link href="/marketplace" className="hover:text-red-500 transition-colors">Marketplace</Link></li>
-                <li><Link href="/clubs" className="hover:text-red-500 transition-colors">Clubs</Link></li>
-                <li><Link href="/calendar" className="hover:text-red-500 transition-colors">Eventos</Link></li>
+                <li><ProtectedLink href="/feed" className="hover:text-red-500 transition-colors">Feed</ProtectedLink></li>
+                <li><ProtectedLink href="/marketplace" className="hover:text-red-500 transition-colors">Marketplace</ProtectedLink></li>
+                <li><ProtectedLink href="/clubs" className="hover:text-red-500 transition-colors">Clubs</ProtectedLink></li>
+                <li><ProtectedLink href="/calendar" className="hover:text-red-500 transition-colors">Eventos</ProtectedLink></li>
               </ul>
             </div>
 
@@ -122,7 +122,8 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-slate-900 text-center text-slate-500 text-sm">
+          <WebsiteStats />
+          <div className="mt-4 pt-8 border-t border-slate-900 text-center text-slate-500 text-sm">
             © 2025 Tramassso. Todos los derechos reservados.
           </div>
         </div>
