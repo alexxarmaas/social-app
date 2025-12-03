@@ -20,7 +20,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
     const router = useRouter();
 
     const handleContactSeller = async (listing: any) => {
-        const sellerId = listing.seller?.id;
+        const sellerId = listing.seller?.sellerId;
         if (!sellerId) {
             toast.error('Vendedor no disponible');
             return;

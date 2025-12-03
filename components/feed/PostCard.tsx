@@ -74,7 +74,7 @@ export default function PostCard({ post }: PostCardProps) {
                         src={post.imageUrl}
                         alt="Post content"
                         fill
-                        className="object-fill"
+                        className="object-contain object-center"
                         unoptimized
                     />
                 </div>

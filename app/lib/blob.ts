@@ -3,6 +3,7 @@ import { v2 as cloudinary } from 'cloudinary';
 
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,7 +16,8 @@ export async function uploadToBlob(file: File, folder: string = 'uploads') {
     if (process.env.NODE_ENV === 'development' || !process.env.CLOUDINARY_CLOUD_NAME) {
         try {
             const bytes = await file.arrayBuffer();
-            const buffer = Buffer.from(bytes);
+            const uint8 = new Uint8Array(bytes);
+            const buffer = Buffer.from(uint8);
 
             const uploadDir = path.join(process.cwd(), 'public', 'uploads', folder);
 
@@ -23,12 +25,29 @@ export async function uploadToBlob(file: File, folder: string = 'uploads') {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
 
-            const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-            const filepath = path.join(uploadDir, filename);
+            const lowerName = file.name?.toLowerCase() || '';
+            const isHeic = file.type?.toLowerCase().includes('heic') || lowerName.endsWith('.heic') || lowerName.endsWith('.heif');
 
-            fs.writeFileSync(filepath, buffer);
+            let saveBuffer: Buffer = buffer;
+            let filenameBase = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
 
-            const url = `/uploads/${folder}/${filename}`;
+            if (isHeic) {
+                try {
+                    // Convert HEIC/HEIF to JPEG in development using sharp for maximum compatibility
+                    saveBuffer = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
+                    // Ensure filename has .jpg extension
+                    filenameBase = filenameBase.replace(/\.[^/.]+$/, '') + '.jpg';
+                } catch (convErr) {
+                    console.warn('HEIC conversion with sharp failed, saving original file:', convErr);
+                    // fallback: keep original buffer and filename
+                }
+            }
+
+            const filepath = path.join(uploadDir, filenameBase);
+
+            fs.writeFileSync(filepath, saveBuffer);
+
+            const url = `/uploads/${folder}/${filenameBase}`;
             return { url, error: null };
         } catch (error) {
             console.error('Local upload error:', error);
@@ -39,11 +58,24 @@ export async function uploadToBlob(file: File, folder: string = 'uploads') {
     // Production Cloudinary Storage
     try {
         const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        const uint8 = new Uint8Array(arrayBuffer);
+        const buffer = Buffer.from(uint8);
+
+        // If the uploaded file is HEIC, ask Cloudinary to convert it to JPEG
+        const lowerName = file.name?.toLowerCase() || '';
+        const isHeic = file.type?.toLowerCase().includes('heic') || lowerName.endsWith('.heic') || lowerName.endsWith('.heif');
+
+        const uploadOptions: any = { folder };
+        // Prefer image resource type for images
+        uploadOptions.resource_type = 'image';
+        if (isHeic) {
+            // Request Cloudinary to convert HEIC/HEIF to JPG on upload
+            uploadOptions.format = 'jpg';
+        }
 
         const result = await new Promise<any>((resolve, reject) => {
             cloudinary.uploader.upload_stream(
-                { folder: folder, resource_type: 'auto' },
+                uploadOptions,
                 (error, result) => {
                     if (error) reject(error);
                     else resolve(result);

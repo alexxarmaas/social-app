@@ -13,8 +13,7 @@ export default async function WebsiteStats() {
 
         return (
             // Server-rendered wrapper that passes initial counts to client poller
-            <div className="py-6 border-t border-slate-900">
-                {/* WebsiteStatsClient is a client component that will poll /api/stats */}
+            <div className="py-6">
                 <WebsiteStatsClient initial={initial} />
             </div>
         );
