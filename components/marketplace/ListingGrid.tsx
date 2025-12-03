@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { startConversation } from "@/app/actions/message";
 import CreateListingModal from "./CreateListingModal";
 import EditStoreProductModal from "@/components/stores/EditStoreProductModal";
 import Image from "next/image";
@@ -14,6 +17,39 @@ interface ListingGridProps {
 export default function ListingGrid({ listings, isOwner = false }: ListingGridProps) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
+    const router = useRouter();
+
+    const handleContactSeller = async (listing: any) => {
+        const sellerId = listing.seller?.id;
+        if (!sellerId) {
+            toast.error('Vendedor no disponible');
+            return;
+        }
+
+        const prefill = `Hola ${listing.seller.username}, estoy interesado en ${listing.title}, ¿podrías darme mas información?`;
+
+        try {
+            const result = await startConversation(sellerId);
+            if (result.error) {
+                // If not authorized, redirect to login with next param
+                if (typeof result.error === 'string' && result.error.toLowerCase().includes('no autorizado')) {
+                    const next = encodeURIComponent(`/messages?prefill=${encodeURIComponent(prefill)}`);
+                    router.push(`/login?next=${next}`);
+                    return;
+                }
+                toast.error(result.error || 'Error iniciando conversación');
+                return;
+            }
+
+            if (result.conversationId) {
+                const convId = result.conversationId;
+                router.push(`/messages?id=${convId}&prefill=${encodeURIComponent(prefill)}`);
+            }
+        } catch (err) {
+            console.error('Error contacting seller', err);
+            toast.error('Error iniciando conversación');
+        }
+    };
 
     return (
         <>
@@ -47,6 +83,15 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                                     </div>
                                     <span>{listing.seller.username}</span>
                                 </div>
+                            </div>
+
+                            <div className="p-3 pt-0 flex items-center gap-2">
+                                <button
+                                    onClick={(e) => { e.preventDefault(); handleContactSeller(listing); }}
+                                    className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition-colors"
+                                >
+                                    Contactar vendedor
+                                </button>
                             </div>
 
                             {isOwner && (

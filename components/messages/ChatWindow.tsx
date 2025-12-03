@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 import Image from "next/image";
@@ -18,6 +19,17 @@ export default function ChatWindow({
 }) {
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState("");
+    const searchParams = useSearchParams();
+
+    // Prefill message from query param if provided
+    useEffect(() => {
+        try {
+            const pre = searchParams.get('prefill');
+            if (pre) setNewMessage(pre);
+        } catch (err) {
+            // ignore
+        }
+    }, [searchParams]);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
