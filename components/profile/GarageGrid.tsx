@@ -56,15 +56,15 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                 </div>
                             )}
                             {isOwner && (
-                                <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute top-2 right-2 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button
-                                        onClick={() => setEditingCar(car)}
+                                        onClick={(e: any) => { e.stopPropagation(); setEditingCar(car); }}
                                         className="p-2 bg-black/60 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                     >
                                         <MdEdit />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(car.id)}
+                                        onClick={(e: any) => { e.stopPropagation(); handleDelete(car.id); }}
                                         className="p-2 bg-black/60 text-white rounded-lg hover:bg-red-600 transition-colors"
                                     >
                                         <MdDelete />
