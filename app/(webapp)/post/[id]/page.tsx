@@ -17,9 +17,7 @@ export default async function PostPage({ params }: PostPageProps) {
     const session = await getServerSession(authOptions);
     const { id } = await params;
 
-    if (!session) {
-        redirect(`/login?callbackUrl=/post/${id}`);
-    }
+
 
     const { post, error } = await getPost(id);
 

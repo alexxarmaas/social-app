@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MdSend, MdDelete } from "react-icons/md";
 import { getComments, addComment, deleteComment } from "@/app/actions/post";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface CommentsSectionProps {
     postId: string;
@@ -14,6 +15,7 @@ interface CommentsSectionProps {
 
 export default function CommentsSection({ postId, onCommentChange, className = "" }: CommentsSectionProps) {
     const { data: session } = useSession();
+    const router = useRouter();
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(true);
@@ -94,25 +96,36 @@ export default function CommentsSection({ postId, onCommentChange, className = "
                 )}
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 border-t border-slate-700 bg-slate-800/50">
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Escribe un comentario..."
-                        className="flex-1 bg-slate-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-                        disabled={submitting}
-                    />
+            {session ? (
+                <form onSubmit={handleSubmit} className="p-4 border-t border-slate-700 bg-slate-800/50">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Escribe un comentario..."
+                            className="flex-1 bg-slate-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            disabled={submitting}
+                        />
+                        <button
+                            type="submit"
+                            disabled={submitting || !newComment.trim()}
+                            className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <MdSend size={20} />
+                        </button>
+                    </div>
+                </form>
+            ) : (
+                <div className="p-4 border-t border-slate-700 bg-slate-800/50">
                     <button
-                        type="submit"
-                        disabled={submitting || !newComment.trim()}
-                        className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => router.push(`/login?callbackUrl=/post/${postId}`)}
+                        className="w-full bg-slate-700 text-slate-300 py-2 rounded-lg hover:bg-slate-600 transition-colors font-medium"
                     >
-                        <MdSend size={20} />
+                        Inicia sesión para comentar
                     </button>
                 </div>
-            </form>
+            )}
         </div>
     );
 }

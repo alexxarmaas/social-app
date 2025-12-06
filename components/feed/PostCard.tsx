@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MdFavorite, MdFavoriteBorder, MdChatBubbleOutline, MdShare, MdMoreHoriz } from "react-icons/md";
+import { useRouter } from "next/navigation";
 import { toggleLike } from "@/app/actions/post";
 import CommentModal from "./CommentModal";
 import toast from "react-hot-toast";
@@ -22,10 +23,11 @@ export default function PostCard({ post, onCommentClick, disableCommentModal = f
     const [commentsCount, setCommentsCount] = useState(post.commentsCount);
     const [showComments, setShowComments] = useState(false);
     const [isLikeLoading, setIsLikeLoading] = useState(false);
+    const router = useRouter();
 
     const handleLike = async () => {
         if (!session) {
-            toast.error("Debes iniciar sesión para dar like");
+            router.push(`/login?callbackUrl=/post/${post.id}`);
             return;
         }
 
@@ -51,7 +53,7 @@ export default function PostCard({ post, onCommentClick, disableCommentModal = f
 
     const handleCommentClick = () => {
         if (!session) {
-            toast.error("Debes iniciar sesión para comentar");
+            router.push(`/login?callbackUrl=/post/${post.id}`);
             return;
         }
 

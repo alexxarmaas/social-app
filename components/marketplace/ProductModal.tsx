@@ -41,7 +41,7 @@ export default function ProductModal({ isOpen, onClose, product, onContactSeller
         } else {
             toast.success("Producto eliminado correctamente");
             onClose();
-            router.refresh();
+            window.location.reload();
         }
     };
 

@@ -53,7 +53,7 @@ export default function EditStoreProductModal({ isOpen, onClose, product }: Edit
             setIsLoading(false);
         } else {
             onClose();
-            router.refresh();
+            window.location.reload();
         }
     };
 
@@ -70,7 +70,7 @@ export default function EditStoreProductModal({ isOpen, onClose, product }: Edit
             setIsLoading(false);
         } else {
             onClose();
-            router.refresh();
+            window.location.reload();
         }
     };
 
