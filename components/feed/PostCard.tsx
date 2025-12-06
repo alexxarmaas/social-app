@@ -11,9 +11,11 @@ import { useSession } from "next-auth/react";
 
 interface PostCardProps {
     post: any;
+    onCommentClick?: () => void;
+    disableCommentModal?: boolean;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, onCommentClick, disableCommentModal = false }: PostCardProps) {
     const { data: session } = useSession();
     const [isLiked, setIsLiked] = useState(post.isLiked);
     const [likesCount, setLikesCount] = useState(post.likesCount);
@@ -52,7 +54,15 @@ export default function PostCard({ post }: PostCardProps) {
             toast.error("Debes iniciar sesión para comentar");
             return;
         }
-        setShowComments(true);
+
+        if (onCommentClick) {
+            onCommentClick();
+            return;
+        }
+
+        if (!disableCommentModal) {
+            setShowComments(true);
+        }
     };
 
     const handleShare = async () => {

@@ -93,6 +93,57 @@ export async function getPosts() {
     }
 }
 
+export async function getPost(postId: string) {
+    try {
+        const session = await getServerSession(authOptions);
+        const currentUserId = session?.user?.id;
+
+        const post = await prisma.post.findUnique({
+            where: { id: postId },
+            include: {
+                author: {
+                    select: {
+                        name: true,
+                        username: true,
+                        avatar: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        likes: true,
+                        comments: true,
+                    },
+                },
+                likes: currentUserId ? {
+                    where: {
+                        userId: currentUserId,
+                    },
+                    select: {
+                        userId: true,
+                    },
+                } : false,
+            },
+        });
+
+        if (!post) {
+            return { error: "Publicación no encontrada" };
+        }
+
+        const formattedPost = {
+            ...post,
+            isLiked: post.likes.length > 0,
+            likes: undefined,
+            likesCount: post._count.likes,
+            commentsCount: post._count.comments,
+        };
+
+        return { post: formattedPost };
+    } catch (error) {
+        console.error("Error fetching post:", error);
+        return { error: "Error al cargar la publicación" };
+    }
+}
+
 export async function toggleLike(postId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
