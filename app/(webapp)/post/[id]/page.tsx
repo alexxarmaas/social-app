@@ -6,13 +6,14 @@ import { MdArrowBack } from "react-icons/md";
 import { notFound } from "next/navigation";
 
 interface PostPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-    const { post, error } = await getPost(params.id);
+    const { id } = await params;
+    const { post, error } = await getPost(id);
 
     if (error || !post) {
         notFound();
