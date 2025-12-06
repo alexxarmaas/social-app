@@ -78,9 +78,9 @@ export async function getPosts() {
         });
 
         // Transform posts to include isLiked boolean
-        const formattedPosts = posts.map((post) => ({
+        const formattedPosts = posts.map((post: any) => ({
             ...post,
-            isLiked: post.likes.length > 0,
+            isLiked: (post.likes?.length ?? 0) > 0,
             likes: undefined, // Remove the likes array from the response
             likesCount: post._count.likes,
             commentsCount: post._count.comments,
@@ -131,7 +131,7 @@ export async function getPost(postId: string) {
 
         const formattedPost = {
             ...post,
-            isLiked: post.likes.length > 0,
+            isLiked: (post.likes?.length ?? 0) > 0,
             likes: undefined,
             likesCount: post._count.likes,
             commentsCount: post._count.comments,

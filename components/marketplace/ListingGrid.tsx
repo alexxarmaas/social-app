@@ -9,6 +9,7 @@ import EditStoreProductModal from "@/components/stores/EditStoreProductModal";
 import ProductModal from "./ProductModal";
 import Image from "next/image";
 import { MdEdit } from "react-icons/md";
+import { useSession } from "next-auth/react";
 
 interface ListingGridProps {
     listings: any[];
@@ -16,6 +17,7 @@ interface ListingGridProps {
 }
 
 export default function ListingGrid({ listings, isOwner = false }: ListingGridProps) {
+    const { data: session } = useSession();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
@@ -63,6 +65,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                 {listings.map((listing) => {
                     const images = listing.imageUrls ? JSON.parse(listing.imageUrls) : [];
                     const mainImage = images[0];
+                    const isListingOwner = session?.user?.id === listing.sellerId;
 
                     return (
                         <div
@@ -104,14 +107,14 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                                 </button>
                             </div>
 
-                            {isOwner && (
+                            {(isOwner || isListingOwner) && (
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         e.preventDefault();
                                         setEditingProduct(listing);
                                     }}
-                                    className="absolute top-2 left-2 p-2 bg-slate-900/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                                    className="absolute top-2 left-2 p-2 bg-slate-900/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 md:opacity-0 opacity-100"
                                 >
                                     <MdEdit size={16} />
                                 </button>
@@ -136,6 +139,10 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                 onClose={() => setSelectedProduct(null)}
                 product={selectedProduct}
                 onContactSeller={handleContactSeller}
+                onEdit={(product) => {
+                    setSelectedProduct(null);
+                    setEditingProduct(product);
+                }}
             />
         </>
     );

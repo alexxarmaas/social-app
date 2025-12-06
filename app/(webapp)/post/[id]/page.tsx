@@ -3,7 +3,9 @@ import PostCard from "@/components/feed/PostCard";
 import CommentsSection from "@/components/feed/CommentsSection";
 import Link from "next/link";
 import { MdArrowBack } from "react-icons/md";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 
 interface PostPageProps {
     params: Promise<{
@@ -12,7 +14,13 @@ interface PostPageProps {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
+    const session = await getServerSession(authOptions);
     const { id } = await params;
+
+    if (!session) {
+        redirect(`/login?callbackUrl=/post/${id}`);
+    }
+
     const { post, error } = await getPost(id);
 
     if (error || !post) {

@@ -1,20 +1,49 @@
 "use client";
 
 import Image from "next/image";
-import { MdClose, MdAttachMoney, MdCategory, MdDescription, MdLabel, MdPerson } from "react-icons/md";
+import { MdClose, MdAttachMoney, MdCategory, MdDescription, MdLabel, MdPerson, MdEdit, MdDelete } from "react-icons/md";
+import { useSession } from "next-auth/react";
+import { deleteStoreListing } from "@/app/actions/store";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     product: any;
     onContactSeller: (product: any) => void;
+    onEdit?: (product: any) => void;
 }
 
-export default function ProductModal({ isOpen, onClose, product, onContactSeller }: ProductModalProps) {
+export default function ProductModal({ isOpen, onClose, product, onContactSeller, onEdit }: ProductModalProps) {
+    const { data: session } = useSession();
+    const router = useRouter();
+    const [isDeleting, setIsDeleting] = useState(false);
+
     if (!isOpen || !product) return null;
 
     const images = product.imageUrls ? JSON.parse(product.imageUrls) : [];
     const mainImage = images[0];
+    const isOwner = session?.user?.id === product.sellerId;
+
+    const handleDelete = async () => {
+        if (!confirm("¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.")) {
+            return;
+        }
+
+        setIsDeleting(true);
+        const result = await deleteStoreListing(product.id);
+
+        if (result.error) {
+            toast.error(result.error);
+            setIsDeleting(false);
+        } else {
+            toast.success("Producto eliminado correctamente");
+            onClose();
+            router.refresh();
+        }
+    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
@@ -111,13 +140,33 @@ export default function ProductModal({ isOpen, onClose, product, onContactSeller
                         </div>
                     </div>
 
-                    <div className="p-6 border-t border-slate-800 mt-auto">
-                        <button
-                            onClick={() => onContactSeller(product)}
-                            className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-red-500/50 transition-all flex items-center justify-center gap-2"
-                        >
-                            Contactar al Vendedor
-                        </button>
+                    <div className="p-6 border-t border-slate-800 mt-auto space-y-3">
+                        {isOwner ? (
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => onEdit && onEdit(product)}
+                                    className="flex-1 bg-slate-700 text-white font-bold py-3 rounded-xl hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <MdEdit size={20} />
+                                    Editar
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={isDeleting}
+                                    className="flex-1 bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    <MdDelete size={20} />
+                                    {isDeleting ? "Eliminando..." : "Eliminar"}
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => onContactSeller(product)}
+                                className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-red-500/50 transition-all flex items-center justify-center gap-2"
+                            >
+                                Contactar al Vendedor
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

@@ -5,6 +5,22 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
 
+
+interface ConversationWithDetails {
+    id: string;
+    updatedAt: Date;
+    participants: {
+        id: string;
+        name: string | null;
+        username: string | null;
+        avatar: string | null;
+    }[];
+    messages: {
+        senderId: string;
+        [key: string]: any;
+    }[];
+}
+
 export async function getConversations() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
@@ -42,7 +58,7 @@ export async function getConversations() {
         });
 
         // Process conversations to identify "other user" and unread count
-        const processedConversations = await Promise.all(conversations.map(async (conv) => {
+        const processedConversations = await Promise.all(conversations.map(async (conv: ConversationWithDetails) => {
             const otherUser = conv.participants.find((p) => p.id !== session.user.id);
             const unreadCount = await prisma.message.count({
                 where: {
@@ -55,7 +71,10 @@ export async function getConversations() {
             return {
                 id: conv.id,
                 otherUser,
-                lastMessage: conv.messages[0],
+                lastMessage: conv.messages[0] ? {
+                    ...conv.messages[0],
+                    isMine: conv.messages[0].senderId === session.user.id
+                } : null,
                 unreadCount,
                 updatedAt: conv.updatedAt,
             };
@@ -81,7 +100,7 @@ export async function getMessages(conversationId: string) {
             include: { participants: true },
         });
 
-        if (!conversation || !conversation.participants.some(p => p.id === session.user.id)) {
+        if (!conversation || !conversation.participants.some((p: { id: string }) => p.id === session.user.id)) {
             return { error: "No autorizado" };
         }
 
