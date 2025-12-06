@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { uploadFileToBlob } from "@/app/lib/blob";
 
 export async function getEvents(filter?: string, clubId?: string) {
     try {
@@ -115,8 +116,18 @@ export async function createEvent(formData: FormData) {
         const priceStr = formData.get("price") as string;
         const price = priceStr ? parseFloat(priceStr) : 0;
 
-        // URL from UploadThing
-        const imageUrl = formData.get("imageUrl") as string;
+        // Handle Image Upload
+        const imageFile = formData.get("image") as File | null;
+        let imageUrl = null;
+
+        if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
+            try {
+                imageUrl = await uploadFileToBlob(imageFile, "event");
+            } catch (error) {
+                console.error("Error uploading event image:", error);
+                // Continue without image or return error? Let's continue but log it.
+            }
+        }
 
         const event = await prisma.event.create({
             data: {
@@ -244,7 +255,7 @@ export async function verifyTicket(ticketCode: string, eventId: string) {
         if (!event) return { error: "Evento no encontrado" };
 
         const isCreator = event.creatorId === session.user.id;
-        const isClubAdmin = event.club?.members.some(m => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
 
         if (!isCreator && !isClubAdmin) {
             return { error: "No tienes permiso para verificar entradas en este evento" };
@@ -295,7 +306,7 @@ export async function checkInAttendee(ticketCode: string, eventId: string) {
         if (!event) return { error: "Evento no encontrado" };
 
         const isCreator = event.creatorId === session.user.id;
-        const isClubAdmin = event.club?.members.some(m => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
 
         if (!isCreator && !isClubAdmin) {
             return { error: "No tienes permiso" };
@@ -354,7 +365,7 @@ export async function verifyTicketByCode(ticketCode: string) {
 
         // Check permissions
         const isCreator = event.creatorId === session.user.id;
-        const isClubAdmin = event.club?.members.some(m => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
 
         if (!isCreator && !isClubAdmin) {
             return { error: "No tienes permiso para verificar entradas en este evento" };
@@ -383,7 +394,7 @@ export async function deleteEvent(eventId: string) {
         if (!event) return { error: "Evento no encontrado" };
 
         const isCreator = event.creatorId === session.user.id;
-        const isClubAdmin = event.club?.members.some(m => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
 
         if (!isCreator && !isClubAdmin) {
             return { error: "No tienes permiso para eliminar este evento" };
@@ -418,7 +429,7 @@ export async function updateEvent(eventId: string, formData: FormData) {
         if (!event) return { error: "Evento no encontrado" };
 
         const isCreator = event.creatorId === session.user.id;
-        const isClubAdmin = event.club?.members.some(m => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
 
         if (!isCreator && !isClubAdmin) {
             return { error: "No tienes permiso para editar este evento" };
@@ -434,7 +445,7 @@ export async function updateEvent(eventId: string, formData: FormData) {
         const visibility = formData.get("visibility") as string;
         const maxAttendees = formData.get("maxAttendees") as string;
         const price = formData.get("price") as string;
-        const imageUrl = formData.get("imageUrl") as string;
+        const imageFile = formData.get("image") as File | null;
         const latitude = formData.get("latitude") as string;
         const longitude = formData.get("longitude") as string;
 
@@ -453,8 +464,12 @@ export async function updateEvent(eventId: string, formData: FormData) {
             longitude: longitude ? parseFloat(longitude) : null,
         };
 
-        if (imageUrl) {
-            updateData.imageUrl = imageUrl;
+        if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
+            try {
+                updateData.imageUrl = await uploadFileToBlob(imageFile, "event");
+            } catch (error) {
+                console.error("Error uploading event image:", error);
+            }
         }
 
         await prisma.event.update({

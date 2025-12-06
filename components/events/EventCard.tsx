@@ -13,9 +13,10 @@ import EditEventModal from "./EditEventModal";
 interface EventCardProps {
     event: any;
     currentUserId?: string;
+    onClick?: () => void;
 }
 
-export default function EventCard({ event, currentUserId }: EventCardProps) {
+export default function EventCard({ event, currentUserId, onClick }: EventCardProps) {
     const [loading, setLoading] = useState(false);
     const [showTicket, setShowTicket] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -66,7 +67,10 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
     const formattedTime = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
     return (
-        <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden hover:border-red-500/50 transition-colors group flex flex-col h-full">
+        <div
+            onClick={onClick}
+            className={`bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden hover:border-red-500/50 transition-colors group flex flex-col h-full ${onClick ? 'cursor-pointer' : ''}`}
+        >
             {/* Image */}
             <div className="aspect-video bg-slate-700 relative">
                 {event.imageUrl ? (
@@ -143,20 +147,21 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
                         <>
                             <Link
                                 href={`/events/${event.id}/manage`}
+                                onClick={(e) => e.stopPropagation()}
                                 className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                             >
                                 <MdQrCodeScanner />
                                 Gestionar
                             </Link>
                             <button
-                                onClick={() => setShowEditModal(true)}
+                                onClick={(e) => { e.stopPropagation(); setShowEditModal(true); }}
                                 className="bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg transition-colors"
                                 title="Editar Evento"
                             >
                                 <MdEdit size={20} />
                             </button>
                             <button
-                                onClick={handleDelete}
+                                onClick={(e) => { e.stopPropagation(); handleDelete(); }}
                                 disabled={deleteLoading}
                                 className="bg-red-900/50 hover:bg-red-900 text-red-200 p-2 rounded-lg transition-colors disabled:opacity-50"
                                 title="Eliminar Evento"
@@ -171,6 +176,7 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
+                                e.stopPropagation();
                                 setShowTicket(true);
                             }}
                             className="w-12 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center"
@@ -183,7 +189,7 @@ export default function EventCard({ event, currentUserId }: EventCardProps) {
                     {/* RSVP Button */}
                     {!isCreator && !isClubAdmin && (
                         <button
-                            onClick={() => handleRsvp(isAttending ? "not_going" : "going")}
+                            onClick={(e) => { e.stopPropagation(); handleRsvp(isAttending ? "not_going" : "going"); }}
                             disabled={loading || (!isAttending && isFull)}
                             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isAttending
                                 ? "bg-slate-700 text-slate-300 hover:bg-slate-600"

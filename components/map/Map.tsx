@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MdMyLocation, MdFilterList } from "react-icons/md";
+import EventDetailsModal from "@/components/events/EventDetailsModal";
 
 // Custom Icons
 const eventIcon = new L.Icon({
@@ -49,6 +50,8 @@ export default function Map({ events = [], stores = [] }: MapProps) {
     const [filteredEvents, setFilteredEvents] = useState(events);
     const [filteredStores, setFilteredStores] = useState(stores);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<any>(null);
+    const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
     // Default center (e.g., Madrid, Spain)
     const defaultCenter: [number, number] = [40.416775, -3.703790];
@@ -148,9 +151,15 @@ export default function Map({ events = [], stores = [] }: MapProps) {
                                     </div>
                                     <h3 className="font-bold text-lg mb-1">{event.title}</h3>
                                     <p className="text-sm text-gray-600 mb-2">{new Date(event.startDate).toLocaleDateString()}</p>
-                                    <Link href={`/events/${event.id}`} className="block text-center bg-red-500 text-white py-1 rounded text-sm font-bold hover:bg-red-600">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedEvent(event);
+                                            setIsEventModalOpen(true);
+                                        }}
+                                        className="block w-full text-center bg-red-500 text-white py-1 rounded text-sm font-bold hover:bg-red-600"
+                                    >
                                         Ver Detalles
-                                    </Link>
+                                    </button>
                                 </div>
                             </Popup>
                         </Marker>
@@ -232,6 +241,12 @@ export default function Map({ events = [], stores = [] }: MapProps) {
                     </button>
                 </div>
             </div>
+
+            <EventDetailsModal
+                isOpen={isEventModalOpen}
+                onClose={() => setIsEventModalOpen(false)}
+                event={selectedEvent}
+            />
         </div>
     );
 }
