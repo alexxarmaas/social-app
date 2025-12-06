@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { startConversation } from "@/app/actions/message";
 import CreateListingModal from "./CreateListingModal";
 import EditStoreProductModal from "@/components/stores/EditStoreProductModal";
+import ProductModal from "./ProductModal";
 import Image from "next/image";
 import { MdEdit } from "react-icons/md";
 
@@ -17,6 +18,7 @@ interface ListingGridProps {
 export default function ListingGrid({ listings, isOwner = false }: ListingGridProps) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const router = useRouter();
 
     const handleContactSeller = async (listing: any) => {
@@ -63,7 +65,11 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                     const mainImage = images[0];
 
                     return (
-                        <div key={listing.id} className="w-full max-w-xs sm:max-w-full sm:w-auto bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden hover:border-red-500/50 transition-colors group box-border relative mx-auto">
+                        <div
+                            key={listing.id}
+                            onClick={() => setSelectedProduct(listing)}
+                            className="w-full max-w-xs sm:max-w-full sm:w-auto bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 overflow-hidden hover:border-red-500/50 transition-colors group box-border relative mx-auto cursor-pointer"
+                        >
                             <div className="aspect-[4/3] sm:aspect-square bg-slate-700 relative">
                                 {mainImage ? (
                                     <Image src={mainImage} alt={listing.title} fill className="object-fill" unoptimized />
@@ -87,7 +93,11 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
 
                             <div className="p-3 pt-0 flex items-center gap-2">
                                 <button
-                                    onClick={(e) => { e.preventDefault(); handleContactSeller(listing); }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        handleContactSeller(listing);
+                                    }}
                                     className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm transition-colors"
                                 >
                                     Contactar vendedor
@@ -97,6 +107,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                             {isOwner && (
                                 <button
                                     onClick={(e) => {
+                                        e.stopPropagation();
                                         e.preventDefault();
                                         setEditingProduct(listing);
                                     }}
@@ -119,6 +130,13 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                     product={editingProduct}
                 />
             )}
+
+            <ProductModal
+                isOpen={!!selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+                product={selectedProduct}
+                onContactSeller={handleContactSeller}
+            />
         </>
     );
 }

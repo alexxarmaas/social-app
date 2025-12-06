@@ -6,12 +6,15 @@ import Link from "next/link";
 import { MdFavorite, MdFavoriteBorder, MdChatBubbleOutline, MdShare, MdMoreHoriz } from "react-icons/md";
 import { toggleLike } from "@/app/actions/post";
 import CommentModal from "./CommentModal";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 interface PostCardProps {
     post: any;
 }
 
 export default function PostCard({ post }: PostCardProps) {
+    const { data: session } = useSession();
     const [isLiked, setIsLiked] = useState(post.isLiked);
     const [likesCount, setLikesCount] = useState(post.likesCount);
     const [commentsCount, setCommentsCount] = useState(post.commentsCount);
@@ -19,6 +22,11 @@ export default function PostCard({ post }: PostCardProps) {
     const [isLikeLoading, setIsLikeLoading] = useState(false);
 
     const handleLike = async () => {
+        if (!session) {
+            toast.error("Debes iniciar sesión para dar like");
+            return;
+        }
+
         if (isLikeLoading) return;
 
         // Optimistic update
@@ -33,9 +41,42 @@ export default function PostCard({ post }: PostCardProps) {
             // Revert on error
             setIsLiked(!newIsLiked);
             setLikesCount((prev: number) => !newIsLiked ? prev + 1 : prev - 1);
+            toast.error(result.error);
         }
 
         setIsLikeLoading(false);
+    };
+
+    const handleCommentClick = () => {
+        if (!session) {
+            toast.error("Debes iniciar sesión para comentar");
+            return;
+        }
+        setShowComments(true);
+    };
+
+    const handleShare = async () => {
+        const shareUrl = `${window.location.origin}/post/${post.id}`;
+        const shareData = {
+            title: `Post de ${post.author?.username || 'Usuario'} en Tramassso`,
+            text: post.content,
+            url: shareUrl,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                toast.success("Enlace copiado al portapapeles");
+            }
+        } catch (err) {
+            console.error("Error sharing:", err);
+            // Ignore abort errors (user cancelled share)
+            if ((err as Error).name !== 'AbortError') {
+                toast.error("Error al compartir");
+            }
+        }
     };
 
     return (
@@ -90,13 +131,16 @@ export default function PostCard({ post }: PostCardProps) {
                     <span>{likesCount}</span>
                 </button>
                 <button
-                    onClick={() => setShowComments(true)}
+                    onClick={handleCommentClick}
                     className="flex items-center gap-2 hover:text-blue-400 transition-colors"
                 >
                     <MdChatBubbleOutline size={22} />
                     <span>{commentsCount}</span>
                 </button>
-                <button className="flex items-center gap-2 hover:text-green-400 transition-colors">
+                <button
+                    onClick={handleShare}
+                    className="flex items-center gap-2 hover:text-green-400 transition-colors"
+                >
                     <MdShare size={22} />
                 </button>
             </div>
