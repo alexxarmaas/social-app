@@ -19,7 +19,7 @@ export default function ProductModal({ isOpen, onClose, product, onContactSeller
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
             <div
-                className="bg-slate-900 rounded-2xl w-full max-w-4xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
+                className="bg-slate-900 rounded-2xl w-full max-w-4xl border border-slate-700 shadow-2xl overflow-y-auto md:overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Image Section */}
@@ -44,7 +44,7 @@ export default function ProductModal({ isOpen, onClose, product, onContactSeller
                 </div>
 
                 {/* Details Section */}
-                <div className="w-full md:w-1/2 flex flex-col h-full">
+                <div className="w-full md:w-1/2 flex flex-col md:h-full">
                     <div className="p-6 border-b border-slate-800 flex justify-between items-start">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-2">{product.title}</h2>
@@ -59,7 +59,7 @@ export default function ProductModal({ isOpen, onClose, product, onContactSeller
                         </button>
                     </div>
 
-                    <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                    <div className="p-6 md:overflow-y-auto md:flex-1 space-y-6">
                         {/* Price */}
                         <div className="flex items-center gap-2 text-3xl font-bold text-white">
                             {product.price}€
