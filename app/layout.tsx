@@ -38,6 +38,7 @@ export const viewport = {
 };
 
 import Provider from "@/components/SessionProvider";
+import PushNotificationManager from "@/components/notifications/PushNotificationManager";
 
 export default function RootLayout({
   children,
@@ -49,7 +50,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${aeroblade.variable} antialiased`}
       >
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <PushNotificationManager />
+        </Provider>
       </body>
     </html>
   );

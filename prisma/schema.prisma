@@ -48,6 +48,19 @@ model User {
   clubMessages       ClubMessage[]
   eventPhotos        EventPhoto[]
   ownedClubs         Club[]        @relation("ClubOwner")
+  pushSubscriptions  PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String
+  p256dh    String
+  auth      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, endpoint])
 }
 
 // Car model for user vehicles

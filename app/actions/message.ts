@@ -4,6 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
+import { sendNotification } from "@/app/actions/notifications";
 
 
 interface ConversationWithDetails {
@@ -193,6 +194,28 @@ export async function sendMessage(conversationId: string | null, recipientId: st
             where: { id: convId },
             data: { updatedAt: new Date() },
         });
+
+        // Notify recipient
+        try {
+            // Find the other participant
+            const conversation = await prisma.conversation.findUnique({
+                where: { id: convId },
+                include: { participants: true }
+            });
+
+            const recipient = conversation?.participants.find(p => p.id !== session.user.id);
+
+            if (recipient) {
+                sendNotification(
+                    recipient.id,
+                    `Nuevo mensaje de ${session.user.name || session.user.username}`,
+                    content.length > 50 ? content.substring(0, 50) + "..." : content,
+                    `/messages?id=${convId}`
+                );
+            }
+        } catch (error) {
+            console.error("Error sending message notification:", error);
+        }
 
 
 

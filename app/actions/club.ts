@@ -4,6 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { revalidatePath } from "next/cache";
+import { sendNotification } from "@/app/actions/notifications";
 
 export async function getClub(clubId: string) {
     try {
@@ -246,6 +247,33 @@ export async function joinClub(clubId: string) {
             }
         });
 
+        // Notify Club Admins
+        try {
+            const club = await prisma.club.findUnique({
+                where: { id: clubId },
+                select: { name: true }
+            });
+
+            const admins = await prisma.clubMember.findMany({
+                where: {
+                    clubId,
+                    role: { in: ["admin", "owner"] }
+                },
+                select: { userId: true }
+            });
+
+            admins.forEach(admin => {
+                sendNotification(
+                    admin.userId,
+                    "Solicitud de unión",
+                    `${session.user.name || session.user.username} quiere unirse a ${club?.name}`,
+                    `/clubs/${clubId}`
+                );
+            });
+        } catch (error) {
+            console.error("Error sending club join notification:", error);
+        }
+
         revalidatePath(`/clubs/${clubId}`);
         return { success: true };
     } catch (error) {
@@ -298,6 +326,28 @@ export async function manageMember(clubId: string, memberId: string, action: "ap
                 where: { id: memberId },
                 data: { status: "approved" }
             });
+
+            // Notify User
+            try {
+                const member = await prisma.clubMember.findUnique({
+                    where: { id: memberId },
+                    include: {
+                        user: { select: { id: true } },
+                        club: { select: { id: true, name: true } }
+                    }
+                });
+
+                if (member) {
+                    sendNotification(
+                        member.user.id,
+                        "Solicitud aceptada",
+                        `Has sido aceptado en el club ${member.club.name}`,
+                        `/clubs/${member.club.id}`
+                    );
+                }
+            } catch (error) {
+                console.error("Error sending club approval notification:", error);
+            }
         } else {
             // reject or kick both delete the record
             await prisma.clubMember.delete({

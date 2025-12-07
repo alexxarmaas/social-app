@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { authOptions } from "@/app/lib/auth";
 import { createNotification } from "./notification";
 import { uploadFileToBlob } from "@/app/lib/blob";
+import { sendNotification } from "@/app/actions/notifications";
 
 export async function createPost(formData: FormData) {
     // Get user session
@@ -188,6 +189,16 @@ export async function toggleLike(postId: string) {
                     "le gustó tu publicación",
                     postId
                 );
+
+                // Push Notification
+                if (post.authorId !== session.user.id) {
+                    sendNotification(
+                        post.authorId,
+                        "Nuevo Like",
+                        `${session.user.name || session.user.username} le gustó tu publicación`,
+                        `/post/${postId}`
+                    );
+                }
             }
         }
 
@@ -278,6 +289,16 @@ export async function addComment(postId: string, content: string) {
                 "comentó en tu publicación",
                 postId
             );
+
+            // Push Notification
+            if (post.authorId !== session.user.id) {
+                sendNotification(
+                    post.authorId,
+                    "Nuevo Comentario",
+                    `${session.user.name || session.user.username} comentó: "${content.length > 30 ? content.substring(0, 30) + '...' : content}"`,
+                    `/post/${postId}`
+                );
+            }
         }
 
         revalidatePath("/feed");

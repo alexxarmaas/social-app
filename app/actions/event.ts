@@ -5,6 +5,7 @@ import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadFileToBlob } from "@/app/lib/blob";
+import { sendNotification } from "@/app/actions/notifications";
 
 export async function getEvents(filter?: string, clubId?: string) {
     try {
@@ -146,6 +147,43 @@ export async function createEvent(formData: FormData) {
                 creator: { connect: { id: session.user.id } }
             }
         });
+
+        // Notify followers or club members
+        try {
+            let recipients: string[] = [];
+
+            if (clubId) {
+                // Notify club members
+                const clubMembers = await prisma.clubMember.findMany({
+                    where: {
+                        clubId,
+                        userId: { not: session.user.id } // Don't notify self
+                    },
+                    select: { userId: true }
+                });
+                recipients = clubMembers.map(m => m.userId);
+            } else {
+                // Notify followers
+                const followers = await prisma.follow.findMany({
+                    where: { followingId: session.user.id },
+                    select: { followerId: true }
+                });
+                recipients = followers.map(f => f.followerId);
+            }
+
+            // Send notifications in background (don't await to block response)
+            recipients.forEach(userId => {
+                sendNotification(
+                    userId,
+                    "Nuevo Evento",
+                    `${session.user.name || session.user.username} ha creado el evento "${title}"`,
+                    `/calendar` // Or specific event link if we had a page
+                );
+            });
+
+        } catch (error) {
+            console.error("Error sending event notifications:", error);
+        }
 
         revalidatePath("/calendar");
         return { event };
