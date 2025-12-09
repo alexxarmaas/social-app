@@ -31,6 +31,7 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
     // Check permissions
     const isCreator = event.creatorId === currentUserId;
     const isClubAdmin = event.club?.members?.some((m: any) => m.userId === currentUserId && ['admin', 'owner'].includes(m.role));
+    const isAuthenticated = !!currentUserId;
 
     const handleRsvp = async (status: string) => {
         if (!currentUserId) {
@@ -143,7 +144,7 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
                 {/* Action */}
                 <div className="flex gap-2">
                     {/* Manage Button */}
-                    {(isCreator || isClubAdmin) && (
+                    {(isAuthenticated && (isCreator || isClubAdmin)) && (
                         <>
                             <Link
                                 href={`/events/${event.id}/manage`}
@@ -172,7 +173,7 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
                     )}
 
                     {/* View Ticket Button */}
-                    {isAttending && !isCreator && !isClubAdmin && (
+                    {isAuthenticated && isAttending && !isCreator && !isClubAdmin && (
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
@@ -187,7 +188,7 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
                     )}
 
                     {/* RSVP Button */}
-                    {!isCreator && !isClubAdmin && (
+                    {isAuthenticated && !isCreator && !isClubAdmin && (
                         <button
                             onClick={(e) => { e.stopPropagation(); handleRsvp(isAttending ? "not_going" : "going"); }}
                             disabled={loading || (!isAttending && isFull)}

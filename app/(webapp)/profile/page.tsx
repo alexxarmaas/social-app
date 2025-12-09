@@ -1,4 +1,6 @@
 import { getUserProfile } from "@/app/actions/profile";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
 import GarageGrid from "@/components/profile/GarageGrid";
@@ -7,6 +9,7 @@ import { MdSettings, MdVerified, MdLocationOn, MdCalendarToday, MdBarChart, MdBo
 
 export default async function ProfilePage() {
     const { user, error } = await getUserProfile();
+    const session = await getServerSession(authOptions);
 
     if (error || !user) {
         return (
@@ -24,9 +27,11 @@ export default async function ProfilePage() {
                     <h1 className="text-xl font-bold text-white flex items-center gap-2">
                         {user.username} <MdVerified className="text-blue-500" />
                     </h1>
-                    <Link href="/settings" className="text-slate-400 hover:text-white">
-                        <MdSettings size={24} />
-                    </Link>
+                    {session?.user?.id === user.id && (
+                        <Link href="/settings" className="text-slate-400 hover:text-white">
+                            <MdSettings size={24} />
+                        </Link>
+                    )}
                 </div>
             </header>
 
@@ -106,7 +111,7 @@ export default async function ProfilePage() {
                 </div>
 
                 {/* Garage Section */}
-                <GarageGrid cars={user.cars} isOwner={true} />
+                <GarageGrid cars={user.cars} isOwner={session?.user?.id === user.id} />
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">

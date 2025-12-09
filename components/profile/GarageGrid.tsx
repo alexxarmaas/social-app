@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { MdClose } from "react-icons/md";
 import AddCarModal from "./AddCarModal";
 import EditCarModal from "./EditCarModal";
@@ -14,6 +15,7 @@ interface GarageGridProps {
 }
 
 export default function GarageGrid({ cars, isOwner = false, hideHeader = false }: { cars: any[], isOwner?: boolean, hideHeader?: boolean }) {
+    const { data: session } = useSession();
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingCar, setEditingCar] = useState<any | null>(null);
     const [selectedImage, setSelectedImage] = useState<any | null>(null);
@@ -31,7 +33,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <MdDirectionsCar className="text-red-500" /> Garaje
                     </h2>
-                    {isOwner && (
+                    {(session && isOwner) && (
                         <button
                             onClick={() => setShowAddModal(true)}
                             className="px-4 py-2 bg-slate-800 text-white rounded-lg font-semibold hover:bg-slate-700 border border-slate-700 flex items-center gap-2"
@@ -55,7 +57,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                                     <MdDirectionsCar size={48} />
                                 </div>
                             )}
-                            {isOwner && (
+                            {(session && isOwner) && (
                                 <div className="absolute top-2 right-2 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={(e: any) => { e.stopPropagation(); setEditingCar(car); }}
@@ -109,7 +111,7 @@ export default function GarageGrid({ cars, isOwner = false, hideHeader = false }
                     <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-700 rounded-xl">
                         <div className="text-slate-500 text-6xl mb-4 flex justify-center"><MdDirectionsCar /></div>
                         <p className="text-slate-400">Tu garaje está vacío</p>
-                        {isOwner && (
+                        {(session && isOwner) && (
                             <button
                                 onClick={() => setShowAddModal(true)}
                                 className="mt-4 text-red-500 font-semibold hover:text-red-400"

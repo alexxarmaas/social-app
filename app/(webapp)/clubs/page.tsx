@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import { getClubs, joinClub, leaveClub } from "@/app/actions/club";
 import CreateClubModal from "@/components/clubs/CreateClubModal";
 import { MdGroups, MdAdd } from "react-icons/md";
@@ -58,7 +60,15 @@ export default function ClubsPage() {
         setLoading(false);
     };
 
+    const router = useRouter();
+    const { data: session } = useSession();
+
     const handleJoinClub = async (clubId: string) => {
+        if (!session) {
+            router.push(`/login?next=${encodeURIComponent(`/clubs/${clubId}`)}`);
+            return;
+        }
+
         const result = await joinClub(clubId);
         if (result.error) {
             alert(result.error);
@@ -68,6 +78,11 @@ export default function ClubsPage() {
     };
 
     const handleCancelRequest = async (clubId: string) => {
+        if (!session) {
+            router.push(`/login?next=${encodeURIComponent(`/clubs/${clubId}`)}`);
+            return;
+        }
+
         const result = await leaveClub(clubId);
         if (result.error) {
             alert(result.error);
@@ -86,7 +101,13 @@ export default function ClubsPage() {
                         <p className="text-slate-400 text-sm mt-1">Únete a comunidades de coches</p>
                     </div>
                     <button
-                        onClick={() => setShowCreateModal(true)}
+                        onClick={() => {
+                            if (!session) {
+                                router.push(`/login?next=${encodeURIComponent('/clubs')}`);
+                                return;
+                            }
+                            setShowCreateModal(true);
+                        }}
                         className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all flex items-center gap-2"
                     >
                         <MdAdd size={20} />

@@ -24,6 +24,13 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
     const router = useRouter();
 
     const handleContactSeller = async (listing: any) => {
+        if (!session) {
+            const prefill = `Hola ${listing.seller.username}, estoy interesado en ${listing.title}, ¿podrías darme mas información?`;
+            const next = encodeURIComponent(`/messages?prefill=${encodeURIComponent(prefill)}`);
+            router.push(`/login?next=${next}`);
+            return;
+        }
+
         const sellerId = listing.sellerId;
         if (!sellerId) {
             toast.error('Vendedor no disponible');
@@ -107,7 +114,7 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
                                 </button>
                             </div>
 
-                            {(isOwner || isListingOwner) && (
+                            {isOwner && (
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();

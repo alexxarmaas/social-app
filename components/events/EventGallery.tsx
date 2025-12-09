@@ -65,7 +65,7 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-white">Galería del Evento</h3>
-                {(isAttendee || isCreator) && (
+                {(session && (isAttendee || isCreator)) && (
                     <button
                         onClick={() => setShowUploadModal(true)}
                         className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2"

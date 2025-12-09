@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { createClubPost, getClubPosts } from "@/app/actions/club";
 import PostCard from "@/components/feed/PostCard";
 import { MdSend, MdImage } from "react-icons/md";
@@ -11,6 +12,7 @@ interface ClubFeedProps {
 }
 
 export default function ClubFeed({ clubId, isMember }: ClubFeedProps) {
+    const { data: session } = useSession();
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [content, setContent] = useState("");
@@ -49,7 +51,7 @@ export default function ClubFeed({ clubId, isMember }: ClubFeedProps) {
     return (
         <div className="space-y-6">
             {/* Create Post Input */}
-            {isMember && (
+            {(session && isMember) && (
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700 p-4">
                     <form onSubmit={handlePost} className="flex gap-4">
                         <div className="flex-1">
@@ -80,7 +82,7 @@ export default function ClubFeed({ clubId, isMember }: ClubFeedProps) {
             ) : posts.length === 0 ? (
                 <div className="text-center py-12 text-slate-500 bg-slate-800/30 rounded-xl border border-slate-700/50">
                     <p>No hay publicaciones aún.</p>
-                    {isMember && <p className="text-sm mt-2">¡Sé el primero en publicar!</p>}
+                    {(session && isMember) && <p className="text-sm mt-2">¡Sé el primero en publicar!</p>}
                 </div>
             ) : (
                 <div className="space-y-4">

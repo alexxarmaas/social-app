@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { MdFavorite, MdFavoriteBorder, MdChatBubbleOutline, MdShare, MdMoreHoriz } from "react-icons/md";
-import { useRouter } from "next/navigation";
 import { toggleLike } from "@/app/actions/post";
 import CommentModal from "./CommentModal";
 import toast from "react-hot-toast";
-import { useSession } from "next-auth/react";
 
 interface PostCardProps {
     post: any;
@@ -32,6 +32,10 @@ export default function PostCard({ post, onCommentClick, disableCommentModal = f
         }
 
         if (isLikeLoading) return;
+        if (!session) {
+            router.push(`/login?next=${encodeURIComponent(pathname || '/')}`);
+            return;
+        }
 
         // Optimistic update
         const newIsLiked = !isLiked;

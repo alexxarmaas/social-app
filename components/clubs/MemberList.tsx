@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { manageMember } from "@/app/actions/club";
 import { MdCheck, MdClose, MdDelete } from "react-icons/md";
+import { useSession } from "next-auth/react";
 
 interface MemberListProps {
     members: any[];
@@ -12,6 +13,7 @@ interface MemberListProps {
 }
 
 export default function MemberList({ members, clubId, isAdmin }: MemberListProps) {
+    const { data: session } = useSession();
     const handleAction = async (memberId: string, action: "approve" | "reject" | "kick") => {
         if (confirm(`¿Estás seguro de que quieres ${action === "approve" ? "aprobar" : "eliminar"} a este usuario?`)) {
             await manageMember(clubId, memberId, action);
@@ -23,7 +25,7 @@ export default function MemberList({ members, clubId, isAdmin }: MemberListProps
 
     return (
         <div className="space-y-6">
-            {isAdmin && pendingMembers.length > 0 && (
+            {(session && isAdmin) && pendingMembers.length > 0 && (
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-yellow-500/30 p-4">
                     <h3 className="text-yellow-500 font-bold mb-4">Solicitudes Pendientes</h3>
                     <div className="space-y-3">
@@ -83,7 +85,7 @@ export default function MemberList({ members, clubId, isAdmin }: MemberListProps
                                     <p className="text-slate-400 text-xs">@{member.user.username}</p>
                                 </div>
                             </Link>
-                            {isAdmin && member.role !== "admin" && (
+                            {(session && isAdmin) && member.role !== "admin" && (
                                 <button
                                     onClick={() => handleAction(member.id, "kick")}
                                     className="text-slate-500 hover:text-red-500 transition-colors"

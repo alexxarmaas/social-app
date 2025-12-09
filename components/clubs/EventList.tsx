@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { createClubEvent, deleteClubEvent, updateClubEvent, joinClubEvent, leaveClubEvent } from "@/app/actions/club";
 import { MdEvent, MdAdd, MdLocationOn, MdAccessTime, MdPeople, MdEdit, MdDelete, MdClose, MdCheckCircle, MdExitToApp } from "react-icons/md";
 
@@ -12,6 +13,7 @@ interface EventListProps {
 }
 
 export default function EventList({ events, clubId, isAdmin, currentUserId }: EventListProps) {
+    const { data: session } = useSession();
     const [showModal, setShowModal] = useState(false);
     const [editingEvent, setEditingEvent] = useState<any>(null);
     const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function EventList({ events, clubId, isAdmin, currentUserId }: Ev
 
     return (
         <div className="space-y-6">
-            {isAdmin && (
+            {(session && isAdmin) && (
                 <button
                     onClick={openCreateModal}
                     className="w-full py-3 bg-slate-800 border border-dashed border-slate-600 rounded-xl text-slate-400 hover:text-white hover:border-slate-500 transition-colors flex items-center justify-center gap-2"
@@ -90,7 +92,7 @@ export default function EventList({ events, clubId, isAdmin, currentUserId }: Ev
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
                                         <h3 className="text-white font-bold text-lg">{event.title}</h3>
-                                        {isAdmin && (
+                                        {(session && isAdmin) && (
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => openEditModal(event)}

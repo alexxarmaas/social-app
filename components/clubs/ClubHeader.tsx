@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { MdEdit, MdCameraAlt, MdCheck, MdClose, MdLocationOn, MdGroups, MdEvent } from "react-icons/md";
 import { updateClub } from "@/app/actions/club";
@@ -16,6 +17,7 @@ interface ClubHeaderProps {
 }
 
 export default function ClubHeader({ club, isOwner, isAdmin, isMember }: ClubHeaderProps) {
+    const { data: session } = useSession();
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -184,7 +186,7 @@ export default function ClubHeader({ club, isOwner, isAdmin, isMember }: ClubHea
 
                             {/* Action Buttons */}
                             <div className="flex items-center gap-3">
-                                {(isOwner || isAdmin) && !isEditing && (
+                                {(session && (isOwner || isAdmin)) && !isEditing && (
                                     <button
                                         onClick={() => setIsEditing(true)}
                                         className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"

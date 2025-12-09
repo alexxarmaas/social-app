@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MdEmail, MdPerson, MdLock, MdStore, MdGroups, MdArrowForward, MdAddPhotoAlternate } from "react-icons/md";
@@ -10,6 +10,7 @@ import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function RegisterPage() {
     const router = useRouter();
+    const [nextPath, setNextPath] = useState<string>('/feed');
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -62,12 +63,21 @@ export default function RegisterPage() {
             }
 
             toast.success("¡Registro exitoso! Redirigiendo...");
-            router.push("/login");
+            router.push(`/login?next=${encodeURIComponent(nextPath)}`);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Error al registrarse");
         } finally {
             setLoading(false);
         }
+
+        // Read `next` from URL to preserve redirect after register
+        useEffect(() => {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const next = params.get('next');
+                if (next) setNextPath(next);
+            } catch (err) {}
+        }, []);
     };
 
     return (
@@ -308,7 +318,7 @@ export default function RegisterPage() {
                 <div className="mt-6 text-center">
                     <p className="text-zinc-400 text-sm">
                         ¿Ya tienes cuenta?{" "}
-                        <Link href="/login" className="text-white hover:underline">
+                        <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="text-white hover:underline">
                             Inicia Sesión
                         </Link>
                     </p>
