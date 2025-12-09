@@ -21,7 +21,6 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
-    pathname.startsWith('/api') ||
     pathname.startsWith('/public')
   ) {
     return NextResponse.next();
@@ -32,9 +31,9 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow GET requests to view pages without auth (public view).
-  // For non-GET requests (actions that modify data), require a valid session.
-  if (req.method === 'GET') {
+  // Allow safe methods to view pages without auth (public view): GET, HEAD, OPTIONS.
+  // For unsafe methods (POST, PUT, DELETE, PATCH, etc.), require a valid session.
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     return NextResponse.next();
   }
 

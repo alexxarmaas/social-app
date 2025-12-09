@@ -23,6 +23,7 @@ export default function PostCard({ post, onCommentClick, disableCommentModal = f
     const [commentsCount, setCommentsCount] = useState(post.commentsCount);
     const [showComments, setShowComments] = useState(false);
     const [isLikeLoading, setIsLikeLoading] = useState(false);
+    const pathname = usePathname();
     const router = useRouter();
 
     const handleLike = async () => {
