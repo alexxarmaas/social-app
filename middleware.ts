@@ -48,15 +48,22 @@ export async function middleware(req: NextRequest) {
     const secFetchMode = (req.headers.get('sec-fetch-mode') || '').toLowerCase();
     const isApi = pathname.startsWith('/api');
 
+    // If this is a server-action (RSC) request it will include Accept: text/x-component.
+    // We must NOT short-circuit server-action requests here because the server action
+    // code itself returns structured `{ error, code }` responses (e.g. code: 'UNAUTHENTICATED').
+    if (accept.includes('text/x-component')) {
+      return NextResponse.next();
+    }
+
     // Consider this a navigation when the client explicitly accepts HTML and the
     // fetch mode is a navigation. Everything else we treat as programmatic.
     const isNavigation = accept.includes('text/html') && secFetchMode === 'navigate';
 
     const isProgrammatic = isApi || req.headers.get('x-requested-with') === 'XMLHttpRequest' ||
-      accept.includes('application/json') || accept.includes('text/x-component') || !isNavigation;
+      accept.includes('application/json') || !isNavigation;
 
     if (isProgrammatic) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHENTICATED' }, { status: 401 });
     }
 
     const loginUrl = new URL('/login', req.url);

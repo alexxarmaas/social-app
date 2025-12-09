@@ -150,7 +150,7 @@ export async function getClubs(search?: string, category?: string) {
 
 export async function createClub(formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
@@ -186,7 +186,7 @@ export async function createClub(formData: FormData) {
 
 export async function updateClub(clubId: string, formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify ownership
     const club = await prisma.club.findUnique({
@@ -235,7 +235,7 @@ export async function updateClub(clubId: string, formData: FormData) {
 
 export async function joinClub(clubId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     try {
         await prisma.clubMember.create({
@@ -283,7 +283,7 @@ export async function joinClub(clubId: string) {
 
 export async function leaveClub(clubId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     try {
         await prisma.clubMember.delete({
@@ -304,7 +304,7 @@ export async function leaveClub(clubId: string) {
 
 export async function manageMember(clubId: string, memberId: string, action: "approve" | "reject" | "kick") {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify admin status
     const adminMembership = await prisma.clubMember.findUnique({
@@ -366,7 +366,7 @@ export async function manageMember(clubId: string, memberId: string, action: "ap
 
 export async function createClubEvent(clubId: string, formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify admin
     const membership = await prisma.clubMember.findUnique({
@@ -407,7 +407,7 @@ export async function createClubEvent(clubId: string, formData: FormData) {
 
 export async function updateClubEvent(eventId: string, clubId: string, formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify admin
     const membership = await prisma.clubMember.findUnique({
@@ -447,7 +447,7 @@ export async function updateClubEvent(eventId: string, clubId: string, formData:
 
 export async function deleteClubEvent(eventId: string, clubId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify admin
     const membership = await prisma.clubMember.findUnique({
@@ -466,7 +466,7 @@ export async function deleteClubEvent(eventId: string, clubId: string) {
 
 export async function joinClubEvent(eventId: string, clubId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     try {
         await prisma.eventAttendee.create({
@@ -485,7 +485,7 @@ export async function joinClubEvent(eventId: string, clubId: string) {
 
 export async function leaveClubEvent(eventId: string, clubId: string) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     try {
         await prisma.eventAttendee.delete({
@@ -507,7 +507,7 @@ export async function leaveClubEvent(eventId: string, clubId: string) {
 
 export async function createClubPost(clubId: string, formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return { error: "No autorizado" };
+    if (!session?.user?.id) return { error: "No autenticado", code: "UNAUTHENTICATED" };
 
     // Verify member
     const membership = await prisma.clubMember.findUnique({
