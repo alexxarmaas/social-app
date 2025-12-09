@@ -9,7 +9,7 @@ import { uploadFileToBlob } from "@/app/lib/blob";
 export async function getUserProfile() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -49,7 +49,7 @@ export async function getUserProfile() {
 export async function updateProfile(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -106,7 +106,7 @@ export async function updateProfile(formData: FormData) {
 export async function addCar(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -143,7 +143,7 @@ export async function addCar(formData: FormData) {
 export async function updateCar(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -185,7 +185,7 @@ export async function updateCar(formData: FormData) {
 export async function deleteCar(carId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {

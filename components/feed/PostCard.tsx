@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
+import { handleUnauth } from "@/components/auth/handleUnauth";
 import Image from "next/image";
 import Link from "next/link";
 import { MdFavorite, MdFavoriteBorder, MdChatBubbleOutline, MdShare, MdMoreHoriz } from "react-icons/md";
@@ -47,6 +48,9 @@ export default function PostCard({ post, onCommentClick, disableCommentModal = f
         const result = await toggleLike(post.id);
 
         if (result.error) {
+            // If unauthenticated, redirect to login preserving current path
+            if (handleUnauth(result, router, `/post/${post.id}`)) return;
+
             // Revert on error
             setIsLiked(!newIsLiked);
             setLikesCount((prev: number) => !newIsLiked ? prev + 1 : prev - 1);

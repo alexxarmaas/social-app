@@ -6,6 +6,8 @@ import { MdAdd, MdClose, MdFavorite, MdFavoriteBorder, MdDelete } from "react-ic
 import { getEventPhotos, uploadEventPhoto } from "@/app/actions/gallery";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
+import { handleUnauth } from '@/components/auth/handleUnauth';
 import ImageUpload from "@/components/ui/ImageUpload";
 
 interface EventGalleryProps {
@@ -18,6 +20,7 @@ interface EventGalleryProps {
 export default function EventGallery({ eventId, isAttendee, isCreator, canUpload }: EventGalleryProps) {
     const { data: session } = useSession();
     const [photos, setPhotos] = useState<any[]>([]);
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [showUploadModal, setShowUploadModal] = useState(false);
@@ -50,6 +53,7 @@ export default function EventGallery({ eventId, isAttendee, isCreator, canUpload
         const result = await uploadEventPhoto(eventId, formData);
 
         if (result.error) {
+            if (handleUnauth(result, router, `/events/${eventId}`)) return;
             toast.error(result.error);
         } else {
             toast.success("Foto subida correctamente");

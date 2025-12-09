@@ -7,7 +7,7 @@ import { authOptions } from "@/app/lib/auth";
 export async function searchUsers(query: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!query || query.trim().length < 2) {
@@ -54,7 +54,7 @@ export async function searchUsers(query: string) {
 export async function searchCars(query: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!query || query.trim().length < 2) {
@@ -94,7 +94,7 @@ export async function searchCars(query: string) {
 export async function searchClubs(query: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!query || query.trim().length < 2) {
@@ -132,7 +132,7 @@ export async function searchClubs(query: string) {
 export async function searchAll(query: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!query || query.trim().length < 2) {

@@ -9,7 +9,7 @@ import { hash, compare } from "bcryptjs";
 export async function updatePassword(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     const currentPassword = formData.get("currentPassword") as string;
@@ -60,7 +60,7 @@ export async function updatePassword(formData: FormData) {
 export async function updateEmail(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     const newEmail = formData.get("email") as string;

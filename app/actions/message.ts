@@ -25,7 +25,7 @@ interface ConversationWithDetails {
 export async function getConversations() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -90,9 +90,9 @@ export async function getConversations() {
 
 export async function getMessages(conversationId: string) {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
-    }
+        if (!session || !session.user?.id) {
+            return { error: "No autenticado", code: "UNAUTHENTICATED" };
+        }
 
     try {
         // Verify participation
@@ -130,7 +130,7 @@ export async function getMessages(conversationId: string) {
 export async function sendMessage(conversationId: string | null, recipientId: string | null, content: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -229,9 +229,9 @@ export async function sendMessage(conversationId: string | null, recipientId: st
 
 export async function startConversation(recipientId: string) {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
-    }
+        if (!session || !session.user?.id) {
+            return { error: "No autenticado", code: "UNAUTHENTICATED" };
+        }
 
     try {
         // Check if conversation exists
@@ -270,7 +270,7 @@ export async function startConversation(recipientId: string) {
 export async function markConversationAsRead(conversationId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {

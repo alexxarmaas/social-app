@@ -41,6 +41,16 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
+    // If the request looks like an XHR/fetch (expects JSON) or it's an API route,
+    // return a 401 JSON response instead of redirecting to the login HTML page.
+    const accept = req.headers.get('accept') || '';
+    const isApi = pathname.startsWith('/api');
+    const wantsJson = accept.includes('application/json') || req.headers.get('x-requested-with') === 'XMLHttpRequest';
+
+    if (isApi || wantsJson) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('next', pathname + search);
     return NextResponse.redirect(loginUrl);

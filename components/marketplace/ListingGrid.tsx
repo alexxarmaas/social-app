@@ -42,12 +42,20 @@ export default function ListingGrid({ listings, isOwner = false }: ListingGridPr
         try {
             const result = await startConversation(sellerId);
             if (result.error) {
-                // If not authorized, redirect to login with next param
+                // If unauthenticated, redirect to login preserving the prefill
+                if (result.code === 'UNAUTHENTICATED') {
+                    const next = encodeURIComponent(`/messages?prefill=${encodeURIComponent(prefill)}`);
+                    router.push(`/login?next=${next}`);
+                    return;
+                }
+
+                // legacy check for other auth messages
                 if (typeof result.error === 'string' && result.error.toLowerCase().includes('no autorizado')) {
                     const next = encodeURIComponent(`/messages?prefill=${encodeURIComponent(prefill)}`);
                     router.push(`/login?next=${next}`);
                     return;
                 }
+
                 toast.error(result.error || 'Error iniciando conversación');
                 return;
             }

@@ -45,9 +45,9 @@ export async function getListings(category?: string, search?: string) {
 
 export async function createListing(formData: FormData) {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
-    }
+        if (!session || !session.user?.id) {
+            return { error: "No autenticado", code: "UNAUTHENTICATED" };
+        }
 
     try {
         const title = formData.get("title") as string;

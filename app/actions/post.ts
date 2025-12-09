@@ -11,7 +11,7 @@ export async function createPost(formData: FormData) {
     // Get user session
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -148,7 +148,7 @@ export async function getPost(postId: string) {
 export async function toggleLike(postId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -249,7 +249,7 @@ export async function getComments(postId: string) {
 export async function addComment(postId: string, content: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!content.trim()) {
@@ -312,7 +312,7 @@ export async function addComment(postId: string, content: string) {
 export async function deleteComment(commentId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {

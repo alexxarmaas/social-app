@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 export async function getNotifications() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -47,7 +47,7 @@ export async function getNotifications() {
 export async function markAsRead(notificationId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -72,7 +72,7 @@ export async function markAsRead(notificationId: string) {
 export async function markAllAsRead() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {

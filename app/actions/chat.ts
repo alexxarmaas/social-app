@@ -7,7 +7,7 @@ import { authOptions } from "@/app/lib/auth";
 export async function getClubMessages(clubId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     console.log("Prisma keys:", Object.keys(prisma));
@@ -54,7 +54,7 @@ export async function getClubMessages(clubId: string) {
 export async function sendClubMessage(clubId: string, content: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (!content.trim()) {

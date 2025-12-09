@@ -59,7 +59,7 @@ export async function getPublicProfile(username: string) {
 export async function followUser(targetUserId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     if (session.user.id === targetUserId) {
@@ -93,7 +93,7 @@ export async function followUser(targetUserId: string) {
 export async function unfollowUser(targetUserId: string) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     try {
@@ -116,7 +116,7 @@ export async function unfollowUser(targetUserId: string) {
 export async function updateProfile(formData: FormData) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.id) {
-        return { error: "No autenticado" };
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
     }
 
     const name = formData.get("name") as string;

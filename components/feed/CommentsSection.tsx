@@ -5,7 +5,9 @@ import Image from "next/image";
 import { MdSend, MdDelete } from "react-icons/md";
 import { getComments, addComment, deleteComment } from "@/app/actions/post";
 import { useSession } from "next-auth/react";
+import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
+import { handleUnauth } from '@/components/auth/handleUnauth';
 
 interface CommentsSectionProps {
     postId: string;
@@ -39,7 +41,11 @@ export default function CommentsSection({ postId, onCommentChange, className = "
 
         setSubmitting(true);
         const result = await addComment(postId, newComment);
-        if (result.success && result.comment) {
+        if (result.error) {
+            if (handleUnauth(result, router, `/post/${postId}`)) return;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any)?.toast?.error?.(result.error as string);
+        } else if (result.success && result.comment) {
             setComments([result.comment, ...comments]);
             setNewComment("");
             if (onCommentChange) onCommentChange(1);
@@ -51,7 +57,11 @@ export default function CommentsSection({ postId, onCommentChange, className = "
         if (!confirm("¿Estás seguro de eliminar este comentario?")) return;
 
         const result = await deleteComment(commentId);
-        if (result.success) {
+        if (result.error) {
+            if (handleUnauth(result, router, `/post/${postId}`)) return;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any)?.toast?.error?.(result.error as string);
+        } else if (result.success) {
             setComments(comments.filter(c => c.id !== commentId));
             if (onCommentChange) onCommentChange(-1);
         }

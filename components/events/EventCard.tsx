@@ -4,6 +4,8 @@ import { MdLocationOn, MdCalendarToday, MdPeople, MdQrCodeScanner, MdEdit, MdDel
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { handleUnauth } from '@/components/auth/handleUnauth';
 import TicketModal from "./TicketModal";
 import { rsvpEvent, deleteEvent } from "@/app/actions/event";
 import { toast } from "react-hot-toast";
@@ -22,6 +24,7 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
     const [showEditModal, setShowEditModal] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const { data: session } = useSession();
+    const router = useRouter();
 
     // Check if current user is attending
     const isAttending = event.attendees.some((a: any) => a.userId === currentUserId);
@@ -43,7 +46,13 @@ export default function EventCard({ event, currentUserId, onClick }: EventCardPr
         const result = await rsvpEvent(event.id, status);
 
         if (result.error) {
-            toast.error(result.error);
+                // Redirect to login if unauthenticated
+                if (handleUnauth(result, router, `/events/${event.id}`)) {
+                    setLoading(false);
+                    return;
+                }
+
+                toast.error(result.error);
         } else {
             toast.success(status === 'going' ? "¡Te has unido al evento!" : "Has cambiado tu asistencia");
         }
