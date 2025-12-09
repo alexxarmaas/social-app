@@ -41,13 +41,21 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
-    // If the request looks like an XHR/fetch (expects JSON) or it's an API route,
-    // return a 401 JSON response instead of redirecting to the login HTML page.
-    const accept = req.headers.get('accept') || '';
+    // Determine whether the request is a browser navigation for HTML (user visiting a page)
+    // or an API/XHR/server-action (programmatic) request. Programmatic requests should
+    // get a 401 JSON response so the client can handle redirecting itself.
+    const accept = (req.headers.get('accept') || '').toLowerCase();
+    const secFetchMode = (req.headers.get('sec-fetch-mode') || '').toLowerCase();
     const isApi = pathname.startsWith('/api');
-    const wantsJson = accept.includes('application/json') || req.headers.get('x-requested-with') === 'XMLHttpRequest';
 
-    if (isApi || wantsJson) {
+    // Consider this a navigation when the client explicitly accepts HTML and the
+    // fetch mode is a navigation. Everything else we treat as programmatic.
+    const isNavigation = accept.includes('text/html') && secFetchMode === 'navigate';
+
+    const isProgrammatic = isApi || req.headers.get('x-requested-with') === 'XMLHttpRequest' ||
+      accept.includes('application/json') || accept.includes('text/x-component') || !isNavigation;
+
+    if (isProgrammatic) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
