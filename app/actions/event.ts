@@ -553,43 +553,40 @@ export async function saveEventRoute(eventId: string, routeData: any) {
             return { error: "No tienes permiso para editar este evento" };
         }
 
-        // Delete existing route if it exists
-        const existingRoute = await prisma.route.findUnique({
-            where: { eventId }
-        });
-
-        if (existingRoute) {
-            await prisma.route.delete({
-                where: { id: existingRoute.id }
-            });
-        }
-
-        // Create new route with stops
         const { stops = [], title = "" } = routeData;
 
-        if (stops.length > 0) {
-            const route = await prisma.route.create({
-                data: {
-                    title,
-                    eventId,
-                    stops: {
-                        create: stops.map((stop: any, idx: number) => ({
-                            name: stop.name,
-                            address: stop.address,
-                            latitude: stop.latitude,
-                            longitude: stop.longitude,
-                            order: idx
-                        }))
-                    }
-                },
-                include: {
-                    stops: { orderBy: { order: 'asc' } }
-                }
+        // Use transaction to ensure atomicity
+        await prisma.$transaction(async (tx) => {
+            // Check for existing route and delete it
+            const existingRoute = await tx.route.findUnique({
+                where: { eventId }
             });
 
-            revalidatePath(`/events/${eventId}`);
-            return { success: true, route };
-        }
+            if (existingRoute) {
+                await tx.route.delete({
+                    where: { id: existingRoute.id }
+                });
+            }
+
+            // Create new route if stops exist
+            if (stops.length > 0) {
+                await tx.route.create({
+                    data: {
+                        title: title || "Ruta del Evento",
+                        eventId,
+                        stops: {
+                            create: stops.map((stop: any, idx: number) => ({
+                                name: stop.name,
+                                address: stop.address || null,
+                                latitude: stop.latitude,
+                                longitude: stop.longitude,
+                                order: idx
+                            }))
+                        }
+                    }
+                });
+            }
+        });
 
         revalidatePath(`/events/${eventId}`);
         return { success: true };
