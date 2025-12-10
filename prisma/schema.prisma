@@ -216,6 +216,35 @@ model Event {
 
   attendees EventAttendee[]
   photos    EventPhoto[]
+  route     Route?
+}
+
+// Route model for event routes with multiple stops
+model Route {
+  id        String   @id @default(uuid())
+  title     String?
+  distance  Float?   // in kilometers
+  duration  Float?   // in minutes
+  stops     Stop[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String @unique
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+// Stop model for route waypoints
+model Stop {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  latitude  Float
+  longitude Float
+  order     Int // order in the route
+  createdAt DateTime @default(now())
+
+  routeId String
+  route   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade)
 }
 
 // Event attendee junction table

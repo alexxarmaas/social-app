@@ -4,6 +4,7 @@ import { authOptions } from "@/app/lib/auth";
 import Image from "next/image";
 import { MdLocationOn, MdCalendarToday, MdPeople, MdAttachMoney } from "react-icons/md";
 import EventGallery from "@/components/events/EventGallery";
+import RouteDisplay from "@/components/events/RouteDisplay";
 import { notFound } from "next/navigation";
 
 export default async function EventPage({ params }: { params: { id: string } }) {
@@ -63,6 +64,9 @@ export default async function EventPage({ params }: { params: { id: string } }) 
                             {event.description || "Sin descripción disponible."}
                         </p>
                     </div>
+
+                    {/* Route (if exists) */}
+                    {event.route && <RouteDisplay route={event.route} />}
 
                     {/* Gallery */}
                     <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">

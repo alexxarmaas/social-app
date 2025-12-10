@@ -76,6 +76,11 @@ export async function getEvent(eventId: string) {
                 creator: {
                     select: { id: true, username: true, name: true, avatar: true }
                 },
+                route: {
+                    include: {
+                        stops: { orderBy: { order: 'asc' } }
+                    }
+                },
                 _count: {
                     select: { attendees: { where: { status: 'going' } } }
                 }
@@ -521,5 +526,75 @@ export async function updateEvent(eventId: string, formData: FormData) {
     } catch (error) {
         console.error("Error updating event:", error);
         return { error: "Error al actualizar el evento" };
+    }
+}
+
+export async function saveEventRoute(eventId: string, routeData: any) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user?.id) {
+        return { error: "No autenticado", code: "UNAUTHENTICATED" };
+    }
+
+    try {
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            include: { club: { include: { members: true } } }
+        });
+
+        if (!event) {
+            return { error: "Evento no encontrado" };
+        }
+
+        const isCreator = event.creatorId === session.user.id;
+        const isClubAdmin = event.club?.members.some((m: any) => m.userId === session.user.id && ['admin', 'owner'].includes(m.role));
+
+        if (!isCreator && !isClubAdmin) {
+            return { error: "No tienes permiso para editar este evento" };
+        }
+
+        // Delete existing route if it exists
+        const existingRoute = await prisma.route.findUnique({
+            where: { eventId }
+        });
+
+        if (existingRoute) {
+            await prisma.route.delete({
+                where: { id: existingRoute.id }
+            });
+        }
+
+        // Create new route with stops
+        const { stops = [], title = "" } = routeData;
+
+        if (stops.length > 0) {
+            const route = await prisma.route.create({
+                data: {
+                    title,
+                    eventId,
+                    stops: {
+                        create: stops.map((stop: any, idx: number) => ({
+                            name: stop.name,
+                            address: stop.address,
+                            latitude: stop.latitude,
+                            longitude: stop.longitude,
+                            order: idx
+                        }))
+                    }
+                },
+                include: {
+                    stops: { orderBy: { order: 'asc' } }
+                }
+            });
+
+            revalidatePath(`/events/${eventId}`);
+            return { success: true, route };
+        }
+
+        revalidatePath(`/events/${eventId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error saving event route:", error);
+        return { error: "Error al guardar la ruta" };
     }
 }
