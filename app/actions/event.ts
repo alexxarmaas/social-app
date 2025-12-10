@@ -45,6 +45,11 @@ export async function getEvents(filter?: string, clubId?: string) {
                 },
                 _count: {
                     select: { attendees: { where: { status: 'going' } } }
+                },
+                route: {
+                    include: {
+                        stops: { orderBy: { order: 'asc' } }
+                    }
                 }
             },
             orderBy: { startDate: 'asc' }

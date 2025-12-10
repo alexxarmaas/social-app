@@ -4,6 +4,7 @@ import { MdClose, MdLocationOn, MdCalendarToday, MdAccessTime, MdPeople, MdMap, 
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import RouteDisplay from "@/components/events/RouteDisplay";
 
 // Dynamically import MapContainer to avoid SSR issues
 const MapContainer = dynamic(
@@ -138,6 +139,9 @@ export default function EventDetailsModal({ isOpen, onClose, event }: EventDetai
                             {event.description || "Sin descripción disponible."}
                         </p>
                     </div>
+
+                    {/* Route Display */}
+                    <RouteDisplay route={event.route} />
 
                     {/* Map Preview */}
                     {event.latitude && event.longitude && isMounted && (
