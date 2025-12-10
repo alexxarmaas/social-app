@@ -481,11 +481,11 @@ export async function updateEvent(eventId: string, formData: FormData) {
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
         const location = formData.get("location") as string;
-        const address = formData.get("address") as string;
+        const address = formData.get("address") as string || undefined;
         const startDate = formData.get("startDate") as string;
-        const endDate = formData.get("endDate") as string;
+        const endDate = formData.get("endDate") as string || undefined;
         const eventType = formData.get("eventType") as string;
-        const visibility = formData.get("visibility") as string;
+        const visibility = formData.get("visibility") as string || undefined;
         const maxAttendees = formData.get("maxAttendees") as string;
         const price = formData.get("price") as string;
         const imageFile = formData.get("image") as File | null;
@@ -555,38 +555,42 @@ export async function saveEventRoute(eventId: string, routeData: any) {
 
         const { stops = [], title = "" } = routeData;
 
-        // Use transaction to ensure atomicity
-        await prisma.$transaction(async (tx) => {
-            // Check for existing route and delete it
-            const existingRoute = await tx.route.findUnique({
+        // Efficiently update or create the route using upsert
+        if (stops.length === 0) {
+            await prisma.route.deleteMany({
                 where: { eventId }
             });
-
-            if (existingRoute) {
-                await tx.route.delete({
-                    where: { id: existingRoute.id }
-                });
-            }
-
-            // Create new route if stops exist
-            if (stops.length > 0) {
-                await tx.route.create({
-                    data: {
-                        title: title || "Ruta del Evento",
-                        eventId,
-                        stops: {
-                            create: stops.map((stop: any, idx: number) => ({
-                                name: stop.name,
-                                address: stop.address || null,
-                                latitude: stop.latitude,
-                                longitude: stop.longitude,
-                                order: idx
-                            }))
-                        }
+        } else {
+            await prisma.route.upsert({
+                where: { eventId },
+                create: {
+                    eventId,
+                    title: title || "Ruta del Evento",
+                    stops: {
+                        create: stops.map((stop: any, idx: number) => ({
+                            name: stop.name,
+                            address: stop.address || null,
+                            latitude: stop.latitude,
+                            longitude: stop.longitude,
+                            order: idx
+                        }))
                     }
-                });
-            }
-        });
+                },
+                update: {
+                    title: title || "Ruta del Evento",
+                    stops: {
+                        deleteMany: {},
+                        create: stops.map((stop: any, idx: number) => ({
+                            name: stop.name,
+                            address: stop.address || null,
+                            latitude: stop.latitude,
+                            longitude: stop.longitude,
+                            order: idx
+                        }))
+                    }
+                }
+            });
+        }
 
         revalidatePath(`/events/${eventId}`);
         return { success: true };
