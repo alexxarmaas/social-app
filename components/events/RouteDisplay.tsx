@@ -43,13 +43,44 @@ export default function RouteDisplay({ route }: RouteDisplayProps) {
         return <div className="h-[300px] bg-slate-800 animate-pulse rounded-xl" />;
     }
 
+    const handleOpenGoogleMaps = () => {
+        if (!route || !route.stops || route.stops.length === 0) return;
+
+        const origin = route.stops[0];
+        const destination = route.stops[route.stops.length - 1];
+        const waypoints = route.stops.slice(1, -1);
+
+        let url = `https://www.google.com/maps/dir/?api=1`;
+        url += `&origin=${origin.latitude},${origin.longitude}`;
+        url += `&destination=${destination.latitude},${destination.longitude}`;
+
+        if (waypoints.length > 0) {
+            const waypointsStr = waypoints
+                .map(stop => `${stop.latitude},${stop.longitude}`)
+                .join('|');
+            url += `&waypoints=${waypointsStr}`;
+        }
+
+        window.open(url, '_blank');
+    };
+
     return (
         <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800 space-y-4">
-            <div className="flex items-center gap-2">
-                <MdDirectionsRun className="text-red-500" size={24} />
-                <h2 className="text-xl font-bold text-white">
-                    {route.title || "Ruta del Evento"}
-                </h2>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <MdDirectionsRun className="text-red-500" size={24} />
+                    <h2 className="text-xl font-bold text-white">
+                        {route.title || "Ruta del Evento"}
+                    </h2>
+                </div>
+
+                <button
+                    onClick={handleOpenGoogleMaps}
+                    className="text-xs bg-blue-600 hover:bg-blue-500 text-white py-1.5 px-3 rounded-lg font-bold transition-colors flex items-center gap-2"
+                >
+                    <MdLocationOn />
+                    Abrir en Google Maps
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
