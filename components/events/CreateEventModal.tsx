@@ -1,16 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createEvent } from "@/app/actions/event";
-import { MdClose, MdEvent, MdLocationOn, MdDescription, MdImage, MdCategory, MdPeople, MdGroups, MdLock, MdAccessTime } from "react-icons/md";
+import { createEvent, saveEventRoute } from "@/app/actions/event";
+import { MdClose, MdEvent, MdLocationOn, MdDescription, MdImage, MdCategory, MdPeople, MdGroups, MdLock, MdAccessTime, MdMap } from "react-icons/md";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import RouteInput from "@/components/events/RouteInput";
 
 // Dynamically import LocationPicker to avoid SSR issues with Leaflet
 const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), {
     ssr: false,
     loading: () => <div className="h-[300px] w-full bg-slate-800 animate-pulse rounded-lg"></div>
 });
+
+interface Stop {
+    id: string;
+    name: string;
+    address?: string | null;
+    latitude: number;
+    longitude: number;
+    order: number;
+}
 
 interface CreateEventModalProps {
     isOpen: boolean;
@@ -23,6 +33,7 @@ export default function CreateEventModal({ isOpen, onClose, userAdminClubs = [] 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedClubId, setSelectedClubId] = useState<string>("");
     const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null);
+    const [route, setRoute] = useState<{ stops: Stop[]; title?: string }>({ stops: [] });
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -47,11 +58,22 @@ export default function CreateEventModal({ isOpen, onClose, userAdminClubs = [] 
 
         if (result.error) {
             alert(result.error);
-        } else {
-            onClose();
-            setPreviewUrl(null);
-            setCoordinates(null);
+            setIsLoading(false);
+            return;
         }
+
+        // Save route if provided
+        if (result.event?.id && route.stops.length > 0) {
+            const routeResult = await saveEventRoute(result.event.id, route);
+            if (routeResult?.error) {
+                alert(routeResult.error);
+            }
+        }
+
+        onClose();
+        setPreviewUrl(null);
+        setCoordinates(null);
+        setRoute({ stops: [] });
         setIsLoading(false);
     };
 
@@ -189,6 +211,15 @@ export default function CreateEventModal({ isOpen, onClose, userAdminClubs = [] 
                             <p className="text-xs text-slate-400 mb-2">Selecciona la ubicación exacta en el mapa:</p>
                             <LocationPicker onLocationSelect={(lat, lng) => setCoordinates({ lat, lng })} />
                         </div>
+                    </div>
+
+                    <div className="bg-slate-800/40 rounded-xl border border-slate-700 p-4 space-y-3">
+                        <div className="flex items-center gap-2 text-white font-semibold text-sm">
+                            <MdMap />
+                            Ruta (opcional)
+                        </div>
+                        <p className="text-xs text-slate-400">Define paradas y coordenadas para la ruta del evento.</p>
+                        <RouteInput onRouteChange={(r) => setRoute(r)} />
                     </div>
 
                     <div>
