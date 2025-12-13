@@ -13,7 +13,7 @@ const PUBLIC_PATHS = [
   '/robots.txt',
   '/sitemap.xml',
   '/api/upload',
-  '/api/auth/register',
+  '/api/auth',
 ];
 
 export async function middleware(req: NextRequest) {
