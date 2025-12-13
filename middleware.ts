@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
   '/favicon.ico',
   '/robots.txt',
   '/sitemap.xml',
+  '/api/upload',
 ];
 
 export async function middleware(req: NextRequest) {
