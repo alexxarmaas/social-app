@@ -140,7 +140,7 @@ export default function ImageUpload({ onUploadComplete, label = "Subir Imagen", 
 
                 <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*, .heic, .heif, .webp"
                     onChange={handleFileChange}
                     disabled={uploading}
                     className="hidden"
