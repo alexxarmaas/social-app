@@ -31,6 +31,15 @@ export default function RegisterPage() {
         bannerUrl: ""
     });
 
+    // Read `next` from URL to preserve redirect after register
+    useEffect(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const next = params.get('next');
+            if (next) setNextPath(next);
+        } catch (err) { }
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -70,14 +79,7 @@ export default function RegisterPage() {
             setLoading(false);
         }
 
-        // Read `next` from URL to preserve redirect after register
-        useEffect(() => {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const next = params.get('next');
-                if (next) setNextPath(next);
-            } catch (err) {}
-        }, []);
+
     };
 
     return (
