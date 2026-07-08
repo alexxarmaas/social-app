@@ -4,6 +4,20 @@
 
 Los eventos y rutas ya están preparados para editarse desde el panel `/admin`.
 
+## Instalación y arranque
+
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Para comprobar producción:
+
+```bash
+npm run build
+```
+
 ### Campos de eventos
 
 - Título
@@ -50,6 +64,23 @@ Crea un preset unsigned en Cloudinary y limita:
 ## Acceso admin
 
 El layout de `/admin` exige sesión de NextAuth y `role = "admin"`. El usuario debe existir en la tabla Prisma `User`.
+
+Desde `/admin` puedes:
+
+- Crear, editar y eliminar eventos.
+- Crear, editar y eliminar rutas.
+- Subir portada y galería con Cloudinary.
+
+## Variables necesarias
+
+- `DATABASE_URL`: base de datos usada por Prisma y NextAuth.
+- `NEXTAUTH_URL`: URL pública de la app.
+- `NEXTAUTH_SECRET`: secreto de NextAuth.
+- `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: clave anónima pública de Supabase.
+- `SUPABASE_SERVICE_ROLE_KEY`: clave de servicio para guardar contenido desde el servidor.
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: nombre del cloud de Cloudinary.
+- `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`: preset unsigned restringido para subir imágenes.
 
 ## Seguridad
 

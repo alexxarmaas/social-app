@@ -1,35 +1,35 @@
 {
   "nav": {
     "home": "Inicio",
-    "about": "Sobre Nosotros",
-    "who_are_we": "Quiénes Somos",
-    "get_app": "Descargar App",
-    "login": "Iniciar Sesión",
-    "register": "Registrarse"
+    "about": "Sobre nosotros",
+    "who_are_we": "Quiénes somos",
+    "get_app": "Descargar app",
+    "login": "Iniciar sesión",
+    "register": "Registro"
   },
   "hero": {
-    "title_prefix": "La Mejor Comunidad de",
-    "title_suffix": "Entusiastas del Motor",
-    "description": "Conecta con otros amantes de los coches, únete a clubs, asiste a eventos y compra/vende coches y piezas. Tu pasión automotriz empieza aquí.",
-    "start_free": "Comenzar Gratis",
-    "download_app": "Descargar App"
+    "title_prefix": "La comunidad premium de",
+    "title_suffix": "amantes del motor",
+    "description": "Conecta con otros amantes de los coches, descubre eventos, explora rutas y forma parte de la cultura Tramassso.",
+    "start_free": "Empezar",
+    "download_app": "Descargar app"
   },
   "features": {
-    "social_feed": "Feed Social",
-    "social_feed_desc": "Comparte tus proyectos, modificaciones y aventuras con la comunidad",
-    "car_clubs": "Clubs de Coches",
-    "car_clubs_desc": "Únete a clubs JDM, Europeos, Muscle y más para conectar con entusiastas",
-    "events": "Calendario de Eventos",
-    "events_desc": "Descubre quedadas, exhibiciones, carreras y rodadas cerca de ti",
-    "marketplace": "Marketplace",
+    "social_feed": "Comunidad",
+    "social_feed_desc": "Comparte proyectos, rutas y experiencias con otros amantes del motor",
+    "car_clubs": "Clubs de coches",
+    "car_clubs_desc": "Conecta con grupos locales y comunidades JDM, europeas, muscle y más",
+    "events": "Calendario de eventos",
+    "events_desc": "Descubre quedadas, exposiciones, rodadas y experiencias cerca de ti",
+    "marketplace": "Mercado",
     "marketplace_desc": "Compra y vende coches, piezas, llantas y accesorios con otros entusiastas"
   },
   "stats": {
-    "active_users": "Usuarios Activos",
-    "car_clubs": "Clubs de Coches",
-    "monthly_events": "Eventos Mensuales"
+    "active_users": "Usuarios activos",
+    "car_clubs": "Clubs de coches",
+    "monthly_events": "Eventos mensuales"
   },
   "footer": {
-    "copyright": "© 2025 Tramassso. La mejor comunidad de entusiastas del motor. Hecho con pasión ❤️"
+    "copyright": "© 2026 Tramassso. Comunidad, eventos y rutas para amantes del motor."
   }
 }

@@ -20,7 +20,7 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     Tramassso
                 </Link>
 
-                {/* Desktop Navigation */}
+                {/* Navegación de escritorio */}
                 <div className="hidden lg:flex gap-6 text-slate-300">
                     <Link
                         href="/"
@@ -32,19 +32,19 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                         href="/about"
                         className={`hover:text-white transition-colors ${currentPage === 'about' ? 'text-white' : ''}`}
                     >
-                        Sobre Nosotros
+                        Sobre nosotros
                     </Link>
                     <Link
                         href="/who-are-we"
                         className={`hover:text-white transition-colors ${currentPage === 'who-are-we' ? 'text-white' : ''}`}
                     >
-                        Quiénes Somos
+                        Quiénes somos
                     </Link>
                     <Link
                         href="/get-app"
                         className={`hover:text-white transition-colors ${currentPage === 'get-app' ? 'text-white' : ''}`}
                     >
-                        Descargar App
+                        Descargar app
                     </Link>
                     <Link
                         href="/events"
@@ -60,35 +60,35 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     </Link>
                 </div>
 
-                {/* Auth Buttons & Mobile Toggle */}
+                    {/* Acceso al panel y menú móvil */}
                 <div className="flex gap-3 items-center">
                     <div className="hidden lg:flex gap-3">
                         <Link href="/admin" className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
-                            Admin
+                            Panel
                         </Link>
                     </div>
 
-                    {/* Mobile Menu Button */}
+                    {/* Botón del menú móvil */}
                     <button onClick={toggleMenu} className="lg:hidden text-slate-300 hover:text-white p-2">
                         {isMenuOpen ? <MdClose size={28} /> : <MdMenu size={28} />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Menú móvil */}
             {isMenuOpen && (
                 <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900 border-b border-slate-800 p-4 flex flex-col gap-4 shadow-xl">
                     <Link href="/" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'home' ? 'text-white' : 'text-slate-300'}`}>
                         Inicio
                     </Link>
                     <Link href="/about" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'about' ? 'text-white' : 'text-slate-300'}`}>
-                        Sobre Nosotros
+                        Sobre nosotros
                     </Link>
                     <Link href="/who-are-we" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'who-are-we' ? 'text-white' : 'text-slate-300'}`}>
-                        Quiénes Somos
+                        Quiénes somos
                     </Link>
                     <Link href="/get-app" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'get-app' ? 'text-white' : 'text-slate-300'}`}>
-                        Descargar App
+                        Descargar app
                     </Link>
                     <Link href="/events" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'events' ? 'text-white' : 'text-slate-300'}`}>
                         Eventos
@@ -98,7 +98,7 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     </Link>
                     <hr className="border-slate-800" />
                     <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="block py-2 text-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold">
-                        Admin
+                        Panel
                     </Link>
                 </div>
             )}

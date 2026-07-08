@@ -1,8 +1,8 @@
 {
     "name": "Tramassso",
     "short_name": "Tramassso",
-    "description": "The ultimate car community app",
-    "start_url": "/feed",
+    "description": "App de comunidad, eventos y rutas de coches",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#0f172a",
     "theme_color": "#0f172a",

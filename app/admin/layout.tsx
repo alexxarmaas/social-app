@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <aside className="border-b border-white/10 bg-zinc-950/95 px-5 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-b-0 lg:border-r lg:px-6">
         <div className="space-y-2">
           <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Panel interno</p>
-          <h1 className="text-2xl font-black uppercase tracking-[0.12em] text-white">Tramassso Admin</h1>
+          <h1 className="text-2xl font-black uppercase tracking-[0.12em] text-white">Panel Tramassso</h1>
         </div>
 
         <nav className="mt-10 grid gap-2 text-sm uppercase tracking-[0.3em] text-zinc-400">

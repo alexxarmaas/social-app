@@ -4,29 +4,29 @@ import WebsiteNav from "@/components/WebsiteNav";
 
 export default function GetAppPage() {
     const features = [
-        { icon: MdPhoneAndroid, title: "Llevalo contigo", description: "Funciona genial en tu teléfono mientras estás en el garaje" },
+        { icon: MdPhoneAndroid, title: "Llévalo contigo", description: "Funciona genial en tu teléfono mientras estás en el garaje" },
         { icon: MdFlashOn, title: "Velocidad", description: "Porque a nadie le gusta esperar" },
         { icon: MdNotifications, title: "Notificaciones", description: "Recibe alertas de eventos y mensajes (cuando tú quieras)" },
-        { icon: MdPhotoCamera, title: "Compartir Fotos", description: "Muestra tu coche en alta resolución" },
-        { icon: MdMap, title: "Encontrar Eventos", description: "Descubre quedadas y exposiciones cerca de ti" },
-        { icon: MdChat, title: "Mensajes Directos", description: "Chatea con otros entusiastas en tiempo real" },
+        { icon: MdPhotoCamera, title: "Compartir fotos", description: "Muestra tu coche en alta resolución" },
+        { icon: MdMap, title: "Encontrar eventos", description: "Descubre quedadas y exposiciones cerca de ti" },
+        { icon: MdChat, title: "Mensajes directos", description: "Chatea con otros entusiastas en tiempo real" },
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-950">
-            {/* Navigation */}
+            {/* Navegación */}
             <WebsiteNav currentPage="get-app" />
 
-            {/* Content */}
+            {/* Contenido */}
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="text-6xl mb-6 flex justify-center text-red-500"><MdPhoneAndroid size={64} /></div>
                     <h1 className="text-5xl font-bold text-white mb-4">Descarga Tramassso</h1>
                     <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
-                        Lleva la comunidad de coches contigo. ¡Disponible pronto en iOS y Android!
+                        Lleva la comunidad de coches contigo. Disponible próximamente en iOS y Android.
                     </p>
 
-                    {/* Download Buttons with Coming Soon */}
+                    {/* Botones de descarga */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                         <div className="relative">
                             <button
@@ -69,7 +69,7 @@ export default function GetAppPage() {
                         Estamos trabajando duro para tener las apps listas. ¡Mientras tanto, usa la versión web!
                     </p>
 
-                    {/* Features Grid */}
+                    {/* Funcionalidades */}
                     <div className="grid md:grid-cols-3 gap-6 mb-16">
                         {features.map((feature, index) => (
                             <div key={index} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700">
@@ -80,19 +80,19 @@ export default function GetAppPage() {
                         ))}
                     </div>
 
-                    {/* Web App Alternative */}
+                    {/* Alternativa web */}
                     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
-                        <h2 className="text-2xl font-bold text-white mb-4">Usa la Web App Ahora</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">Usa la web app ahora</h2>
                         <p className="text-slate-300 mb-6">
                             ¿No quieres esperar? Puedes acceder a todo ahora mismo desde tu navegador.
                             Funciona en escritorio, tablet y móvil.
                         </p>
                         <ProtectedLink href="/events" className="inline-block px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
-                            Ver Eventos →
+                            Ver eventos
                         </ProtectedLink>
                     </div>
 
-                    {/* Stats */}
+                    {/* Estadísticas */}
                     <div className="mt-16 grid grid-cols-3 gap-8">
                         <div className="text-center">
                             <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">
@@ -102,15 +102,15 @@ export default function GetAppPage() {
                         </div>
                         <div className="text-center">
                             <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">
-                                Q1 2026
+                                Próximamente
                             </div>
-                            <div className="text-slate-400 text-sm">Lanzamiento Esperado</div>
+                            <div className="text-slate-400 text-sm">Lanzamiento disponible próximamente</div>
                         </div>
                         <div className="text-center">
                             <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">
                                 50K+
                             </div>
-                            <div className="text-slate-400 text-sm">Usuarios Web</div>
+                            <div className="text-slate-400 text-sm">Usuarios web</div>
                         </div>
                     </div>
                 </div>

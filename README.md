@@ -2,19 +2,29 @@
 
 Aplicación Next.js para Tramassso: eventos, rutas de conducción y panel de administración para editar contenido sin tocar código.
 
-## Arranque local
+## Instalación
 
 ```bash
 npm install
+```
+
+## Configuración
+
+```bash
 cp .env.example .env
+```
+
+Edita `.env` con tus claves reales. No subas `.env` a GitHub.
+
+## Arranque local
+
+```bash
 npm run dev
 ```
 
 Abre `http://localhost:3000`.
 
 ## Variables necesarias
-
-Edita `.env` con tus claves reales. No subas `.env` a GitHub.
 
 - `DATABASE_URL`: base de datos usada por Prisma y NextAuth.
 - `NEXTAUTH_URL` y `NEXTAUTH_SECRET`: autenticación del panel admin.
@@ -41,6 +51,16 @@ npm run build    # build de producción
 npm run start    # servir producción
 npm run lint     # lint
 ```
+
+Para compilar antes de desplegar:
+
+```bash
+npm run build
+```
+
+## Supabase
+
+Ejecuta `supabase/tramassso-content.sql` desde el SQL Editor de Supabase. Ese script crea las tablas de eventos y rutas usadas por el panel de administración. Después copia la URL del proyecto, la clave anónima y la clave de servicio a `.env`.
 
 ## Notas de seguridad
 

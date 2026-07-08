@@ -4,15 +4,15 @@ import WebsiteNav from "@/components/WebsiteNav";
 
 export default function WhoAreWePage() {
     const team = [
-        { name: "Alejandro Arnas", role: "Founder & CEO", icon: MdPerson, specialty: "JDM Enthusiast" },
+        { name: "Alejandro Armas", role: "Fundador y CEO", icon: MdPerson, specialty: "Entusiasta JDM" },
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-950">
-            {/* Navigation */}
+            {/* Navegación */}
             <WebsiteNav currentPage="who-are-we" />
 
-            {/* Content */}
+            {/* Contenido */}
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto">
                     <h1 className="text-5xl font-bold text-white mb-8">Tramassso</h1>
@@ -23,7 +23,7 @@ export default function WhoAreWePage() {
                         </p>
 
                         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700">
-                            <h2 className="text-3xl font-bold text-white mb-6">Nuestra Historia</h2>
+                            <h2 className="text-3xl font-bold text-white mb-6">Nuestra historia</h2>
                             <p className="text-slate-300 mb-4">
                                 Tramassso nació de una idea simple: los entusiastas del motor necesitaban un espacio dedicado para conectar, compartir y crecer juntos. Lo que comenzó como encuentros de fin de semana en estacionamientos ha evolucionado a una comunidad que cada día va en aumento.
                             </p>
@@ -32,7 +32,7 @@ export default function WhoAreWePage() {
                             </p>
                         </div>
 
-                        <h2 className="text-3xl font-bold text-white mt-12 mb-6">Conoce al Equipo</h2>
+                        <h2 className="text-3xl font-bold text-white mt-12 mb-6">Conoce al equipo</h2>
 
                         <div className="grid md:grid-cols-2 gap-6">
                             {team.map((member, index) => (
@@ -60,9 +60,9 @@ export default function WhoAreWePage() {
                                 <ProtectedLink href="/events" className="px-6 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
                                     Ver Eventos
                                 </ProtectedLink>
-                                <button className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors">
-                                    Carreras
-                                </button>
+                                <ProtectedLink href="/about" className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors">
+                                    Sobre Tramassso
+                                </ProtectedLink>
                             </div>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ function readRequiredEnv(name: string, fallback?: string) {
   const value = process.env[name] ?? fallback;
 
   if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
+    throw new Error(`Falta la variable de entorno obligatoria: ${name}`);
   }
 
   return value;

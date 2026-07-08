@@ -8,13 +8,13 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <div>
             <p className="text-[10px] uppercase tracking-[0.5em] text-zinc-500">Tramassso GC</p>
-            <h1 className="text-sm font-semibold uppercase tracking-[0.4em] text-white">Driving Culture, Elevated</h1>
+            <h1 className="text-sm font-semibold uppercase tracking-[0.4em] text-white">Cultura del motor elevada</h1>
           </div>
           <nav className="hidden items-center gap-8 text-xs uppercase tracking-[0.3em] text-zinc-400 md:flex">
-            <Link href="/events" className="transition hover:text-white">Events</Link>
-            <Link href="/routes" className="transition hover:text-white">Routes</Link>
-            <Link href="/admin" className="transition hover:text-white">Admin</Link>
-            <Link href="#contact" className="transition hover:text-white">Contact</Link>
+            <Link href="/events" className="transition hover:text-white">Eventos</Link>
+            <Link href="/routes" className="transition hover:text-white">Rutas</Link>
+            <Link href="/admin" className="transition hover:text-white">Panel</Link>
+            <Link href="#contact" className="transition hover:text-white">Contacto</Link>
           </nav>
         </div>
       </header>
@@ -24,10 +24,10 @@ export default function HomePage() {
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.5em] text-zinc-500">Gran Canaria</p>
             <h2 className="max-w-3xl text-5xl font-black uppercase tracking-[0.08em] text-white md:text-7xl">
-              Premium sports car events and routes with sponsor-grade presentation.
+              Eventos y rutas de coches deportivos con una experiencia premium.
             </h2>
             <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">
-              Tramassso is being rebuilt as a luxury monochrome platform for curated driving experiences, high-value brand partnerships, and monetized route discovery across GC.
+              Tramassso conecta comunidad, rutas, eventos y marcas en una plataforma pensada para amantes del motor y patrocinadores.
             </p>
           </div>
 
@@ -35,26 +35,29 @@ export default function HomePage() {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <MdInsights className="text-zinc-300" size={22} />
               <p className="mt-4 text-3xl font-black text-white">1.2M</p>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Monthly impressions</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Impresiones mensuales</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <MdLocationOn className="text-zinc-300" size={22} />
               <p className="mt-4 text-3xl font-black text-white">GC</p>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Local reach</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Alcance local</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <MdSpeed className="text-zinc-300" size={22} />
               <p className="mt-4 text-3xl font-black text-white">Freemium</p>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Model</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Modelo</p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Link href="/events" className="rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-zinc-200">
-              View Events
+              Ver eventos
             </Link>
             <Link href="/routes" className="rounded-full border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
-              Explore Routes
+              Explorar rutas
+            </Link>
+            <Link href="#contact" className="rounded-full border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
+              Contactar
             </Link>
           </div>
         </div>
@@ -78,21 +81,21 @@ export default function HomePage() {
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <div className="grid gap-3 rounded-[1.5rem] border border-white/10 bg-black/60 p-5 backdrop-blur-md">
                 <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.4em] text-zinc-500">
-                  <span>GC sponsor deck</span>
+                  <span>Dossier patrocinadores GC</span>
                   <span>2026</span>
                 </div>
                 <div className="grid gap-2 text-sm text-zinc-300">
                   <div className="flex items-center justify-between">
-                    <span>Brand visibility</span>
-                    <span className="text-white">High</span>
+                    <span>Visibilidad de marca</span>
+                    <span className="text-white">Alta</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Audience fit</span>
+                    <span>Afinidad de audiencia</span>
                     <span className="text-white">Premium</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Booking path</span>
-                    <span className="text-white">Direct</span>
+                    <span>Canal de reserva</span>
+                    <span className="text-white">Directo</span>
                   </div>
                 </div>
               </div>
@@ -103,42 +106,57 @@ export default function HomePage() {
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-14 lg:grid-cols-3 lg:px-8">
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdSpeed size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Eventos seleccionados</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Encuentros y experiencias pensadas para una comunidad que cuida el detalle, la ruta y la presentación.</p>
+        </article>
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
           <MdOutlineHandshake size={22} className="text-zinc-300" />
-          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Sponsor-first design</h3>
-          <p className="mt-3 text-sm leading-7 text-zinc-400">High-visibility placements, curated inventory, and a clean presentation layer tailored for automotive partners.</p>
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Visibilidad para marcas</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Espacios de alto impacto, inventario seleccionado y una presentación limpia pensada para colaboradores del sector motor.</p>
         </article>
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
           <MdStraighten size={22} className="text-zinc-300" />
-          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Routes that convert</h3>
-          <p className="mt-3 text-sm leading-7 text-zinc-400">Drive discovery around Gran Canaria with a route guide built to surface premium content and local relevance.</p>
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Rutas con carácter</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Descubre Gran Canaria con una guía de rutas diseñada para destacar contenido premium y relevancia local.</p>
         </article>
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-          <MdSpeed size={22} className="text-zinc-300" />
-          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Fast booking funnel</h3>
-          <p className="mt-3 text-sm leading-7 text-zinc-400">Minimal friction inquiry flow for event partnerships, route sponsorships, and branded activations.</p>
+          <MdLocationOn size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Comunidad local</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Una red de conductores, creadores y marcas conectada alrededor de la cultura del motor en Gran Canaria.</p>
+        </article>
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdInsights size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Experiencias premium</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Un flujo de contacto directo para eventos seleccionados, patrocinios de ruta y activaciones de marca.</p>
+        </article>
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdOutlineHandshake size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Preparado para patrocinadores</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Formatos publicitarios sobrios y espacios de colaboración listos para campañas, eventos y rutas patrocinadas.</p>
         </article>
       </section>
 
       <section id="contact" className="mx-auto max-w-7xl px-5 pb-20 lg:px-8">
         <div className="grid gap-8 rounded-[2.2rem] border border-white/10 bg-zinc-900/60 p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
           <div className="space-y-4">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Sponsor inquiry</p>
-            <h3 className="text-4xl font-black uppercase tracking-[0.08em] text-white">Partnership intake</h3>
-            <p className="max-w-lg text-sm leading-7 text-zinc-400">Send your brand brief, event activation goals, or route sponsorship ask. The structure is intentionally minimal so the message stays on the offer, not the UI.</p>
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Preparado para patrocinadores</p>
+            <h3 className="text-4xl font-black uppercase tracking-[0.08em] text-white">Contacto para colaboraciones</h3>
+            <p className="max-w-lg text-sm leading-7 text-zinc-400">Cuéntanos tu propuesta de marca, tus objetivos de activación o el tipo de presencia que quieres asociar a rutas y eventos.</p>
           </div>
 
           <form className="grid gap-4 rounded-[1.6rem] border border-white/10 bg-black/40 p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
             <div className="grid gap-4 md:grid-cols-2">
-              <input name="name" placeholder="Name" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
-              <input name="email" placeholder="Email" type="email" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+              <input name="name" placeholder="Nombre" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+              <input name="email" placeholder="Correo electrónico" type="email" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
             </div>
-            <input name="brand" placeholder="Brand / agency" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
-            <textarea name="brief" rows={5} placeholder="Tell us what you want to activate." className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <input name="brand" placeholder="Marca o empresa" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <textarea name="brief" rows={5} placeholder="Cuéntanos qué quieres activar" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
             <div className="flex items-center justify-between gap-4">
-              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Direct sponsor contact</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Contacto directo para marcas</p>
               <button type="submit" className="rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200">
                 <MdEmail className="inline-block align-[-2px]" />
-                <span className="ml-2">Send inquiry</span>
+                <span className="ml-2">Enviar solicitud</span>
               </button>
             </div>
           </form>
