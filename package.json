@@ -10,7 +10,10 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "6.19.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/leaflet": "^1.9.21",
     "@vercel/analytics": "^1.6.0",
@@ -27,13 +30,15 @@
     "prisma": "6.19.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hook-form": "^7.81.0",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^16.3.5",
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
     "react-qr-code": "^2.0.18",
     "sharp": "^0.32.0",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -46,16 +46,25 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     >
                         Descargar App
                     </Link>
+                    <Link
+                        href="/events"
+                        className={`hover:text-white transition-colors ${currentPage === 'events' ? 'text-white' : ''}`}
+                    >
+                        Eventos
+                    </Link>
+                    <Link
+                        href="/routes"
+                        className={`hover:text-white transition-colors ${currentPage === 'routes' ? 'text-white' : ''}`}
+                    >
+                        Rutas
+                    </Link>
                 </div>
 
                 {/* Auth Buttons & Mobile Toggle */}
                 <div className="flex gap-3 items-center">
                     <div className="hidden lg:flex gap-3">
-                        <Link href="/login" className="px-4 py-2 text-slate-300 hover:text-white transition-colors font-semibold">
-                            Iniciar Sesión
-                        </Link>
-                        <Link href="/register" className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
-                            Registrarse
+                        <Link href="/admin" className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                            Admin
                         </Link>
                     </div>
 
@@ -81,12 +90,15 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     <Link href="/get-app" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'get-app' ? 'text-white' : 'text-slate-300'}`}>
                         Descargar App
                     </Link>
-                    <hr className="border-slate-800" />
-                    <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white transition-colors">
-                        Iniciar Sesión
+                    <Link href="/events" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'events' ? 'text-white' : 'text-slate-300'}`}>
+                        Eventos
                     </Link>
-                    <Link href="/register" onClick={() => setIsMenuOpen(false)} className="block py-2 text-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold">
-                        Registrarse
+                    <Link href="/routes" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'routes' ? 'text-white' : 'text-slate-300'}`}>
+                        Rutas
+                    </Link>
+                    <hr className="border-slate-800" />
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="block py-2 text-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold">
+                        Admin
                     </Link>
                 </div>
             )}

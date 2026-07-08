@@ -1,133 +1,149 @@
-import Image from "next/image";
 import Link from "next/link";
-import { MdSpeed, MdGroups, MdStore, MdEvent, MdSecurity, MdDevices } from "react-icons/md";
-import WebsiteNav from "@/components/WebsiteNav";
-import WebsiteStats from "@/components/WebsiteStats";
-import ProtectedLink from "@/components/ProtectedLink";
+import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-900 text-white overflow-x-hidden">
-      {/* Navigation */}
-      <WebsiteNav currentPage="home" />
+    <main className="min-h-screen bg-zinc-950 text-zinc-50">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-zinc-950/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.5em] text-zinc-500">Tramassso GC</p>
+            <h1 className="text-sm font-semibold uppercase tracking-[0.4em] text-white">Driving Culture, Elevated</h1>
+          </div>
+          <nav className="hidden items-center gap-8 text-xs uppercase tracking-[0.3em] text-zinc-400 md:flex">
+            <Link href="/events" className="transition hover:text-white">Events</Link>
+            <Link href="/routes" className="transition hover:text-white">Routes</Link>
+            <Link href="/admin" className="transition hover:text-white">Admin</Link>
+            <Link href="#contact" className="transition hover:text-white">Contact</Link>
+          </nav>
+        </div>
+      </header>
 
-      {/* Hero Section */}
-      <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:py-20">
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.5em] text-zinc-500">Gran Canaria</p>
+            <h2 className="max-w-3xl text-5xl font-black uppercase tracking-[0.08em] text-white md:text-7xl">
+              Premium sports car events and routes with sponsor-grade presentation.
+            </h2>
+            <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">
+              Tramassso is being rebuilt as a luxury monochrome platform for curated driving experiences, high-value brand partnerships, and monetized route discovery across GC.
+            </p>
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-            <span className="block text-white">La Red Social Definitiva</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-              Para Amantes del Motor
-            </span>
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-300 mb-10">
-            Conecta con entusiastas, únete a clubs exclusivos, encuentra eventos y compra/vende piezas en el marketplace especializado más grande.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              href="/register"
-              className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-lg font-bold hover:shadow-lg hover:shadow-red-500/30 transition-all transform hover:-translate-y-1"
-            >
-              Unirse Ahora Gratis
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <MdInsights className="text-zinc-300" size={22} />
+              <p className="mt-4 text-3xl font-black text-white">1.2M</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Monthly impressions</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <MdLocationOn className="text-zinc-300" size={22} />
+              <p className="mt-4 text-3xl font-black text-white">GC</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Local reach</p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+              <MdSpeed className="text-zinc-300" size={22} />
+              <p className="mt-4 text-3xl font-black text-white">Freemium</p>
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Model</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link href="/events" className="rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-zinc-200">
+              View Events
             </Link>
-            <Link
-              href="/about"
-              className="px-8 py-4 bg-slate-800 border border-slate-700 rounded-full text-lg font-bold hover:bg-slate-700 transition-all"
-            >
-              Saber Más
+            <Link href="/routes" className="rounded-full border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
+              Explore Routes
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Features Grid */}
-      <div id="features" className="py-24 bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Todo lo que necesitas</h2>
-            <p className="text-slate-400 text-lg">Diseñado por y para entusiastas del automovilismo</p>
-          </div>
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900/70 p-3 shadow-[0_35px_100px_rgba(0,0,0,0.6)]">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] border border-white/5 bg-black">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="absolute inset-0 h-full w-full object-cover opacity-70 grayscale"
+              poster="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop"
+            >
+              <source src="https://assets.mixkit.co/videos/preview/mixkit-black-sports-car-driving-on-a-scenic-road-39854-large.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_45%)]" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-8 bg-slate-800/50 rounded-2xl border border-slate-700 hover:border-red-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-red-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-500/20 transition-colors">
-                <MdGroups className="text-3xl text-red-500" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Clubs y Comunidades</h3>
-              <p className="text-slate-400">Crea o únete a clubs basados en tu coche, región o estilo. Organiza rutas y mantén el contacto.</p>
-            </div>
-
-            <div className="p-8 bg-slate-800/50 rounded-2xl border border-slate-700 hover:border-orange-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-orange-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-500/20 transition-colors">
-                <MdStore className="text-3xl text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Marketplace Especializado</h3>
-              <p className="text-slate-400">Compra y vende coches y piezas con confianza. Filtros específicos para encontrar exactamente lo que buscas.</p>
-            </div>
-
-            <div className="p-8 bg-slate-800/50 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors group">
-              <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
-                <MdEvent className="text-3xl text-blue-500" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Eventos y KDDs</h3>
-              <p className="text-slate-400">Descubre eventos cerca de ti. Desde grandes exposiciones hasta reuniones locales nocturnas.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="py-20 border-y border-slate-800 bg-slate-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-slate-950 py-12 border-t border-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-orange-500 rounded-lg flex items-center justify-center font-bold text-xl">
-                  T
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <div className="grid gap-3 rounded-[1.5rem] border border-white/10 bg-black/60 p-5 backdrop-blur-md">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.4em] text-zinc-500">
+                  <span>GC sponsor deck</span>
+                  <span>2026</span>
                 </div>
-                <span className="font-bold text-xl tracking-tight">Tramassso</span>
+                <div className="grid gap-2 text-sm text-zinc-300">
+                  <div className="flex items-center justify-between">
+                    <span>Brand visibility</span>
+                    <span className="text-white">High</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Audience fit</span>
+                    <span className="text-white">Premium</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Booking path</span>
+                    <span className="text-white">Direct</span>
+                  </div>
+                </div>
               </div>
-              <p className="text-slate-400 max-w-md">
-                La plataforma líder para la cultura automovilística. Conectando pasión, máquinas y personas en un solo lugar.
-              </p>
             </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-4">Plataforma</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><ProtectedLink href="/feed" className="hover:text-red-500 transition-colors">Feed</ProtectedLink></li>
-                <li><ProtectedLink href="/marketplace" className="hover:text-red-500 transition-colors">Marketplace</ProtectedLink></li>
-                <li><ProtectedLink href="/clubs" className="hover:text-red-500 transition-colors">Clubs</ProtectedLink></li>
-                <li><ProtectedLink href="/calendar" className="hover:text-red-500 transition-colors">Eventos</ProtectedLink></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link href="/privacy" className="hover:text-red-500 transition-colors">Privacidad</Link></li>
-                <li><Link href="/terms" className="hover:text-red-500 transition-colors">Términos</Link></li>
-                <li><Link href="/cookies" className="hover:text-red-500 transition-colors">Cookies</Link></li>
-              </ul>
-            </div>
-          </div>
-          <WebsiteStats />
-          <div className="mt-4 pt-8 border-t border-slate-900 text-center text-slate-500 text-sm">
-            © 2025 Tramassso. Todos los derechos reservados.
           </div>
         </div>
-      </footer>
-    </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-5 pb-14 lg:grid-cols-3 lg:px-8">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdOutlineHandshake size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Sponsor-first design</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">High-visibility placements, curated inventory, and a clean presentation layer tailored for automotive partners.</p>
+        </article>
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdStraighten size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Routes that convert</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Drive discovery around Gran Canaria with a route guide built to surface premium content and local relevance.</p>
+        </article>
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+          <MdSpeed size={22} className="text-zinc-300" />
+          <h3 className="mt-4 text-2xl font-semibold uppercase tracking-[0.16em] text-white">Fast booking funnel</h3>
+          <p className="mt-3 text-sm leading-7 text-zinc-400">Minimal friction inquiry flow for event partnerships, route sponsorships, and branded activations.</p>
+        </article>
+      </section>
+
+      <section id="contact" className="mx-auto max-w-7xl px-5 pb-20 lg:px-8">
+        <div className="grid gap-8 rounded-[2.2rem] border border-white/10 bg-zinc-900/60 p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Sponsor inquiry</p>
+            <h3 className="text-4xl font-black uppercase tracking-[0.08em] text-white">Partnership intake</h3>
+            <p className="max-w-lg text-sm leading-7 text-zinc-400">Send your brand brief, event activation goals, or route sponsorship ask. The structure is intentionally minimal so the message stays on the offer, not the UI.</p>
+          </div>
+
+          <form className="grid gap-4 rounded-[1.6rem] border border-white/10 bg-black/40 p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
+            <div className="grid gap-4 md:grid-cols-2">
+              <input name="name" placeholder="Name" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+              <input name="email" placeholder="Email" type="email" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            </div>
+            <input name="brand" placeholder="Brand / agency" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <textarea name="brief" rows={5} placeholder="Tell us what you want to activate." className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Direct sponsor contact</p>
+              <button type="submit" className="rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200">
+                <MdEmail className="inline-block align-[-2px]" />
+                <span className="ml-2">Send inquiry</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
   );
 }

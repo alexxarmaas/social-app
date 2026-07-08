@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
-    const [nextPath, setNextPath] = useState<string>('/feed');
+    const [nextPath, setNextPath] = useState<string>('/admin');
 
     // Read `next` from URL on the client to avoid CSR bailout during prerender
     useEffect(() => {
@@ -15,7 +15,7 @@ export default function LoginPage() {
             const params = new URLSearchParams(window.location.search);
             const next = params.get('next');
             if (next) setNextPath(next);
-        } catch (err) {
+        } catch {
             // ignore
         }
     }, []);
@@ -41,7 +41,7 @@ export default function LoginPage() {
             } else {
                 router.push(nextPath);
             }
-        } catch (err) {
+        } catch {
             setError("Error al iniciar sesión");
         } finally {
             setLoading(false);
@@ -56,7 +56,7 @@ export default function LoginPage() {
                     <Link href="/" className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
                         Tramassso
                     </Link>
-                    <p className="text-slate-400 mt-2">Bienvenido de vuelta a la comunidad</p>
+                    <p className="text-slate-400 mt-2">Acceso privado para el equipo de Tramassso</p>
                 </div>
 
                 {/* Login Form */}
@@ -144,13 +144,7 @@ export default function LoginPage() {
                         </button>
                     </div>
 
-                    {/* Sign Up Link */}
-                    <p className="text-center text-slate-400 mt-6">
-                        ¿No tienes cuenta?{" "}
-                        <Link href="/register" className="text-red-400 hover:text-red-300 font-semibold">
-                            Regístrate
-                        </Link>
-                    </p>
+                    <p className="text-center text-slate-400 mt-6">Si necesitas acceso administrativo, usa credenciales autorizadas.</p>
                 </div>
 
                 {/* Back to Home */}

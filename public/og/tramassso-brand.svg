@@ -1,0 +1,10 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="630" fill="#050505"/>
+<circle cx="962" cy="130" r="210" fill="white" fill-opacity="0.03"/>
+<circle cx="238" cy="520" r="260" fill="white" fill-opacity="0.04"/>
+<path d="M170 430C258 328 379 278 524 278C640 278 739 307 823 364C862 390 905 428 951 479H812C763 427 720 392 682 372C629 345 573 331 515 331C420 331 338 357 268 409L170 430Z" fill="white" fill-opacity="0.12"/>
+<path d="M221 470H979" stroke="white" stroke-opacity="0.35" stroke-width="2"/>
+<text x="90" y="188" fill="white" fill-opacity="0.96" font-size="96" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="16">TRAMASSSO</text>
+<text x="92" y="246" fill="white" fill-opacity="0.64" font-size="26" font-family="Arial, Helvetica, sans-serif" letter-spacing="6">GRAN CANARIA DRIVING CULTURE</text>
+<text x="92" y="552" fill="white" fill-opacity="0.72" font-size="22" font-family="Arial, Helvetica, sans-serif" letter-spacing="4">EVENTS • ROUTES • PARTNERSHIPS</text>
+</svg>

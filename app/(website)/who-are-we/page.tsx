@@ -1,6 +1,5 @@
-import Link from "next/link";
 import ProtectedLink from "@/components/ProtectedLink";
-import { MdPerson, MdComputer, MdBuild, MdPalette } from "react-icons/md";
+import { MdPerson } from "react-icons/md";
 import WebsiteNav from "@/components/WebsiteNav";
 
 export default function WhoAreWePage() {
@@ -58,8 +57,8 @@ export default function WhoAreWePage() {
                                 Siempre buscamos personas apasionadas para unirse a nuestra comunidad. Ya sea como miembro o parte de nuestro equipo, hay un lugar para ti en Tramassso.
                             </p>
                             <div className="flex gap-4">
-                                <ProtectedLink href="/feed" className="px-6 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
-                                    Unirse a la Comunidad
+                                <ProtectedLink href="/events" className="px-6 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                                    Ver Eventos
                                 </ProtectedLink>
                                 <button className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors">
                                     Carreras

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ProtectedLink from "@/components/ProtectedLink";
 import { MdFlag, MdLightbulb } from "react-icons/md";
 import WebsiteNav from "@/components/WebsiteNav";
@@ -49,8 +48,8 @@ export default function AboutPage() {
                             <p className="mb-6">
                                 Ya sea que te gusten los JDM, el lujo europeo, el muscle americano o los vehículos eléctricos, Tramassso es tu hogar. ¡Únete a miles de entusiastas hoy!
                             </p>
-                            <ProtectedLink href="/feed" className="inline-block px-8 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
-                                Empezar Ahora
+                            <ProtectedLink href="/events" className="inline-block px-8 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                                Ver Eventos
                             </ProtectedLink>
                         </div>
                     </div>

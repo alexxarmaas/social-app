@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ProtectedLink from "@/components/ProtectedLink";
 import { MdPhoneAndroid, MdFlashOn, MdNotifications, MdPhotoCamera, MdMap, MdChat } from "react-icons/md";
 import WebsiteNav from "@/components/WebsiteNav";
@@ -88,8 +87,8 @@ export default function GetAppPage() {
                             ¿No quieres esperar? Puedes acceder a todo ahora mismo desde tu navegador.
                             Funciona en escritorio, tablet y móvil.
                         </p>
-                        <ProtectedLink href="/feed" className="inline-block px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
-                            Lanzar Web App →
+                        <ProtectedLink href="/events" className="inline-block px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                            Ver Eventos →
                         </ProtectedLink>
                     </div>
 
