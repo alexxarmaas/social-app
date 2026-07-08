@@ -20,18 +20,18 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
             : pathname.split("/").filter(Boolean)[0] ?? "home"
     );
 
-    const linkClass = (page: string) => `hover:text-white transition-colors ${activePage === page ? "text-white" : ""}`;
-    const mobileLinkClass = (page: string) => `block py-2 hover:text-white transition-colors ${activePage === page ? "text-white" : "text-slate-300"}`;
+    const linkClass = (page: string) => `transition hover:text-white ${activePage === page ? "text-white" : "text-zinc-400"}`;
+    const mobileLinkClass = (page: string) => `block rounded-2xl px-3 py-3 transition hover:bg-white/5 hover:text-white ${activePage === page ? "bg-white/5 text-white" : "text-zinc-400"}`;
 
     return (
-        <nav className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                <Link href="/" className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 font-aeroblade tracking-wider">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/90 text-zinc-50 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+                <Link href="/" className="font-aeroblade text-2xl font-bold tracking-[0.18em] text-white">
                     Tramassso
                 </Link>
 
                 {/* Navegación de escritorio */}
-                <div className="hidden lg:flex gap-6 text-slate-300">
+                <div className="hidden items-center gap-8 text-xs uppercase tracking-[0.28em] lg:flex">
                     <Link
                         href="/"
                         className={linkClass("home")}
@@ -70,7 +70,7 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     </Link>
                     <Link
                         href="/#contact"
-                        className="hover:text-white transition-colors"
+                        className="text-zinc-400 transition hover:text-white"
                     >
                         Contacto
                     </Link>
@@ -78,14 +78,14 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
 
                     {/* Acceso al panel y menú móvil */}
                 <div className="flex gap-3 items-center">
-                    <div className="hidden lg:flex gap-3">
-                        <Link href="/admin" className="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                    <div className="hidden lg:flex">
+                        <Link href="/admin" className="rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-black transition hover:bg-zinc-200">
                             Panel
                         </Link>
                     </div>
 
                     {/* Botón del menú móvil */}
-                    <button onClick={toggleMenu} className="lg:hidden text-slate-300 hover:text-white p-2">
+                    <button onClick={toggleMenu} className="rounded-full border border-white/10 p-2 text-zinc-300 transition hover:border-white/30 hover:text-white lg:hidden" aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
                         {isMenuOpen ? <MdClose size={28} /> : <MdMenu size={28} />}
                     </button>
                 </div>
@@ -93,7 +93,7 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
 
             {/* Menú móvil */}
             {isMenuOpen && (
-                <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900 border-b border-slate-800 p-4 flex flex-col gap-4 shadow-xl">
+                <div className="absolute left-0 top-full flex w-full flex-col gap-2 border-b border-white/10 bg-zinc-950 p-4 shadow-2xl lg:hidden">
                     <Link href="/" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("home")}>
                         Inicio
                     </Link>
@@ -112,11 +112,11 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                     <Link href="/routes" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("routes")}>
                         Rutas
                     </Link>
-                    <Link href="/#contact" onClick={() => setIsMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white transition-colors">
+                    <Link href="/#contact" onClick={() => setIsMenuOpen(false)} className="block rounded-2xl px-3 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">
                         Contacto
                     </Link>
-                    <hr className="border-slate-800" />
-                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="block py-2 text-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold">
+                    <hr className="border-white/10" />
+                    <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="block rounded-full bg-white px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.28em] text-black transition hover:bg-zinc-200">
                         Panel
                     </Link>
                 </div>

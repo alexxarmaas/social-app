@@ -1,3 +1,4 @@
+create schema if not exists public;
 create extension if not exists pgcrypto;
 
 create table if not exists public.events (
@@ -17,8 +18,8 @@ create table if not exists public.routes (
   description text not null,
   start_point text not null,
   end_point text not null,
-  distance_km numeric(8,2) not null,
-  drive_time_minutes integer not null,
+  distance_km numeric(8,2) not null check (distance_km > 0),
+  drive_time_minutes integer not null check (drive_time_minutes > 0),
   cover_image_url text,
   gallery_urls text[] not null default '{}'::text[],
   created_at timestamptz not null default now()
@@ -26,6 +27,10 @@ create table if not exists public.routes (
 
 alter table public.events enable row level security;
 alter table public.routes enable row level security;
+
+grant usage on schema public to anon, authenticated;
+grant select on public.events to anon, authenticated;
+grant select on public.routes to anon, authenticated;
 
 drop policy if exists "Public read events" on public.events;
 create policy "Public read events"
@@ -40,3 +45,5 @@ create policy "Public read routes"
   for select
   to anon, authenticated
   using (true);
+
+notify pgrst, 'reload schema';
