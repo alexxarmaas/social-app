@@ -69,10 +69,7 @@ export default async function RoutesGuidePage() {
         {!routes.length ? (
           <div className="mt-10 rounded-[2rem] border border-dashed border-zinc-800 bg-white/5 p-10 text-center">
             <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Aún no hay rutas publicadas</p>
-            <p className="mt-3 text-sm text-zinc-400">Añade la primera ruta desde el panel de administración.</p>
-            <Link href="/admin" className="mt-6 inline-flex rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200">
-              Abrir admin
-            </Link>
+            <p className="mt-3 text-sm text-zinc-400">Estamos preparando nuevas rutas escénicas para Gran Canaria.</p>
           </div>
         ) : null}
       </section>

@@ -83,7 +83,7 @@ export default function GetAppPage() {
                             ¿No quieres esperar? Puedes acceder a todo ahora mismo desde tu navegador.
                             Funciona en escritorio, tablet y móvil.
                         </p>
-                        <ProtectedLink href="/events" className="inline-block px-8 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                        <ProtectedLink href="/events" className="inline-block rounded-full border border-white/15 bg-black px-8 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-white transition hover:border-white hover:bg-zinc-900">
                             Ver eventos
                         </ProtectedLink>
                     </div>

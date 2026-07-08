@@ -35,7 +35,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link href="/events" className="rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-zinc-200">
+            <Link href="/events" className="rounded-full border border-white/15 bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white hover:bg-zinc-900">
               Ver eventos
             </Link>
             <Link href="/routes" className="rounded-full border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
@@ -139,7 +139,7 @@ export default function HomePage() {
             <textarea name="brief" rows={5} placeholder="Cuéntanos qué quieres activar" className="rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
             <div className="flex items-center justify-between gap-4">
               <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Contacto directo para marcas</p>
-              <button type="submit" className="rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200">
+              <button type="submit" className="rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-white transition hover:border-white hover:bg-zinc-900">
                 <MdEmail className="inline-block align-[-2px]" />
                 <span className="ml-2">Enviar solicitud</span>
               </button>

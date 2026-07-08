@@ -137,19 +137,19 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
   };
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-      <div className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
+    <section className="grid gap-6 xl:grid-cols-[1.25fr_0.8fr]">
+      <div className="rounded-[1.75rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.25)]">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Eventos</p>
-            <h2 className="mt-2 text-2xl font-semibold text-zinc-50">Inventario de eventos</h2>
+            <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-zinc-50">Inventario de eventos</h2>
           </div>
           <button type="button" onClick={() => setSelectedId(null)} className="rounded-full border border-zinc-800 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-300 transition hover:border-zinc-500 hover:text-white">
             Nuevo evento
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-zinc-800">
+        <div className="overflow-hidden rounded-[1.35rem] border border-zinc-800">
           <table className="min-w-full divide-y divide-zinc-800 text-sm">
             <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.35em] text-zinc-500">
               <tr>
@@ -201,10 +201,10 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(saveEvent)} className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
+      <form onSubmit={handleSubmit(saveEvent)} className="rounded-[1.75rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.25)]">
         <div className="mb-5">
           <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Crear / editar</p>
-          <h2 className="mt-2 text-2xl font-semibold text-zinc-50">Formulario de evento</h2>
+          <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-zinc-50">Formulario de evento</h2>
         </div>
 
         <div className="grid gap-4">

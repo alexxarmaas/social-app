@@ -44,7 +44,7 @@ export default function AboutPage() {
                             <p className="mb-6">
                                 Ya sea que te gusten los JDM, el lujo europeo, el muscle americano o los vehículos eléctricos, Tramassso es tu hogar. ¡Únete a miles de entusiastas hoy!
                             </p>
-                            <ProtectedLink href="/events" className="inline-block px-8 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                            <ProtectedLink href="/events" className="inline-block rounded-full border border-white/15 bg-black px-8 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-white transition hover:border-white hover:bg-zinc-900">
                                 Ver eventos
                             </ProtectedLink>
                         </div>

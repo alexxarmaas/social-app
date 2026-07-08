@@ -53,7 +53,7 @@ export default function WhoAreWePage() {
                                 Siempre buscamos personas apasionadas para unirse a nuestra comunidad. Ya sea como miembro o parte de nuestro equipo, hay un lugar para ti en Tramassso.
                             </p>
                             <div className="flex gap-4">
-                                <ProtectedLink href="/events" className="px-6 py-3 bg-white text-red-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                                <ProtectedLink href="/events" className="rounded-full border border-white/15 bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-white transition hover:border-white hover:bg-zinc-900">
                                     Ver Eventos
                                 </ProtectedLink>
                                 <ProtectedLink href="/about" className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors">

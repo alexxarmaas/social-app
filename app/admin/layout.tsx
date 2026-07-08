@@ -16,27 +16,36 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect("/");
   }
 
+  const displayUser = session.user.email ?? session.user.name ?? "admin";
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 lg:flex">
-      <aside className="border-b border-white/10 bg-zinc-950/95 px-5 py-6 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-b-0 lg:border-r lg:px-6">
-        <div className="space-y-2">
+      <aside className="border-b border-white/10 bg-black/35 px-5 py-6 backdrop-blur-xl lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-b-0 lg:border-r lg:px-6">
+        <div className="space-y-3">
           <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Panel interno</p>
-          <h1 className="text-2xl font-black uppercase tracking-[0.12em] text-white">Panel Tramassso</h1>
+          <div>
+            <p className="font-sans text-lg font-semibold tracking-tight text-white">Tramassso</p>
+            <p className="mt-1 text-xs uppercase tracking-[0.32em] text-zinc-500">Administración</p>
+          </div>
         </div>
 
-        <nav className="mt-10 grid gap-2 text-sm uppercase tracking-[0.3em] text-zinc-400">
-          <Link href="/admin" className="rounded-2xl border border-zinc-800 bg-white/5 px-4 py-3 transition hover:border-zinc-500 hover:text-white">Resumen</Link>
-          <Link href="/events" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-zinc-500 hover:text-white">Eventos públicos</Link>
-          <Link href="/routes" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-zinc-500 hover:text-white">Rutas públicas</Link>
-          <Link href="/" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-zinc-500 hover:text-white">Inicio público</Link>
+        <nav className="mt-9 grid gap-2 text-xs uppercase tracking-[0.24em] text-zinc-400">
+          <Link href="/admin" className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-white/30 hover:text-white">Resumen</Link>
+          <Link href="/events" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Eventos públicos</Link>
+          <Link href="/routes" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Rutas públicas</Link>
+          <Link href="/" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Inicio público</Link>
         </nav>
 
-        <div className="mt-10 rounded-3xl border border-zinc-800 bg-white/5 p-4 text-xs uppercase tracking-[0.3em] text-zinc-500">
-          Sesión iniciada como {session.user.email ?? session.user.name ?? "admin"}
+        <div className="mt-9 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Sesión iniciada</p>
+          <p className="mt-2 break-all font-sans text-sm text-zinc-200">{displayUser}</p>
+          <p className="mt-3 inline-flex rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-zinc-400">
+            {session.user.role}
+          </p>
         </div>
       </aside>
 
-      <main className="flex-1 px-5 py-8 lg:px-8 lg:py-10">{children}</main>
+      <main className="flex-1 px-5 py-7 lg:px-8 lg:py-8">{children}</main>
     </div>
   );
 }

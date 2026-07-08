@@ -67,10 +67,7 @@ export default async function EventsFeedPage() {
         {!events.length ? (
           <div className="mt-10 rounded-[2rem] border border-dashed border-zinc-800 bg-white/5 p-10 text-center">
             <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Aún no hay eventos publicados</p>
-            <p className="mt-3 text-sm text-zinc-400">Usa el panel de administración para publicar el primer evento de Tramassso.</p>
-            <Link href="/admin" className="mt-6 inline-flex rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200">
-              Abrir admin
-            </Link>
+            <p className="mt-3 text-sm text-zinc-400">Pronto publicaremos las próximas quedadas y experiencias de Tramassso.</p>
           </div>
         ) : null}
       </section>
