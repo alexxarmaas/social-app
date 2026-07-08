@@ -16,7 +16,7 @@ model User {
   email     String   @unique
   username  String   @unique
   password  String // Hashed password
-  role      String   @default("user") // "user", "club_admin", "store_manager"
+  role      String   @default("user") // "user", "admin", "superadmin", "club_admin", "store_manager"
   name      String?
   bio       String?
   avatar    String?

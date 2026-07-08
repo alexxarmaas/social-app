@@ -37,7 +37,7 @@ Abre `http://localhost:3000`.
 El contenido de eventos y rutas se edita desde `/admin`.
 
 1. Crea las tablas de Supabase con `supabase/tramassso-content.sql`.
-2. Crea un usuario admin en tu base Prisma con `role = "admin"`.
+2. Crea un usuario admin o superadmin en tu base Prisma con `role = "admin"` o `role = "superadmin"`.
 3. Entra en `/login` y luego `/admin`.
 4. Crea, edita o elimina eventos y rutas desde el panel.
 
@@ -50,6 +50,7 @@ npm run dev      # desarrollo
 npm run build    # build de producción
 npm run start    # servir producción
 npm run lint     # lint
+npm run create-superadmin # crea o actualiza el superadmin
 ```
 
 Para compilar antes de desplegar:
@@ -61,6 +62,26 @@ npm run build
 ## Supabase
 
 Ejecuta `supabase/tramassso-content.sql` desde el SQL Editor de Supabase. Ese script crea las tablas de eventos y rutas usadas por el panel de administración. Después copia la URL del proyecto, la clave anónima y la clave de servicio a `.env`.
+
+## Superadmin
+
+El superadmin se crea en la base de datos real configurada en `DATABASE_URL`; no hay bypass por correo en el código. Si `DATABASE_URL` apunta a Supabase, el usuario se crea en Supabase. Si apunta a una base local, se crea localmente.
+
+PowerShell:
+
+```powershell
+$env:SUPERADMIN_EMAIL="alexarmas2002@outlook.es"
+$env:SUPERADMIN_PASSWORD="TU_CONTRASEÑA_SEGURA"
+npm run create-superadmin
+```
+
+Bash:
+
+```bash
+SUPERADMIN_EMAIL="alexarmas2002@outlook.es" SUPERADMIN_PASSWORD="TU_CONTRASEÑA_SEGURA" npm run create-superadmin
+```
+
+Después podrás iniciar sesión en `/login` con `alexarmas2002@outlook.es` y la contraseña definida en `SUPERADMIN_PASSWORD`.
 
 ## Notas de seguridad
 

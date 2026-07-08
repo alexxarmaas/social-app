@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/app/lib/auth";
+import { isAdminRole } from "@/app/lib/admin-auth";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -11,7 +12,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect("/login?next=/admin");
   }
 
-  if (session.user.role !== "admin") {
+  if (!isAdminRole(session.user.role)) {
     redirect("/");
   }
 
