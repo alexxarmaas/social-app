@@ -1,6 +1,5 @@
 import ProtectedLink from "@/components/ProtectedLink";
 import { MdPhoneAndroid, MdFlashOn, MdNotifications, MdPhotoCamera, MdMap, MdChat } from "react-icons/md";
-import WebsiteNav from "@/components/WebsiteNav";
 
 export default function GetAppPage() {
     const features = [
@@ -14,9 +13,6 @@ export default function GetAppPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-950">
-            {/* Navegación */}
-            <WebsiteNav currentPage="get-app" />
-
             {/* Contenido */}
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto text-center">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
+import WebsiteNav from "@/components/WebsiteNav";
 
 export const metadata: Metadata = {
   metadataBase,
@@ -32,5 +33,10 @@ export default function WebsiteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <WebsiteNav />
+      {children}
+    </>
+  );
 }

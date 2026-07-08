@@ -1,13 +1,9 @@
 import ProtectedLink from "@/components/ProtectedLink";
 import { MdFlag, MdLightbulb } from "react-icons/md";
-import WebsiteNav from "@/components/WebsiteNav";
 
 export default function AboutPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-950">
-            {/* Navegación */}
-            <WebsiteNav currentPage="about" />
-
             {/* Contenido */}
             <main className="container mx-auto px-4 py-20">
                 <div className="max-w-4xl mx-auto">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MdMenu, MdClose } from "react-icons/md";
 
 interface WebsiteNavProps {
@@ -10,8 +11,17 @@ interface WebsiteNavProps {
 
 export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const activePage = currentPage ?? (
+        pathname === "/"
+            ? "home"
+            : pathname.split("/").filter(Boolean)[0] ?? "home"
+    );
+
+    const linkClass = (page: string) => `hover:text-white transition-colors ${activePage === page ? "text-white" : ""}`;
+    const mobileLinkClass = (page: string) => `block py-2 hover:text-white transition-colors ${activePage === page ? "text-white" : "text-slate-300"}`;
 
     return (
         <nav className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
@@ -24,39 +34,45 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
                 <div className="hidden lg:flex gap-6 text-slate-300">
                     <Link
                         href="/"
-                        className={`hover:text-white transition-colors ${currentPage === 'home' ? 'text-white' : ''}`}
+                        className={linkClass("home")}
                     >
                         Inicio
                     </Link>
                     <Link
                         href="/about"
-                        className={`hover:text-white transition-colors ${currentPage === 'about' ? 'text-white' : ''}`}
+                        className={linkClass("about")}
                     >
                         Sobre nosotros
                     </Link>
                     <Link
                         href="/who-are-we"
-                        className={`hover:text-white transition-colors ${currentPage === 'who-are-we' ? 'text-white' : ''}`}
+                        className={linkClass("who-are-we")}
                     >
                         Quiénes somos
                     </Link>
                     <Link
                         href="/get-app"
-                        className={`hover:text-white transition-colors ${currentPage === 'get-app' ? 'text-white' : ''}`}
+                        className={linkClass("get-app")}
                     >
                         Descargar app
                     </Link>
                     <Link
                         href="/events"
-                        className={`hover:text-white transition-colors ${currentPage === 'events' ? 'text-white' : ''}`}
+                        className={linkClass("events")}
                     >
                         Eventos
                     </Link>
                     <Link
                         href="/routes"
-                        className={`hover:text-white transition-colors ${currentPage === 'routes' ? 'text-white' : ''}`}
+                        className={linkClass("routes")}
                     >
                         Rutas
+                    </Link>
+                    <Link
+                        href="/#contact"
+                        className="hover:text-white transition-colors"
+                    >
+                        Contacto
                     </Link>
                 </div>
 
@@ -78,23 +94,26 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
             {/* Menú móvil */}
             {isMenuOpen && (
                 <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900 border-b border-slate-800 p-4 flex flex-col gap-4 shadow-xl">
-                    <Link href="/" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'home' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("home")}>
                         Inicio
                     </Link>
-                    <Link href="/about" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'about' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/about" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("about")}>
                         Sobre nosotros
                     </Link>
-                    <Link href="/who-are-we" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'who-are-we' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/who-are-we" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("who-are-we")}>
                         Quiénes somos
                     </Link>
-                    <Link href="/get-app" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'get-app' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/get-app" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("get-app")}>
                         Descargar app
                     </Link>
-                    <Link href="/events" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'events' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/events" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("events")}>
                         Eventos
                     </Link>
-                    <Link href="/routes" onClick={() => setIsMenuOpen(false)} className={`block py-2 hover:text-white transition-colors ${currentPage === 'routes' ? 'text-white' : 'text-slate-300'}`}>
+                    <Link href="/routes" onClick={() => setIsMenuOpen(false)} className={mobileLinkClass("routes")}>
                         Rutas
+                    </Link>
+                    <Link href="/#contact" onClick={() => setIsMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white transition-colors">
+                        Contacto
                     </Link>
                     <hr className="border-slate-800" />
                     <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="block py-2 text-center bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-semibold">

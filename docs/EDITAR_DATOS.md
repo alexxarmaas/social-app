@@ -48,6 +48,19 @@ npm run build
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
 
+Si aparece `Could not find the table 'public.events' in the schema cache` o `Could not find the table 'public.routes' in the schema cache`, el proyecto Supabase conectado no tiene creadas las tablas de contenido o PostgREST todavía no ha refrescado la caché. Ejecuta de nuevo `supabase/tramassso-content.sql` en el SQL Editor del mismo proyecto indicado en `NEXT_PUBLIC_SUPABASE_URL`.
+
+Puedes comprobarlo en Supabase con:
+
+```sql
+select table_schema, table_name
+from information_schema.tables
+where table_schema = 'public'
+  and table_name in ('events', 'routes');
+```
+
+El resultado debe devolver `public.events` y `public.routes`. Si acabas de crear las tablas y el error persiste unos segundos, recarga la página para que PostgREST actualice la caché de esquema.
+
 ## Imágenes
 
 El panel usa Cloudinary desde el navegador. Necesitas:

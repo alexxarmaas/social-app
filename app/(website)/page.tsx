@@ -4,21 +4,6 @@ import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStrai
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-50">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-zinc-950/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-zinc-500">Tramassso GC</p>
-            <h1 className="text-sm font-semibold uppercase tracking-[0.4em] text-white">Cultura del motor elevada</h1>
-          </div>
-          <nav className="hidden items-center gap-8 text-xs uppercase tracking-[0.3em] text-zinc-400 md:flex">
-            <Link href="/events" className="transition hover:text-white">Eventos</Link>
-            <Link href="/routes" className="transition hover:text-white">Rutas</Link>
-            <Link href="/admin" className="transition hover:text-white">Panel</Link>
-            <Link href="#contact" className="transition hover:text-white">Contacto</Link>
-          </nav>
-        </div>
-      </header>
-
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:py-20">
         <div className="space-y-8">
           <div className="space-y-4">

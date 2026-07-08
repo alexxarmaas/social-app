@@ -133,6 +133,20 @@ function tableName(kind: ContentKind) {
   return kind === "events" ? "events" : "routes";
 }
 
+function contentKindLabel(kind: ContentKind) {
+  return kind === "events" ? "eventos" : "rutas";
+}
+
+function formatSupabaseError(kind: ContentKind, error: { message?: string; code?: string }) {
+  const message = error.message ?? "Error de Supabase";
+
+  if (message.includes("schema cache") || message.includes(`public.${tableName(kind)}`) || error.code === "PGRST205") {
+    return `No existe la tabla de ${contentKindLabel(kind)} en Supabase. Ejecuta supabase/tramassso-content.sql en el SQL Editor del proyecto conectado y vuelve a intentarlo.`;
+  }
+
+  return message;
+}
+
 export async function listPublicEvents() {
   const client = createSupabasePublicClient();
   const { data, error } = await client
@@ -141,7 +155,7 @@ export async function listPublicEvents() {
     .order("date", { ascending: true });
 
   if (error) {
-    return { events: [] as EventRecord[], error: error.message };
+    return { events: [] as EventRecord[], error: formatSupabaseError("events", error) };
   }
 
   return {
@@ -158,7 +172,7 @@ export async function getPublicEventById(id: string) {
     .maybeSingle();
 
   if (error || !data) {
-    return { event: null as EventDetailsRecord | null, error: error?.message ?? "Evento no encontrado" };
+    return { event: null as EventDetailsRecord | null, error: error ? formatSupabaseError("events", error) : "Evento no encontrado" };
   }
 
   return {
@@ -177,7 +191,7 @@ export async function listPublicRoutes() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return { routes: [] as RouteRecord[], error: error.message };
+    return { routes: [] as RouteRecord[], error: formatSupabaseError("routes", error) };
   }
 
   return {
@@ -194,7 +208,7 @@ export async function getPublicRouteById(id: string) {
     .maybeSingle();
 
   if (error || !data) {
-    return { route: null as RouteDetailsRecord | null, error: error?.message ?? "Ruta no encontrada" };
+    return { route: null as RouteDetailsRecord | null, error: error ? formatSupabaseError("routes", error) : "Ruta no encontrada" };
   }
 
   return {
@@ -219,7 +233,7 @@ export async function listAdminContent(kind: ContentKind): Promise<{ items: Even
   const { data, error } = await client.from(tableName(kind)).select(selectColumns).order("created_at", { ascending: false });
 
   if (error) {
-    return { items: [], error: error.message };
+    return { items: [], error: formatSupabaseError(kind, error) };
   }
 
   if (kind === "events") {
@@ -250,7 +264,7 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
     const { data, error } = await query;
 
     if (error || !data) {
-      return { error: error?.message ?? "No se pudo guardar el evento" };
+      return { error: error ? formatSupabaseError("events", error) : "No se pudo guardar el evento" };
     }
 
     return { item: mapEventRow(data as EventRow) };
@@ -275,7 +289,7 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
   const { data, error } = await query;
 
   if (error || !data) {
-    return { error: error?.message ?? "No se pudo guardar la ruta" };
+    return { error: error ? formatSupabaseError("routes", error) : "No se pudo guardar la ruta" };
   }
 
   return { item: mapRouteRow(data as RouteRow) };
@@ -286,7 +300,7 @@ export async function deleteContent(kind: ContentKind, id: string) {
   const { error } = await client.from(tableName(kind)).delete().eq("id", id);
 
   if (error) {
-    return { error: error.message };
+    return { error: formatSupabaseError(kind, error) };
   }
 
   return { success: true };
