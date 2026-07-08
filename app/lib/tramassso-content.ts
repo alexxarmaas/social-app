@@ -206,7 +206,10 @@ export async function getPublicRouteById(id: string) {
   };
 }
 
-export async function listAdminContent(kind: ContentKind) {
+export async function listAdminContent(kind: "events"): Promise<{ items: EventRecord[]; error?: string }>;
+export async function listAdminContent(kind: "routes"): Promise<{ items: RouteRecord[]; error?: string }>;
+export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[]; error?: string } | { items: RouteRecord[]; error?: string }>;
+export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[]; error?: string } | { items: RouteRecord[]; error?: string }> {
   const client = createSupabasePublicClient();
   const selectColumns =
     kind === "events"
@@ -220,10 +223,10 @@ export async function listAdminContent(kind: ContentKind) {
   }
 
   if (kind === "events") {
-    return { items: (data ?? []).map((row) => mapEventRow(row as EventRow)) as EventRecord[] };
+    return { items: (data ?? []).map((row) => mapEventRow(row as unknown as EventRow)) as EventRecord[] };
   }
 
-  return { items: (data ?? []).map((row) => mapRouteRow(row as RouteRow)) as RouteRecord[] };
+  return { items: (data ?? []).map((row) => mapRouteRow(row as unknown as RouteRow)) as RouteRecord[] };
 }
 
 export async function saveContent(kind: ContentKind, payload: unknown, id?: string) {

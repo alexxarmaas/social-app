@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { z } from "zod";
 import { routeInputSchema, type RouteInput, type RouteRecord } from "@/app/lib/tramassso-content";
 import CloudinaryUploader from "@/components/admin/CloudinaryUploader";
 
@@ -33,7 +34,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
     [routes, selectedId],
   );
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<RouteInput>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<z.input<typeof routeInputSchema>, undefined, z.output<typeof routeInputSchema>>({
     resolver: zodResolver(routeInputSchema),
     defaultValues: emptyValues,
   });
