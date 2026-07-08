@@ -63,16 +63,13 @@ El resultado debe devolver `public.events` y `public.routes`. Si acabas de crear
 
 ## Imágenes
 
-El panel usa Cloudinary desde el navegador. Necesitas:
+El panel usa Cloudinary con firma de servidor. Necesitas:
 
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`
-- `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
 
-Crea un preset unsigned en Cloudinary y limita:
-- carpeta de destino,
-- tipos de archivo permitidos,
-- tamaño máximo,
-- moderación si lo necesitas.
+No necesitas upload preset unsigned. La ruta `/api/admin/cloudinary-signature` firma la subida y solo responde a usuarios con rol `admin` o `superadmin`.
 
 ## Acceso admin
 
@@ -92,8 +89,9 @@ Desde `/admin` puedes:
 - `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: clave anónima pública de Supabase.
 - `SUPABASE_SERVICE_ROLE_KEY`: clave de servicio para guardar contenido desde el servidor.
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: nombre del cloud de Cloudinary.
-- `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`: preset unsigned restringido para subir imágenes.
+- `CLOUDINARY_CLOUD_NAME`: nombre del cloud de Cloudinary.
+- `CLOUDINARY_API_KEY`: API key de Cloudinary.
+- `CLOUDINARY_API_SECRET`: secreto usado solo en servidor para firmar subidas.
 
 ## Seguridad
 

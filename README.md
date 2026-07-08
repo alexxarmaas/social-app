@@ -29,7 +29,7 @@ Abre `http://localhost:3000`.
 - `DATABASE_URL`: base de datos usada por Prisma y NextAuth.
 - `NEXTAUTH_URL` y `NEXTAUTH_SECRET`: autenticación del panel admin.
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`: contenido editable de eventos y rutas.
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` y `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`: subida de imágenes desde el admin.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`: subida firmada de imágenes desde el admin.
 - Variables `NEXT_PUBLIC_ADSENSE_*`: anuncios opcionales.
 
 ## Datos editables
@@ -87,4 +87,4 @@ Después podrás iniciar sesión en la ruta interna de acceso del equipo con `al
 
 - Rota cualquier clave real que haya estado en GitHub.
 - Mantén `.env` fuera del repositorio.
-- Usa un upload preset unsigned de Cloudinary restringido por carpeta, formato y tamaño.
+- El uploader usa firma de servidor con `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`. No necesitas upload preset unsigned.
