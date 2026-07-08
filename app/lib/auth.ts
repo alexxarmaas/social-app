@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
         },
     },
     pages: {
-        signIn: "/login",
+        signIn: "/acceso-interno-tramassso",
     },
     session: {
         strategy: "jwt",

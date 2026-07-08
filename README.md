@@ -38,7 +38,7 @@ El contenido de eventos y rutas se edita desde `/admin`.
 
 1. Crea las tablas de Supabase con `supabase/tramassso-content.sql`.
 2. Crea un usuario admin o superadmin en tu base Prisma con `role = "admin"` o `role = "superadmin"`.
-3. Entra en `/login` y luego `/admin`.
+3. Entra en la ruta interna de acceso del equipo y luego en `/admin`.
 4. Crea, edita o elimina eventos y rutas desde el panel.
 
 Consulta `docs/EDITAR_DATOS.md` para la guía completa.
@@ -81,7 +81,7 @@ Bash:
 SUPERADMIN_EMAIL="alexarmas2002@outlook.es" SUPERADMIN_PASSWORD="TU_CONTRASEÑA_SEGURA" npm run create-superadmin
 ```
 
-Después podrás iniciar sesión en `/login` con `alexarmas2002@outlook.es` y la contraseña definida en `SUPERADMIN_PASSWORD`.
+Después podrás iniciar sesión en la ruta interna de acceso del equipo con `alexarmas2002@outlook.es` y la contraseña definida en `SUPERADMIN_PASSWORD`.
 
 ## Notas de seguridad
 

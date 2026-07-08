@@ -18,7 +18,7 @@ export default function ProtectedLink({ href, children, className = "" }: Protec
         if (session) {
             router.push(href);
         } else {
-            router.push(`/login?next=${encodeURIComponent(href)}`);
+            router.push(`/acceso-interno-tramassso?next=${encodeURIComponent(href)}`);
         }
     };
 

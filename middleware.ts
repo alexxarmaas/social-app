@@ -4,6 +4,7 @@ import { getToken } from 'next-auth/jwt';
 
 const PUBLIC_PATHS = [
   '/login',
+  '/acceso-interno-tramassso',
   '/register',
   '/get-app',
   '/about',
@@ -68,7 +69,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHENTICATED' }, { status: 401 });
     }
 
-    const loginUrl = new URL('/login', req.url);
+    const loginUrl = new URL('/acceso-interno-tramassso', req.url);
     loginUrl.searchParams.set('next', pathname + search);
     return NextResponse.redirect(loginUrl);
   }
