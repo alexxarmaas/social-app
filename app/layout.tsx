@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { getValidAdsenseClientId } from "@/app/lib/adsense";
 import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
+import Provider from "@/components/SessionProvider";
+import PushNotificationManager from "@/components/notifications/PushNotificationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,23 +24,23 @@ const aeroblade = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Tramassso | GC Driving Events & Routes",
-  description: "Premium sports car events, driving routes, and sponsor-ready experiences in Gran Canaria.",
+  title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
+  description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
   metadataBase,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Tramassso | GC Driving Events & Routes",
-    description: "Premium sports car events, driving routes, and sponsor-ready experiences in Gran Canaria.",
+    title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
+    description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
     url: "/",
     siteName: "Tramassso",
     images: [luxuryFallbackImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tramassso | GC Driving Events & Routes",
-    description: "Premium sports car events, driving routes, and sponsor-ready experiences in Gran Canaria.",
+    title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
+    description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
     images: [luxuryFallbackImage],
   },
   manifest: "/manifest.json",
@@ -49,16 +51,13 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
 };
-
-import Provider from "@/components/SessionProvider";
-import PushNotificationManager from "@/components/notifications/PushNotificationManager";
 
 export default function RootLayout({
   children,
@@ -68,10 +67,8 @@ export default function RootLayout({
   const adsenseClientId = getValidAdsenseClientId();
 
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${aeroblade.variable} antialiased`}
-      >
+    <html lang="es">
+      <body className={`${geistSans.variable} ${geistMono.variable} ${aeroblade.variable} antialiased`}>
         <Provider>
           {adsenseClientId ? (
             <Script

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { ZodError } from "zod";
 import { getCurrentAdminSession } from "@/app/lib/admin-auth";
 import { deleteContent, listAdminContent, saveContent } from "@/app/lib/tramassso-content";
 import type { ContentKind } from "@/app/lib/tramassso-content";
@@ -22,15 +23,34 @@ function parseKind(value: string | null): ContentKind | null {
   return null;
 }
 
+function errorMessage(error: unknown) {
+  if (error instanceof ZodError) {
+    return error.issues.map((issue) => issue.message).join(" ");
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Ha ocurrido un error inesperado.";
+}
+
+function revalidateContent() {
+  revalidatePath("/admin");
+  revalidatePath("/");
+  revalidatePath("/events");
+  revalidatePath("/routes");
+}
+
 export async function GET(request: NextRequest) {
   if (!(await requireAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
 
   const kind = parseKind(request.nextUrl.searchParams.get("kind"));
 
   if (!kind) {
-    return NextResponse.json({ error: "Missing kind" }, { status: 400 });
+    return NextResponse.json({ error: "Falta el tipo de contenido." }, { status: 400 });
   }
 
   const result = await listAdminContent(kind);
@@ -44,66 +64,66 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   if (!(await requireAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
 
-  const body: { kind?: string; payload?: unknown } = await request.json();
-  const kind = parseKind(body.kind ?? null);
+  try {
+    const body: { kind?: string; payload?: unknown } = await request.json();
+    const kind = parseKind(body.kind ?? null);
 
-  if (!kind || !body.payload) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    if (!kind || !body.payload) {
+      return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
+    }
+
+    const result = await saveContent(kind, body.payload);
+
+    if ("error" in result && result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    revalidateContent();
+    return NextResponse.json(result, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: errorMessage(error) }, { status: 400 });
   }
-
-  const result = await saveContent(kind, body.payload);
-
-  if ("error" in result && result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/");
-  revalidatePath("/events");
-  revalidatePath("/routes");
-
-  return NextResponse.json(result, { status: 201 });
 }
 
 export async function PUT(request: NextRequest) {
   if (!(await requireAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
 
-  const body: { kind?: string; id?: string; payload?: unknown } = await request.json();
-  const kind = parseKind(body.kind ?? null);
+  try {
+    const body: { kind?: string; id?: string; payload?: unknown } = await request.json();
+    const kind = parseKind(body.kind ?? null);
 
-  if (!kind || !body.id || !body.payload) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    if (!kind || !body.id || !body.payload) {
+      return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
+    }
+
+    const result = await saveContent(kind, body.payload, body.id);
+
+    if ("error" in result && result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    revalidateContent();
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: errorMessage(error) }, { status: 400 });
   }
-
-  const result = await saveContent(kind, body.payload, body.id);
-
-  if ("error" in result && result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
-  }
-
-  revalidatePath("/admin");
-  revalidatePath("/");
-  revalidatePath("/events");
-  revalidatePath("/routes");
-
-  return NextResponse.json(result);
 }
 
 export async function DELETE(request: NextRequest) {
   if (!(await requireAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
 
   const body: { kind?: string; id?: string } = await request.json();
   const kind = parseKind(body.kind ?? null);
 
   if (!kind || !body.id) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
   }
 
   const result = await deleteContent(kind, body.id);
@@ -112,10 +132,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/");
-  revalidatePath("/events");
-  revalidatePath("/routes");
-
+  revalidateContent();
   return NextResponse.json(result);
 }

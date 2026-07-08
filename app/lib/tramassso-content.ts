@@ -1,25 +1,25 @@
 import { z } from "zod";
 import { createSupabasePublicClient, createSupabaseServiceClient } from "@/app/lib/supabase";
 
-const urlListSchema = z.array(z.string().url()).default([]);
+const urlListSchema = z.array(z.string().url("Cada imagen debe ser una URL válida.")).default([]);
 
 export const eventInputSchema = z.object({
-  title: z.string().trim().min(3).max(120),
-  description: z.string().trim().min(20).max(5000),
-  date: z.string().min(1),
-  location: z.string().trim().min(2).max(200),
-  cover_image_url: z.string().trim().url().or(z.literal("")).optional(),
+  title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres.").max(120, "El título no puede superar 120 caracteres."),
+  description: z.string().trim().min(20, "La descripción debe tener al menos 20 caracteres.").max(5000, "La descripción no puede superar 5000 caracteres."),
+  date: z.string().min(1, "Indica la fecha del evento."),
+  location: z.string().trim().min(2, "Indica la ubicación.").max(200, "La ubicación no puede superar 200 caracteres."),
+  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL válida.").or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
 });
 
 export const routeInputSchema = z.object({
-  title: z.string().trim().min(3).max(120),
-  description: z.string().trim().min(20).max(5000),
-  start_point: z.string().trim().min(2).max(200),
-  end_point: z.string().trim().min(2).max(200),
-  distance_km: z.coerce.number().positive().max(1000),
-  drive_time_minutes: z.coerce.number().int().positive().max(1440),
-  cover_image_url: z.string().trim().url().or(z.literal("")).optional(),
+  title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres.").max(120, "El título no puede superar 120 caracteres."),
+  description: z.string().trim().min(20, "La descripción debe tener al menos 20 caracteres.").max(5000, "La descripción no puede superar 5000 caracteres."),
+  start_point: z.string().trim().min(2, "Indica el punto de salida.").max(200, "El punto de salida no puede superar 200 caracteres."),
+  end_point: z.string().trim().min(2, "Indica el punto de llegada.").max(200, "El punto de llegada no puede superar 200 caracteres."),
+  distance_km: z.coerce.number().positive("La distancia debe ser mayor que 0.").max(1000, "La distancia no puede superar 1000 km."),
+  drive_time_minutes: z.coerce.number().int("El tiempo debe ser un número entero.").positive("El tiempo debe ser mayor que 0.").max(1440, "El tiempo no puede superar 1440 minutos."),
+  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL válida.").or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
 });
 
@@ -121,8 +121,8 @@ function mapRouteRow(row: RouteRow): RouteRecord {
     description: row.description,
     start_point: row.start_point,
     end_point: row.end_point,
-    distance_km: row.distance_km,
-    drive_time_minutes: row.drive_time_minutes,
+    distance_km: Number(row.distance_km),
+    drive_time_minutes: Number(row.drive_time_minutes),
     cover_image_url: row.cover_image_url,
     gallery_urls: row.gallery_urls ?? [],
     created_at: row.created_at,
@@ -158,7 +158,7 @@ export async function getPublicEventById(id: string) {
     .maybeSingle();
 
   if (error || !data) {
-    return { event: null as EventDetailsRecord | null, error: error?.message ?? "Event not found" };
+    return { event: null as EventDetailsRecord | null, error: error?.message ?? "Evento no encontrado" };
   }
 
   return {
@@ -194,7 +194,7 @@ export async function getPublicRouteById(id: string) {
     .maybeSingle();
 
   if (error || !data) {
-    return { route: null as RouteDetailsRecord | null, error: error?.message ?? "Route not found" };
+    return { route: null as RouteDetailsRecord | null, error: error?.message ?? "Ruta no encontrada" };
   }
 
   return {
@@ -250,7 +250,7 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
     const { data, error } = await query;
 
     if (error || !data) {
-      return { error: error?.message ?? "Unable to save event" };
+      return { error: error?.message ?? "No se pudo guardar el evento" };
     }
 
     return { item: mapEventRow(data as EventRow) };
@@ -275,7 +275,7 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
   const { data, error } = await query;
 
   if (error || !data) {
-    return { error: error?.message ?? "Unable to save route" };
+    return { error: error?.message ?? "No se pudo guardar la ruta" };
   }
 
   return { item: mapRouteRow(data as RouteRow) };

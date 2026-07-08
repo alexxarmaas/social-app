@@ -16,7 +16,7 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
 
   const uploadFile = async (file: File) => {
     if (!cloudName || !uploadPreset) {
-      throw new Error("Missing Cloudinary upload configuration");
+      throw new Error("Falta la configuración de Cloudinary.");
     }
 
     const formData = new FormData();
@@ -29,13 +29,13 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
     });
 
     if (!response.ok) {
-      throw new Error("Cloudinary upload failed");
+      throw new Error("No se pudo subir la imagen a Cloudinary.");
     }
 
     const data: { secure_url?: string } = await response.json();
 
     if (!data.secure_url) {
-      throw new Error("Cloudinary did not return a secure URL");
+      throw new Error("Cloudinary no devolvió una URL segura.");
     }
 
     return data.secure_url;
@@ -62,10 +62,8 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
   };
 
   return (
-    <label
-      className={`inline-flex cursor-pointer items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-    >
-      <span>{uploading ? "Uploading" : label}</span>
+    <label className={`inline-flex cursor-pointer items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}>
+      <span>{uploading ? "Subiendo" : label}</span>
       <input type="file" accept="image/*" multiple={multiple} onChange={handleChange} className="hidden" disabled={uploading} />
     </label>
   );

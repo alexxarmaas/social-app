@@ -17,17 +17,13 @@ interface AdBannerProps {
   label?: string;
 }
 
-export default function AdBanner({ slot, format = "auto", className = "", label = "Sponsored placement" }: AdBannerProps) {
+export default function AdBanner({ slot, format = "auto", className = "", label = "Espacio patrocinado" }: AdBannerProps) {
   const pathname = usePathname();
   const adsenseClientId = getValidAdsenseClientId();
   const validSlot = isValidAdsenseSlot(slot) ? slot : null;
 
   useEffect(() => {
-    if (!adsenseClientId || !validSlot) {
-      return;
-    }
-
-    if (typeof window === "undefined") {
+    if (!adsenseClientId || !validSlot || typeof window === "undefined") {
       return;
     }
 
@@ -46,14 +42,7 @@ export default function AdBanner({ slot, format = "auto", className = "", label 
   return (
     <div className={`rounded-3xl border border-zinc-800 bg-zinc-950/80 p-3 ${className}`}>
       <div className="mb-2 text-[10px] uppercase tracking-[0.35em] text-zinc-500">{label}</div>
-      <ins
-        className="adsbygoogle block"
-        style={{ display: "block" }}
-        data-ad-client={adsenseClientId}
-        data-ad-slot={validSlot}
-        data-ad-format={format}
-        data-full-width-responsive="true"
-      />
+      <ins className="adsbygoogle block" style={{ display: "block" }} data-ad-client={adsenseClientId} data-ad-slot={validSlot} data-ad-format={format} data-full-width-responsive="true" />
     </div>
   );
 }

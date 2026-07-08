@@ -4,24 +4,25 @@ import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: "Tramassso | Premium GC Driving Events",
+    default: "Tramassso | Eventos y rutas premium en Gran Canaria",
     template: "%s | Tramassso",
   },
-  description: "Premium sports car events, route guides, and sponsor-ready experiences in Gran Canaria.",
+  description: "Eventos de coches, rutas por Gran Canaria y experiencias preparadas para patrocinadores.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Tramassso | Premium GC Driving Events",
-    description: "Premium sports car events, route guides, and sponsor-ready experiences in Gran Canaria.",
+    title: "Tramassso | Eventos y rutas premium en Gran Canaria",
+    description: "Eventos de coches, rutas por Gran Canaria y experiencias preparadas para patrocinadores.",
     url: "/",
     siteName: "Tramassso",
     images: [luxuryFallbackImage],
+    locale: "es_ES",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tramassso | Premium GC Driving Events",
-    description: "Premium sports car events, route guides, and sponsor-ready experiences in Gran Canaria.",
+    title: "Tramassso | Eventos y rutas premium en Gran Canaria",
+    description: "Eventos de coches, rutas por Gran Canaria y experiencias preparadas para patrocinadores.",
     images: [luxuryFallbackImage],
   },
 };
