@@ -18,7 +18,7 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
     return null;
   }
 
-  let parsedValue = value;
+  let parsedValue: unknown = value;
 
   if (typeof value === "string") {
     try {
