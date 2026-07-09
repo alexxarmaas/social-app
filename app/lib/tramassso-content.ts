@@ -352,6 +352,7 @@ export async function getPublicPartner(id: string) {
 export async function listAdminContent(kind: "events"): Promise<{ items: EventRecord[]; error?: string }>;
 export async function listAdminContent(kind: "routes"): Promise<{ items: RouteRecord[]; error?: string }>;
 export async function listAdminContent(kind: "partners"): Promise<{ items: PartnerRecord[]; error?: string }>;
+export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[] | RouteRecord[] | PartnerRecord[]; error?: string }>;
 export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[] | RouteRecord[] | PartnerRecord[]; error?: string }> {
   const client = createSupabasePublicClient();
   const selectColumns = kind === "events" ? eventColumns : kind === "routes" ? routeColumns : partnerColumns;
@@ -382,6 +383,7 @@ export async function listAdminContent(kind: ContentKind): Promise<{ items: Even
 export async function saveContent(kind: "events", payload: unknown, id?: string): Promise<{ item: EventRecord } | { error: string }>;
 export async function saveContent(kind: "routes", payload: unknown, id?: string): Promise<{ item: RouteRecord } | { error: string }>;
 export async function saveContent(kind: "partners", payload: unknown, id?: string): Promise<{ item: PartnerRecord } | { error: string }>;
+export async function saveContent(kind: ContentKind, payload: unknown, id?: string): Promise<{ item: EventRecord | RouteRecord | PartnerRecord } | { error: string }>;
 export async function saveContent(kind: ContentKind, payload: unknown, id?: string): Promise<{ item: EventRecord | RouteRecord | PartnerRecord } | { error: string }> {
   const client = createSupabaseServiceClient();
 
