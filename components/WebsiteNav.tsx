@@ -13,6 +13,7 @@ const navItems = [
   { href: "/", label: "Inicio", page: "home" },
   { href: "/events", label: "Eventos", page: "events" },
   { href: "/routes", label: "Rutas", page: "routes" },
+  { href: "/partners", label: "Colaboradores", page: "partners" },
   { href: "/#contact", label: "Contacto", page: "contact" },
 ];
 

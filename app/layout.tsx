@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { getValidAdsenseClientId } from "@/app/lib/adsense";
 import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";

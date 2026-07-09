@@ -27,7 +27,7 @@ export default async function EventsFeedPage() {
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Quedadas y experiencias de coches en Gran Canaria con inventario publicitario integrado entre las tarjetas.</p>
         </div>
 
-        {error ? <p className="mt-8 text-sm text-red-300">{error}</p> : null}
+        {error ? <p className="mt-8 text-sm text-red-300">No hemos podido cargar los eventos en este momento.</p> : null}
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event, index) => (

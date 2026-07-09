@@ -1,6 +1,6 @@
 # Tramassso
 
-Aplicación Next.js para Tramassso: eventos, rutas de conducción y panel de administración para editar contenido sin tocar código.
+Aplicación Next.js para Tramassso: eventos, rutas con mapa, colaboradores y panel de administración para editar contenido sin tocar código.
 
 ## Instalación
 
@@ -16,6 +16,14 @@ cp .env.example .env
 
 Edita `.env` con tus claves reales. No subas `.env` a GitHub.
 
+## Variables necesarias
+
+- `DATABASE_URL`: base de datos usada por Prisma y NextAuth.
+- `NEXTAUTH_URL` y `NEXTAUTH_SECRET`: autenticación del panel admin.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`: contenido editable de eventos, rutas y colaboradores.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`: subida firmada de imágenes desde el admin.
+- Variables `NEXT_PUBLIC_ADSENSE_*`: anuncios opcionales.
+
 ## Arranque local
 
 ```bash
@@ -24,48 +32,50 @@ npm run dev
 
 Abre `http://localhost:3000`.
 
-## Variables necesarias
+## Supabase
 
-- `DATABASE_URL`: base de datos usada por Prisma y NextAuth.
-- `NEXTAUTH_URL` y `NEXTAUTH_SECRET`: autenticación del panel admin.
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`: contenido editable de eventos y rutas.
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`: subida firmada de imágenes desde el admin.
-- Variables `NEXT_PUBLIC_ADSENSE_*`: anuncios opcionales.
+Ejecuta estas SQL desde el SQL Editor del proyecto Supabase conectado:
+
+1. `supabase/tramassso-content.sql`
+2. `supabase/partners-and-route-coordinates.sql`
+
+La segunda SQL añade `coordinates` a `public.routes` y crea `public.partners`.
+
+Formato válido para coordenadas de rutas:
+
+```json
+[
+  { "lat": 28.1234, "lng": -15.4321 },
+  { "lat": 28.125, "lng": -15.44 }
+]
+```
+
+El array debe tener al menos dos puntos. Si una ruta no tiene mapa, deja el campo vacío en el admin.
 
 ## Datos editables
 
-El contenido de eventos y rutas se edita desde `/admin`.
+El contenido se edita desde `/admin`:
 
-1. Crea las tablas de Supabase con `supabase/tramassso-content.sql`.
-2. Crea un usuario admin o superadmin en tu base Prisma con `role = "admin"` o `role = "superadmin"`.
-3. Entra en la ruta interna de acceso del equipo y luego en `/admin`.
-4. Crea, edita o elimina eventos y rutas desde el panel.
+- Eventos públicos.
+- Rutas públicas, incluyendo coordenadas JSON para el mapa.
+- Colaboradores públicos en `/partners`.
+- Imágenes y logos mediante Cloudinary firmado.
 
-Consulta `docs/EDITAR_DATOS.md` para la guía completa.
+Los logos de colaboradores se suben desde el mismo panel con `CloudinaryUploader`; no necesitas upload preset unsigned.
 
 ## Comandos
 
 ```bash
-npm run dev      # desarrollo
-npm run build    # build de producción
-npm run start    # servir producción
-npm run lint     # lint
-npm run create-superadmin # crea o actualiza el superadmin
-```
-
-Para compilar antes de desplegar:
-
-```bash
+npm run dev
 npm run build
+npm run start
+npm run lint
+npm run create-superadmin
 ```
-
-## Supabase
-
-Ejecuta `supabase/tramassso-content.sql` desde el SQL Editor de Supabase. Ese script crea las tablas de eventos y rutas usadas por el panel de administración. Después copia la URL del proyecto, la clave anónima y la clave de servicio a `.env`.
 
 ## Superadmin
 
-El superadmin se crea en la base de datos real configurada en `DATABASE_URL`; no hay bypass por correo en el código. Si `DATABASE_URL` apunta a Supabase, el usuario se crea en Supabase. Si apunta a una base local, se crea localmente.
+El superadmin se crea en la base de datos real configurada en `DATABASE_URL`; no hay bypass por correo en el código.
 
 PowerShell:
 
@@ -81,10 +91,19 @@ Bash:
 SUPERADMIN_EMAIL="alexarmas2002@outlook.es" SUPERADMIN_PASSWORD="TU_CONTRASEÑA_SEGURA" npm run create-superadmin
 ```
 
-Después podrás iniciar sesión en la ruta interna de acceso del equipo con `alexarmas2002@outlook.es` y la contraseña definida en `SUPERADMIN_PASSWORD`.
+Después podrás iniciar sesión en la ruta interna de acceso del equipo con el correo y la contraseña definida en `SUPERADMIN_PASSWORD`.
 
-## Notas de seguridad
+## Build
+
+Antes de desplegar:
+
+```bash
+npm run build
+```
+
+## Seguridad
 
 - Rota cualquier clave real que haya estado en GitHub.
 - Mantén `.env` fuera del repositorio.
-- El uploader usa firma de servidor con `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`. No necesitas upload preset unsigned.
+- `.env.example` debe contener solo placeholders.
+- El uploader usa firma de servidor con `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`.

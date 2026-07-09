@@ -24,7 +24,12 @@ const emptyValues: RouteFormInput = {
   drive_time_minutes: 0,
   cover_image_url: "",
   gallery_urls: [],
+  coordinates: "",
 };
+
+function formatCoordinatesForTextarea(route: RouteRecord) {
+  return route.coordinates ? JSON.stringify(route.coordinates, null, 2) : "";
+}
 
 export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManagerProps) {
   const [routes, setRoutes] = useState<RouteRecord[]>(initialRoutes);
@@ -57,6 +62,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
       drive_time_minutes: selectedRoute.drive_time_minutes,
       cover_image_url: selectedRoute.cover_image_url ?? "",
       gallery_urls: selectedRoute.gallery_urls,
+      coordinates: formatCoordinatesForTextarea(selectedRoute),
     });
   }, [reset, selectedRoute]);
 
@@ -284,6 +290,18 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
               )}
             </div>
           </div>
+
+          <label className="grid gap-2">
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Coordenadas de la ruta</span>
+            <textarea
+              {...register("coordinates")}
+              rows={7}
+              placeholder={'[\n  { "lat": 28.1234, "lng": -15.4321 },\n  { "lat": 28.1250, "lng": -15.4400 }\n]'}
+              className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 font-mono text-sm text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400"
+            />
+            <span className="text-xs leading-5 text-zinc-500">Pega un array JSON con al menos dos puntos. Déjalo vacío si la ruta no tiene mapa.</span>
+            {errors.coordinates ? <span className="text-xs text-red-400">{errors.coordinates.message}</span> : null}
+          </label>
 
           <div className="flex items-center gap-3 pt-2">
             <button type="submit" disabled={saving} className="rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">

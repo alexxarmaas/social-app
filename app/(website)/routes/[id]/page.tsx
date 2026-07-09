@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPublicRouteById } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath } from "@/app/lib/seo";
+import RouteMap from "@/components/routes/RouteMap";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +77,14 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
               )) : <p>Aún no hay imágenes en la galería.</p>}
             </div>
           </div>
+        </div>
+
+        <div className="mt-10 space-y-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Mapa interactivo</p>
+            <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-white">Trazado de la ruta</h2>
+          </div>
+          <RouteMap coordinates={route.coordinates} />
         </div>
       </section>
     </main>

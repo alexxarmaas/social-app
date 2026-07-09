@@ -27,7 +27,7 @@ export default async function RoutesGuidePage() {
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Una guía premium para rutas escénicas y experiencias preparadas para marcas, sin interrumpir el contenido.</p>
         </div>
 
-        {error ? <p className="mt-8 text-sm text-red-300">{error}</p> : null}
+        {error ? <p className="mt-8 text-sm text-red-300">No hemos podido cargar las rutas en este momento.</p> : null}
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {routes.map((route, index) => (

@@ -16,7 +16,7 @@ async function requireAdmin() {
 }
 
 function parseKind(value: string | null): ContentKind | null {
-  if (value === "events" || value === "routes") {
+  if (value === "events" || value === "routes" || value === "partners") {
     return value;
   }
 
@@ -35,11 +35,27 @@ function errorMessage(error: unknown) {
   return "Ha ocurrido un error inesperado.";
 }
 
-function revalidateContent() {
+function revalidateContent(kind?: ContentKind, id?: string) {
   revalidatePath("/admin");
   revalidatePath("/");
-  revalidatePath("/events");
-  revalidatePath("/routes");
+
+  if (!kind || kind === "events") {
+    revalidatePath("/events");
+    if (id) {
+      revalidatePath(`/events/${id}`);
+    }
+  }
+
+  if (!kind || kind === "routes") {
+    revalidatePath("/routes");
+    if (id) {
+      revalidatePath(`/routes/${id}`);
+    }
+  }
+
+  if (!kind || kind === "partners") {
+    revalidatePath("/partners");
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -81,7 +97,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    revalidateContent();
+    revalidateContent(kind, "item" in result ? result.item.id : undefined);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: errorMessage(error) }, { status: 400 });
@@ -107,7 +123,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    revalidateContent();
+    revalidateContent(kind, body.id);
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: errorMessage(error) }, { status: 400 });
@@ -132,6 +148,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  revalidateContent();
+  revalidateContent(kind, body.id);
   return NextResponse.json(result);
 }
