@@ -36,7 +36,11 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
 
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
-      context.addIssue(issue);
+      context.addIssue({
+        code: "custom",
+        message: issue.message,
+        path: issue.path,
+      });
     }
     return z.NEVER;
   }
