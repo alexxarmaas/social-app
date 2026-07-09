@@ -19,8 +19,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const displayUser = session.user.email ?? session.user.name ?? "admin";
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50 lg:flex">
-      <aside className="border-b border-white/10 bg-black/35 px-5 py-6 backdrop-blur-xl lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-b-0 lg:border-r lg:px-6">
+    <div className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50 lg:flex">
+      <aside className="border-b border-white/10 bg-black/35 px-4 py-5 backdrop-blur-xl sm:px-5 sm:py-6 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-6">
         <div className="space-y-3">
           <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Panel interno</p>
           <div>
@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           </div>
         </div>
 
-        <nav className="mt-9 grid gap-2 text-xs uppercase tracking-[0.24em] text-zinc-400">
+        <nav className="mt-6 grid gap-2 text-[11px] uppercase tracking-[0.18em] text-zinc-400 sm:mt-9 sm:text-xs sm:tracking-[0.24em]">
           <Link href="/admin" className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-white/30 hover:text-white">Resumen</Link>
           <Link href="/events" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Eventos públicos</Link>
           <Link href="/routes" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Rutas públicas</Link>
@@ -45,7 +45,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </div>
       </aside>
 
-      <main className="flex-1 px-5 py-7 lg:px-8 lg:py-8">{children}</main>
+      <main className="min-w-0 flex-1 px-4 py-6 sm:px-5 sm:py-7 lg:px-8 lg:py-8">{children}</main>
     </div>
   );
 }

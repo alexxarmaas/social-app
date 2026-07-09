@@ -101,7 +101,7 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
 
   return (
     <div className="grid gap-2">
-      <label className={`inline-flex cursor-pointer items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900 ${uploading ? "cursor-not-allowed opacity-60" : ""} ${className}`}>
+      <label className={`inline-flex min-w-0 cursor-pointer items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-2 text-center text-xs uppercase tracking-[0.2em] text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900 sm:tracking-[0.28em] ${uploading ? "cursor-not-allowed opacity-60" : ""} ${className}`}>
         <span>{uploading ? "Subiendo" : label}</span>
         <input type="file" accept="image/*" multiple={multiple} onChange={handleChange} className="hidden" disabled={uploading} />
       </label>

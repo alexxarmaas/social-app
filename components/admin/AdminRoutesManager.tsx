@@ -141,9 +141,9 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
   };
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[1.25fr_0.8fr]">
-      <div className="rounded-[1.75rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.25)]">
-        <div className="mb-5 flex items-end justify-between gap-4">
+    <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.8fr)]">
+      <div className="min-w-0 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 p-4 shadow-[0_25px_80px_rgba(0,0,0,0.25)] sm:rounded-[1.75rem] sm:p-5">
+        <div className="mb-5 grid gap-4 sm:flex sm:items-end sm:justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Rutas</p>
             <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-zinc-50">Inventario de rutas</h2>
@@ -153,8 +153,8 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-[1.35rem] border border-zinc-800">
-          <table className="min-w-full divide-y divide-zinc-800 text-sm">
+        <div className="overflow-x-auto rounded-[1.35rem] border border-zinc-800">
+          <table className="min-w-[46rem] divide-y divide-zinc-800 text-sm">
             <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.35em] text-zinc-500">
               <tr>
                 <th className="px-4 py-3">Ruta</th>
@@ -205,7 +205,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(saveRoute)} className="rounded-[1.75rem] border border-zinc-800 bg-zinc-950/80 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.25)]">
+      <form onSubmit={handleSubmit(saveRoute)} className="min-w-0 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 p-4 shadow-[0_25px_80px_rgba(0,0,0,0.25)] sm:rounded-[1.75rem] sm:p-5">
         <div className="mb-5">
           <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Crear / editar</p>
           <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-zinc-50">Formulario de ruta</h2>
@@ -303,8 +303,8 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
             {errors.coordinates ? <span className="text-xs text-red-400">{errors.coordinates.message}</span> : null}
           </label>
 
-          <div className="flex items-center gap-3 pt-2">
-            <button type="submit" disabled={saving} className="rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.32em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
+          <div className="grid gap-3 pt-2 sm:flex sm:items-center">
+            <button type="submit" disabled={saving} className="w-full rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:tracking-[0.32em]">
               {saving ? "Guardando" : selectedId ? "Actualizar ruta" : "Crear ruta"}
             </button>
             <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">{message ?? "Listo"}</span>

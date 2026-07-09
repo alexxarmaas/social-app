@@ -23,18 +23,18 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
   const activePage = currentPage ?? (pathname === "/" ? "home" : pathname.split("/").filter(Boolean)[0] ?? "home");
 
   const linkClass = (page: string) =>
-    `transition hover:text-white ${activePage === page ? "text-white" : "text-zinc-400"}`;
+    `whitespace-nowrap transition hover:text-white ${activePage === page ? "text-white" : "text-zinc-400"}`;
   const mobileLinkClass = (page: string) =>
     `block rounded-2xl px-3 py-3 transition hover:bg-white/5 hover:text-white ${activePage === page ? "bg-white/5 text-white" : "text-zinc-400"}`;
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/90 text-zinc-50 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-        <Link href="/" className="font-aeroblade text-2xl font-bold tracking-[0.18em] text-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-5 sm:py-4 lg:px-8">
+        <Link href="/" className="min-w-0 font-aeroblade text-xl font-bold tracking-[0.14em] text-white sm:text-2xl sm:tracking-[0.18em]">
           Tramassso
         </Link>
 
-        <div className="hidden items-center gap-10 text-xs uppercase tracking-[0.32em] lg:flex">
+        <div className="hidden items-center gap-5 text-[11px] uppercase tracking-[0.22em] lg:flex xl:gap-10 xl:text-xs xl:tracking-[0.32em]">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className={linkClass(item.page)}>
               {item.label}

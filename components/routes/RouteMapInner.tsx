@@ -36,8 +36,8 @@ export default function RouteMapInner({ coordinates }: RouteMapInnerProps) {
   const center: LatLngExpression = positions[0] ?? fallbackCenter;
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
-      <MapContainer center={center} zoom={12} scrollWheelZoom className="h-[28rem] w-full bg-zinc-950">
+    <div className="overflow-hidden rounded-[1.5rem] border border-zinc-800 bg-zinc-950 shadow-[0_25px_80px_rgba(0,0,0,0.35)] sm:rounded-[2rem]">
+      <MapContainer center={center} zoom={12} scrollWheelZoom className="h-[18rem] w-full bg-zinc-950 sm:h-[28rem]">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

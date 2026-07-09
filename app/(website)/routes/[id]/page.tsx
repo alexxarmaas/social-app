@@ -42,34 +42,34 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-50">
-      <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="space-y-6">
-            <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Detalle de la ruta</p>
-            <h1 className="text-5xl font-black uppercase tracking-[0.08em] text-white md:text-7xl">{route.title}</h1>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Detalle de la ruta</p>
+            <h1 className="text-balance text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-7xl">{route.title}</h1>
             <p className="max-w-3xl text-sm leading-7 text-zinc-400 md:text-base">{route.description}</p>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-3xl border border-zinc-800 bg-white/5 p-4">
-                <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Salida</p>
-                <p className="mt-2 text-white">{route.start_point}</p>
+              <div className="min-w-0 rounded-2xl border border-zinc-800 bg-white/5 p-4 sm:rounded-3xl">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">Salida</p>
+                <p className="mt-2 break-words text-white">{route.start_point}</p>
               </div>
-              <div className="rounded-3xl border border-zinc-800 bg-white/5 p-4">
-                <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Llegada</p>
-                <p className="mt-2 text-white">{route.end_point}</p>
+              <div className="min-w-0 rounded-2xl border border-zinc-800 bg-white/5 p-4 sm:rounded-3xl">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">Llegada</p>
+                <p className="mt-2 break-words text-white">{route.end_point}</p>
               </div>
-              <div className="rounded-3xl border border-zinc-800 bg-white/5 p-4">
-                <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Distancia</p>
+              <div className="min-w-0 rounded-2xl border border-zinc-800 bg-white/5 p-4 sm:rounded-3xl">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">Distancia</p>
                 <p className="mt-2 text-white">{route.distance_km} km</p>
               </div>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-900/80">
+          <div className="overflow-hidden rounded-[1.5rem] border border-zinc-800 bg-zinc-900/80 sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
               <Image src={route.cover_image_url || luxuryFallbackPath} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
             </div>
-            <div className="grid gap-3 border-t border-zinc-800 p-5 text-sm text-zinc-400">
+            <div className="grid gap-3 border-t border-zinc-800 p-4 text-sm text-zinc-400 sm:p-5">
               {route.gallery_urls.length > 0 ? route.gallery_urls.slice(0, 3).map((imageUrl) => (
                 <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
                   <Image src={imageUrl} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
@@ -81,7 +81,7 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
 
         <div className="mt-10 space-y-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Mapa interactivo</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Mapa interactivo</p>
             <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-white">Trazado de la ruta</h2>
           </div>
           <RouteMap coordinates={route.coordinates} />

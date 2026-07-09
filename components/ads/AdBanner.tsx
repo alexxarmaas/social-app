@@ -33,15 +33,15 @@ export default function AdBanner({ slot, format = "auto", className = "", label 
 
   if (!adsenseClientId || !validSlot) {
     return (
-      <div className={`rounded-3xl border border-zinc-800 bg-zinc-950/80 px-5 py-4 text-xs uppercase tracking-[0.3em] text-zinc-500 ${className}`}>
+      <div className={`rounded-2xl border border-zinc-800 bg-zinc-950/80 px-4 py-4 text-[10px] uppercase tracking-[0.2em] text-zinc-500 sm:rounded-3xl sm:px-5 sm:text-xs sm:tracking-[0.3em] ${className}`}>
         {label}
       </div>
     );
   }
 
   return (
-    <div className={`rounded-3xl border border-zinc-800 bg-zinc-950/80 p-3 ${className}`}>
-      <div className="mb-2 text-[10px] uppercase tracking-[0.35em] text-zinc-500">{label}</div>
+    <div className={`rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 sm:rounded-3xl ${className}`}>
+      <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:tracking-[0.35em]">{label}</div>
       <ins className="adsbygoogle block" style={{ display: "block" }} data-ad-client={adsenseClientId} data-ad-slot={validSlot} data-ad-format={format} data-full-width-responsive="true" />
     </div>
   );
