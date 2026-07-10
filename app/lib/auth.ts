@@ -9,12 +9,12 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: "Credenciales",
             credentials: {
-                email: { label: "Correo electrónico", type: "email" },
-                password: { label: "Contraseña", type: "password" },
+                email: { label: "Correo electronico", type: "email" },
+                password: { label: "Clave", type: "password" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
-                    throw new Error("Credenciales inválidas");
+                    throw new Error("Credenciales invalidas");
                 }
 
                 const email = credentials.email.trim().toLowerCase();
@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
                 );
 
                 if (!isPasswordValid) {
-                    throw new Error("Contraseña incorrecta");
+                    throw new Error("Clave incorrecta");
                 }
 
                 return {

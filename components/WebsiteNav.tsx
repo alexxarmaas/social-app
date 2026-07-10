@@ -46,7 +46,7 @@ export default function WebsiteNav({ currentPage }: WebsiteNavProps) {
           type="button"
           onClick={() => setIsMenuOpen((open) => !open)}
           className="rounded-full border border-red-500/25 bg-black p-2 text-zinc-300 transition hover:border-red-500/60 hover:text-white lg:hidden"
-          aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-label={isMenuOpen ? "Cerrar menu" : "Abrir menu"}
         >
           {isMenuOpen ? <MdClose size={28} /> : <MdMenu size={28} />}
         </button>

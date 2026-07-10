@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const kind = parseKind(body.kind ?? null);
 
     if (!kind || !body.payload) {
-      return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
+      return NextResponse.json({ error: "Datos no validos." }, { status: 400 });
     }
 
     const result = await saveContent(kind, body.payload);
@@ -114,7 +114,7 @@ export async function PUT(request: NextRequest) {
     const kind = parseKind(body.kind ?? null);
 
     if (!kind || !body.id || !body.payload) {
-      return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
+      return NextResponse.json({ error: "Datos no validos." }, { status: 400 });
     }
 
     const result = await saveContent(kind, body.payload, body.id);
@@ -139,7 +139,7 @@ export async function DELETE(request: NextRequest) {
   const kind = parseKind(body.kind ?? null);
 
   if (!kind || !body.id) {
-    return NextResponse.json({ error: "Datos no válidos." }, { status: 400 });
+    return NextResponse.json({ error: "Datos no validos." }, { status: 400 });
   }
 
   const result = await deleteContent(kind, body.id);

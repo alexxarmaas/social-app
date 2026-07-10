@@ -5,7 +5,7 @@ import { getPublicRouteById } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 import RouteMap from "@/components/routes/RouteMap";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type RoutePageProps = {
   params: Promise<{ id: string }>;
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: RoutePageProps): Promise<Meta
   if (!route) {
     return buildPremiumMetadata({
       title: "Ruta Tramassso",
-      description: "Ruta premium de conducción en Gran Canaria.",
+      description: "Ruta premium de conduccion en Gran Canaria.",
       path: `/routes/${id}`,
       image: luxuryFallbackImage,
     });
@@ -97,14 +97,14 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
-              <Image src={route.cover_image_url || luxuryFallbackPath} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
+              <Image src={route.cover_image_url || luxuryFallbackPath} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" priority />
             </div>
             <div className="grid gap-3 border-t border-zinc-800 p-4 text-sm text-zinc-400 sm:p-5">
               {route.gallery_urls.length > 0 ? route.gallery_urls.slice(0, 3).map((imageUrl) => (
                 <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
                   <Image src={imageUrl} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
                 </div>
-              )) : <p>Aún no hay imágenes en la galería.</p>}
+              )) : <p>Aun no hay imagenes en la galeria.</p>}
             </div>
           </div>
         </div>

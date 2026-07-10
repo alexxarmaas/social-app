@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getPublicEventById } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type EventPageProps = {
   params: Promise<{ id: string }>;
@@ -79,14 +79,14 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
-              <Image src={event.cover_image_url || luxuryFallbackPath} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
+              <Image src={event.cover_image_url || luxuryFallbackPath} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" priority />
             </div>
             <div className="grid gap-3 border-t border-zinc-800 p-4 text-sm text-zinc-400 sm:p-5">
               {event.gallery_urls.length > 0 ? event.gallery_urls.slice(0, 3).map((imageUrl) => (
                 <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
                   <Image src={imageUrl} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
                 </div>
-              )) : <p>Aún no hay imágenes en la galería.</p>}
+              )) : <p>Aun no hay imagenes en la galeria.</p>}
             </div>
           </div>
         </div>

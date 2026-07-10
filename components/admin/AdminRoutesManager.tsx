@@ -202,7 +202,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
               {!routes.length ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">
-                    No hay rutas todavía
+                    No hay rutas todavia
                   </td>
                 </tr>
               ) : null}
@@ -219,13 +219,13 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
 
         <div className="grid gap-4">
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Título</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Titulo</span>
             <input {...register("title")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
             {errors.title ? <span className="text-xs text-red-400">{errors.title.message}</span> : null}
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripción</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripcion</span>
             <textarea {...register("description")} rows={6} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
             {errors.description ? <span className="text-xs text-red-400">{errors.description.message}</span> : null}
           </label>
@@ -276,8 +276,8 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
 
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Galería</span>
-              <CloudinaryUploader label="Añadir foto" multiple onUploadComplete={(url) => setValue("gallery_urls", [...galleryUrls, url], { shouldDirty: true, shouldValidate: true })} />
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Galeria</span>
+              <CloudinaryUploader label="Agregar foto" multiple onUploadComplete={(url) => setValue("gallery_urls", [...galleryUrls, url], { shouldDirty: true, shouldValidate: true })} />
             </div>
             <div className="grid gap-2">
               {galleryUrls.length > 0 ? (
@@ -291,7 +291,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-5 text-xs uppercase tracking-[0.3em] text-zinc-600">
-                  Aún no hay imágenes en la galería
+                  Aun no hay imagenes en la galeria
                 </div>
               )}
             </div>
@@ -305,7 +305,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
               placeholder={'[\n  { "lat": 28.1234, "lng": -15.4321 },\n  { "lat": 28.1250, "lng": -15.4400 }\n]'}
               className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 font-mono text-sm text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400"
             />
-            <span className="text-xs leading-5 text-zinc-500">Pega un array JSON con al menos dos puntos. Déjalo vacío si la ruta no tiene mapa.</span>
+            <span className="text-xs leading-5 text-zinc-500">Pega un array JSON con al menos dos puntos. Dejalo vacio si la ruta no tiene mapa.</span>
             {errors.coordinates ? <span className="text-xs text-red-400">{errors.coordinates.message}</span> : null}
           </label>
 
@@ -316,7 +316,7 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-5 text-xs leading-5 text-zinc-500">
-              La vista previa del mapa aparecerá cuando las coordenadas sean un JSON válido con al menos dos puntos.
+              La vista previa del mapa aparecera cuando las coordenadas sean un JSON valido con al menos dos puntos.
             </div>
           )}
 

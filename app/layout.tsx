@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -27,14 +28,14 @@ const aeroblade = localFont({
 
 export const metadata: Metadata = {
   title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
-  description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
+  description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
   metadataBase,
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
-    description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
+    description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
     url: "/",
     siteName: "Tramassso",
     images: [luxuryFallbackImage],
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tramassso | Eventos y rutas de motor en Gran Canaria",
-    description: "Eventos deportivos, rutas de conducción y experiencias premium para la comunidad del motor en Gran Canaria.",
+    description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
     images: [luxuryFallbackImage],
   },
   manifest: "/manifest.json",
@@ -83,6 +84,7 @@ export default function RootLayout({
           {children}
           <PushNotificationManager />
           <Analytics />
+          <SpeedInsights />
         </Provider>
       </body>
     </html>

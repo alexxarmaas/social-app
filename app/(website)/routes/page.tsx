@@ -6,11 +6,11 @@ import AdBanner from "@/components/ads/AdBanner";
 import { listPublicRoutes } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPremiumMetadata({
   title: "Rutas Tramassso",
-  description: "Rutas de motor por Gran Canaria con estética Tramassso.",
+  description: "Rutas de motor por Gran Canaria con estetica Tramassso.",
   path: "/routes",
   image: null,
 });
@@ -35,7 +35,7 @@ export default async function RoutesGuidePage() {
               <article className="racing-card group min-w-0 overflow-hidden rounded-[1.5rem] border sm:rounded-[2rem]">
                 <div className="relative aspect-[16/11] overflow-hidden bg-zinc-900">
                   {route.cover_image_url ? (
-                    <Image src={route.cover_image_url} alt={route.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" />
+                    <Image src={route.cover_image_url} alt={route.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" priority={index === 0} />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.4em] text-zinc-600">Sin portada</div>
                   )}
@@ -56,7 +56,7 @@ export default async function RoutesGuidePage() {
                     <span>{route.distance_km} km</span>
                     <span>{route.drive_time_minutes} min</span>
                     <span>{route.end_point}</span>
-                    <span>{route.gallery_urls.length} imágenes</span>
+                    <span>{route.gallery_urls.length} imagenes</span>
                   </div>
                   <Link href={`/routes/${route.id}`} className="racing-button inline-flex rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] transition">
                     Ver detalle

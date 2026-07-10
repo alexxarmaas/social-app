@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import TrackSponsorClick from "@/components/TrackSponsorClick";
 import { notFound } from "next/navigation";
 import { getPublicPartner } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata, luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type PartnerPageProps = {
   params: Promise<{ id: string }>;
@@ -84,9 +85,9 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
                 Volver
               </Link>
               {partner.website_url ? (
-                <a href={partner.website_url} target="_blank" rel="noreferrer" className="racing-button inline-flex justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition">
+                <TrackSponsorClick sponsorName={partner.name} websiteUrl={partner.website_url} className="racing-button inline-flex justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition">
                   Visitar web
-                </a>
+                </TrackSponsorClick>
               ) : null}
             </div>
           </div>

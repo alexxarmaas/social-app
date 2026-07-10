@@ -155,7 +155,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
               <tr>
                 <th className="px-4 py-3">Evento</th>
                 <th className="px-4 py-3">Fecha</th>
-                <th className="px-4 py-3">Ubicación</th>
+                <th className="px-4 py-3">Ubicacion</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
@@ -192,7 +192,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
               {!events.length ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">
-                    No hay eventos todavía
+                    No hay eventos todavia
                   </td>
                 </tr>
               ) : null}
@@ -209,13 +209,13 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
 
         <div className="grid gap-4">
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Título</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Titulo</span>
             <input {...register("title")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
             {errors.title ? <span className="text-xs text-red-400">{errors.title.message}</span> : null}
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripción</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripcion</span>
             <textarea {...register("description")} rows={6} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
             {errors.description ? <span className="text-xs text-red-400">{errors.description.message}</span> : null}
           </label>
@@ -228,7 +228,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
             </label>
 
             <label className="grid gap-2">
-              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Ubicación</span>
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Ubicacion</span>
               <input {...register("location")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
               {errors.location ? <span className="text-xs text-red-400">{errors.location.message}</span> : null}
             </label>
@@ -252,8 +252,8 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
 
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Galería</span>
-              <CloudinaryUploader label="Añadir foto" multiple onUploadComplete={(url) => setValue("gallery_urls", [...galleryUrls, url], { shouldDirty: true, shouldValidate: true })} />
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Galeria</span>
+              <CloudinaryUploader label="Agregar foto" multiple onUploadComplete={(url) => setValue("gallery_urls", [...galleryUrls, url], { shouldDirty: true, shouldValidate: true })} />
             </div>
             <div className="grid gap-2">
               {galleryUrls.length > 0 ? (
@@ -267,7 +267,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-5 text-xs uppercase tracking-[0.3em] text-zinc-600">
-                  Aún no hay imágenes en la galería
+                  Aun no hay imagenes en la galeria
                 </div>
               )}
             </div>

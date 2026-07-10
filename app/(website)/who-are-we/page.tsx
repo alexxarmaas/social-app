@@ -15,16 +15,16 @@ export default function WhoAreWePage() {
 
                     <div className="space-y-8">
                         <p className="text-base leading-7 text-slate-300 sm:text-lg">
-                            Somos un equipo de apasionados entusiastas del motor que querían crear una plataforma que realmente entienda y celebre la cultura automotriz. Desde sesiones nocturnas en el garaje hasta días de pista de fin de semana, vivimos y respiramos coches.
+                            Somos un equipo de apasionados entusiastas del motor que querian crear una plataforma que realmente entienda y celebre la cultura automotriz. Desde sesiones nocturnas en el garaje hasta dias de pista de fin de semana, vivimos y respiramos coches.
                         </p>
 
                         <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-5 backdrop-blur-sm sm:p-8">
                             <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">Nuestra historia</h2>
                             <p className="text-slate-300 mb-4">
-                                Tramassso nació de una idea simple: los entusiastas del motor necesitaban un espacio dedicado para conectar, compartir y crecer juntos. Lo que comenzó como encuentros de fin de semana en estacionamientos ha evolucionado a una comunidad que cada día va en aumento.
+                                Tramassso nacio de una idea simple: los entusiastas del motor necesitaban un espacio dedicado para conectar, compartir y crecer juntos. Lo que comenzo como encuentros de fin de semana en estacionamientos ha evolucionado a una comunidad que cada dia va en aumento.
                             </p>
                             <p className="text-slate-300">
-                                Hemos construido esta plataforma con la misma atención al detalle que aplicamos a nuestras propias construcciones: cada función, cada interacción, diseñada pensando en la comunidad automotriz.
+                                Hemos construido esta plataforma con la misma atencion al detalle que aplicamos a nuestras propias construcciones: cada funcion, cada interaccion, creada pensando en la comunidad automotriz.
                             </p>
                         </div>
 

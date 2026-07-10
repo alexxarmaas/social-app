@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import TrackSponsorClick from "@/components/TrackSponsorClick";
 import { listPublicPartners } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPremiumMetadata({
   title: "Colaboradores Tramassso",
@@ -58,9 +59,9 @@ export default async function PartnersPage() {
                     Ver perfil
                   </Link>
                   {partner.website_url ? (
-                    <a href={partner.website_url} target="_blank" rel="noreferrer" className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
+                    <TrackSponsorClick sponsorName={partner.name} websiteUrl={partner.website_url} className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
                       Visitar web
-                    </a>
+                    </TrackSponsorClick>
                   ) : null}
                 </div>
               </article>
@@ -68,8 +69,8 @@ export default async function PartnersPage() {
           </div>
         ) : (
           <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores en selección</p>
-            <p className="mt-3 text-sm text-zinc-400">Pronto añadiremos nuevas marcas.</p>
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores en seleccion</p>
+            <p className="mt-3 text-sm text-zinc-400">Pronto agregaremos nuevas marcas.</p>
           </div>
         )}
       </section>

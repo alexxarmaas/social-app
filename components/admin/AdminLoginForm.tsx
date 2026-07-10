@@ -21,7 +21,7 @@ export default function AdminLoginForm() {
         setNextPath(next);
       }
     } catch {
-      // Sin acción: el fallback es /admin.
+      // Sin accion: el fallback es /admin.
     }
   }, []);
 
@@ -38,12 +38,12 @@ export default function AdminLoginForm() {
       });
 
       if (response?.error) {
-        setError("Credenciales inválidas.");
+        setError("Credenciales invalidas.");
       } else {
         router.push(nextPath);
       }
     } catch {
-      setError("No se pudo iniciar sesión.");
+      setError("No se pudo iniciar sesion.");
     } finally {
       setLoading(false);
     }
@@ -60,7 +60,7 @@ export default function AdminLoginForm() {
         </div>
 
         <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7 shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
-          <h1 className="mb-6 text-2xl font-semibold text-white">Iniciar sesión</h1>
+          <h1 className="mb-6 text-2xl font-semibold text-white">Iniciar sesion</h1>
 
           {error ? (
             <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
@@ -70,7 +70,7 @@ export default function AdminLoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="grid gap-2">
-              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Correo electrónico</span>
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Correo electronico</span>
               <input
                 type="email"
                 value={email}
@@ -82,7 +82,7 @@ export default function AdminLoginForm() {
             </label>
 
             <label className="grid gap-2">
-              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Contraseña</span>
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Clave</span>
               <input
                 type="password"
                 value={password}

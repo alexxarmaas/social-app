@@ -70,7 +70,7 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
     }
 
     if (!data.secure_url) {
-      throw new Error("Cloudinary no devolvió una URL segura.");
+      throw new Error("Cloudinary no devolvio una URL segura.");
     }
 
     return data.secure_url;

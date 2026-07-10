@@ -157,7 +157,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
             <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.35em] text-zinc-500">
               <tr>
                 <th className="px-4 py-3">Colaborador</th>
-                <th className="px-4 py-3">Categoría</th>
+                <th className="px-4 py-3">Categoria</th>
                 <th className="px-4 py-3">Destacado</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
@@ -174,12 +174,12 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
                       </div>
                       <div>
                         <div className="font-medium text-zinc-50">{partner.name}</div>
-                        <div className="max-w-[22rem] text-xs text-zinc-500 line-clamp-2">{partner.description ?? "Sin descripción"}</div>
+                        <div className="max-w-[22rem] text-xs text-zinc-500 line-clamp-2">{partner.description ?? "Sin descripcion"}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-4 text-zinc-300">{partner.category}</td>
-                  <td className="px-4 py-4 text-zinc-300">{partner.is_featured ? "Sí" : "No"}</td>
+                  <td className="px-4 py-4 text-zinc-300">{partner.is_featured ? "Si" : "No"}</td>
                   <td className="px-4 py-4 text-right">
                     <div className="inline-flex gap-2">
                       <button type="button" onClick={() => setSelectedId(partner.id)} className="rounded-full border border-zinc-800 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-zinc-300 transition hover:border-white hover:text-white">
@@ -195,7 +195,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
               {!partners.length ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">
-                    No hay colaboradores todavía
+                    No hay colaboradores todavia
                   </td>
                 </tr>
               ) : null}
@@ -218,13 +218,13 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Categoría</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Categoria</span>
             <input {...register("category")} placeholder="Taller, detailing, marca..." className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
             {errors.category ? <span className="text-xs text-red-400">{errors.category.message}</span> : null}
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripción</span>
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Descripcion</span>
             <textarea {...register("description")} rows={5} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
             {errors.description ? <span className="text-xs text-red-400">{errors.description.message}</span> : null}
           </label>

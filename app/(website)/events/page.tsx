@@ -6,11 +6,11 @@ import AdBanner from "@/components/ads/AdBanner";
 import { listPublicEvents } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPremiumMetadata({
   title: "Eventos Tramassso",
-  description: "Eventos de motor en Gran Canaria con estética Tramassso.",
+  description: "Eventos de motor en Gran Canaria con estetica Tramassso.",
   path: "/events",
   image: null,
 });
@@ -23,7 +23,7 @@ export default async function EventsFeedPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
           <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Eventos</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Eventos con carácter</h1>
+          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Eventos con caracter</h1>
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Salidas, quedadas y experiencias seleccionadas en Gran Canaria.</p>
         </div>
 
@@ -35,7 +35,7 @@ export default async function EventsFeedPage() {
               <article className="racing-card group min-w-0 overflow-hidden rounded-[1.5rem] border sm:rounded-[2rem]">
                 <div className="relative aspect-[16/11] overflow-hidden bg-zinc-900">
                   {event.cover_image_url ? (
-                    <Image src={event.cover_image_url} alt={event.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" />
+                    <Image src={event.cover_image_url} alt={event.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" priority={index === 0} />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.4em] text-zinc-600">Sin portada</div>
                   )}
@@ -49,7 +49,7 @@ export default async function EventsFeedPage() {
                   <p className="line-clamp-3 leading-7">{event.description}</p>
                   <div className="grid gap-2 border-t border-zinc-800 pt-4 text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:flex sm:items-center sm:justify-between sm:gap-3 sm:tracking-[0.35em]">
                     <span className="min-w-0 truncate">{event.location}</span>
-                    <span>{event.gallery_urls.length} imágenes</span>
+                    <span>{event.gallery_urls.length} imagenes</span>
                   </div>
                   <Link href={`/events/${event.id}`} className="racing-button inline-flex rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] transition">
                     Ver detalle
@@ -66,7 +66,7 @@ export default async function EventsFeedPage() {
 
         {!events.length ? (
           <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Próxima salida en preparación</p>
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Proxima salida en preparacion</p>
             <p className="mt-3 text-sm text-zinc-400">Vuelve pronto para ver nuevos eventos.</p>
           </div>
         ) : null}

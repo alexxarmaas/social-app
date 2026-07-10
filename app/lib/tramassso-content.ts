@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { createSupabasePublicClient, createSupabaseServiceClient } from "@/app/lib/supabase";
 
-const urlListSchema = z.array(z.string().url("Cada imagen debe ser una URL válida.")).default([]);
-const optionalUrlSchema = z.string().trim().url("La URL debe ser válida.").or(z.literal("")).nullish();
+const urlListSchema = z.array(z.string().url("Cada imagen debe ser una URL valida.")).default([]);
+const optionalUrlSchema = z.string().trim().url("La URL debe ser valida.").or(z.literal("")).nullish();
 
 export const routeCoordinateSchema = z.object({
   lat: z.coerce.number().min(-90, "La latitud debe estar entre -90 y 90.").max(90, "La latitud debe estar entre -90 y 90."),
@@ -11,7 +11,7 @@ export const routeCoordinateSchema = z.object({
 
 export type RouteCoordinate = z.infer<typeof routeCoordinateSchema>;
 
-const routeCoordinateListSchema = z.array(routeCoordinateSchema).min(2, "Añade al menos 2 puntos para mostrar el mapa.");
+const routeCoordinateListSchema = z.array(routeCoordinateSchema).min(2, "Agrega al menos 2 puntos para mostrar el mapa.");
 
 export const routeCoordinatesSchema = z.unknown().transform((value, context): RouteCoordinate[] | null => {
   if (value === undefined || value === null || value === "") {
@@ -26,7 +26,7 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
     } catch {
       context.addIssue({
         code: "custom",
-        message: "Las coordenadas deben ser un JSON válido.",
+        message: "Las coordenadas deben ser un JSON valido.",
       });
       return z.NEVER;
     }
@@ -49,32 +49,32 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
 });
 
 export const eventInputSchema = z.object({
-  title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres.").max(120, "El título no puede superar 120 caracteres."),
-  description: z.string().trim().min(20, "La descripción debe tener al menos 20 caracteres.").max(5000, "La descripción no puede superar 5000 caracteres."),
+  title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres.").max(120, "El titulo no puede superar 120 caracteres."),
+  description: z.string().trim().min(20, "La descripcion debe tener al menos 20 caracteres.").max(5000, "La descripcion no puede superar 5000 caracteres."),
   date: z.string().min(1, "Indica la fecha del evento."),
-  location: z.string().trim().min(2, "Indica la ubicación.").max(200, "La ubicación no puede superar 200 caracteres."),
-  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL válida.").or(z.literal("")).optional(),
+  location: z.string().trim().min(2, "Indica la ubicacion.").max(200, "La ubicacion no puede superar 200 caracteres."),
+  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL valida.").or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
 });
 
 export const routeInputSchema = z.object({
-  title: z.string().trim().min(3, "El título debe tener al menos 3 caracteres.").max(120, "El título no puede superar 120 caracteres."),
-  description: z.string().trim().min(20, "La descripción debe tener al menos 20 caracteres.").max(5000, "La descripción no puede superar 5000 caracteres."),
+  title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres.").max(120, "El titulo no puede superar 120 caracteres."),
+  description: z.string().trim().min(20, "La descripcion debe tener al menos 20 caracteres.").max(5000, "La descripcion no puede superar 5000 caracteres."),
   start_point: z.string().trim().min(2, "Indica el punto de salida.").max(200, "El punto de salida no puede superar 200 caracteres."),
   end_point: z.string().trim().min(2, "Indica el punto de llegada.").max(200, "El punto de llegada no puede superar 200 caracteres."),
   distance_km: z.coerce.number().positive("La distancia debe ser mayor que 0.").max(1000, "La distancia no puede superar 1000 km."),
-  drive_time_minutes: z.coerce.number().int("El tiempo debe ser un número entero.").positive("El tiempo debe ser mayor que 0.").max(1440, "El tiempo no puede superar 1440 minutos."),
-  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL válida.").or(z.literal("")).optional(),
+  drive_time_minutes: z.coerce.number().int("El tiempo debe ser un numero entero.").positive("El tiempo debe ser mayor que 0.").max(1440, "El tiempo no puede superar 1440 minutos."),
+  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL valida.").or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
   coordinates: routeCoordinatesSchema.optional(),
 });
 
 export const partnerInputSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres.").max(120, "El nombre no puede superar 120 caracteres."),
-  category: z.string().trim().min(2, "Indica la categoría.").max(80, "La categoría no puede superar 80 caracteres."),
+  category: z.string().trim().min(2, "Indica la categoria.").max(80, "La categoria no puede superar 80 caracteres."),
   logo_url: optionalUrlSchema,
   website_url: optionalUrlSchema,
-  description: z.string().trim().max(1000, "La descripción no puede superar 1000 caracteres.").or(z.literal("")).nullish(),
+  description: z.string().trim().max(1000, "La descripcion no puede superar 1000 caracteres.").or(z.literal("")).nullish(),
   is_featured: z.coerce.boolean().default(false),
 });
 
@@ -260,7 +260,7 @@ function formatSupabaseError(kind: ContentKind, error: { message?: string; code?
   }
 
   if (message.includes("schema cache") || message.includes(`public.${tableName(kind)}`) || error.code === "PGRST205") {
-    return `No existe la tabla de ${contentKindLabel(kind)} en Supabase. Ejecuta la SQL indicada en la documentación y vuelve a intentarlo.`;
+    return `No existe la tabla de ${contentKindLabel(kind)} en Supabase. Ejecuta la SQL indicada en la documentacion y vuelve a intentarlo.`;
   }
 
   return message;

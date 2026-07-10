@@ -97,7 +97,7 @@ async function main() {
             title: 'Madrid Night Run',
             description: 'Cruising through the streets of Madrid.',
             startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-            location: 'Santiago Bernabéu',
+            location: 'Santiago Bernabeu',
             eventType: 'cruise',
             visibility: 'public',
             creatorId: user1.id,

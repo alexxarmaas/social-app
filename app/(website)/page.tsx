@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MdEmail, MdInsights, MdLocationOn, MdOutlineCameraAlt, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
   const [{ events }, { routes }, { partners }] = await Promise.all([
@@ -24,7 +24,7 @@ export default async function HomePage() {
               Motor, rutas y comunidad.
             </h1>
             <p className="max-w-xl text-sm leading-7 text-zinc-400 md:text-base">
-              Eventos seleccionados, rutas con carácter y marcas conectadas al mundo del motor.
+              Eventos seleccionados, rutas con caracter y marcas conectadas al mundo del motor.
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export default async function HomePage() {
         <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
           <MdSpeed size={22} className="relative z-10 text-red-300" />
           <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Eventos seleccionados</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Quedadas con ruta, estética y comunidad.</p>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Quedadas con ruta, estetica y comunidad.</p>
         </article>
         <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
           <MdOutlineHandshake size={22} className="relative z-10 text-red-300" />
@@ -112,7 +112,7 @@ export default async function HomePage() {
         </article>
         <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
           <MdStraighten size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Rutas con carácter</h2>
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Rutas con caracter</h2>
           <p className="mt-3 text-sm leading-6 text-zinc-400">Trazados por Gran Canaria con mapa.</p>
         </article>
         <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
@@ -135,12 +135,12 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-5 sm:pb-20 lg:px-8">
         <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
           <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Próximo evento</p>
+            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Proximo evento</p>
             <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {nextEvent ? nextEvent.title : "Próxima salida"}
+              {nextEvent ? nextEvent.title : "Proxima salida"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "En preparación."}
+              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "En preparacion."}
             </p>
             <Link href={nextEvent ? `/events/${nextEvent.id}` : "/events"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver eventos
@@ -153,7 +153,7 @@ export default async function HomePage() {
               {featuredRoute ? featuredRoute.title : "Nueva ruta"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa" : ""}` : "Trazado en preparación."}
+              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa" : ""}` : "Trazado en preparacion."}
             </p>
             <Link href={featuredRoute ? `/routes/${featuredRoute.id}` : "/routes"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver rutas
@@ -166,7 +166,7 @@ export default async function HomePage() {
               {featuredPartner ? featuredPartner.name : "Marcas en pista"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredPartner ? featuredPartner.category : "Directorio en selección."}
+              {featuredPartner ? featuredPartner.category : "Directorio en seleccion."}
             </p>
             <Link href={featuredPartner ? `/partners/${featuredPartner.id}` : "/partners"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver colaboradores
@@ -180,16 +180,16 @@ export default async function HomePage() {
           <div className="min-w-0 space-y-3 sm:space-y-4">
             <p className="racing-eyebrow text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-xs sm:tracking-[0.45em]">Marcas y colaboraciones</p>
             <h2 className="max-w-full break-words text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.03em] text-white [overflow-wrap:anywhere] sm:text-4xl sm:tracking-[0.08em]">Entra en la ruta</h2>
-            <p className="max-w-lg text-xs leading-relaxed text-zinc-400 sm:text-sm sm:leading-7">Cuéntanos qué quieres activar y lo movemos.</p>
+            <p className="max-w-lg text-xs leading-relaxed text-zinc-400 sm:text-sm sm:leading-7">Cuentanos que quieres activar y lo movemos.</p>
           </div>
 
           <form className="grid min-w-0 gap-3 rounded-[1.2rem] border border-white/10 bg-black/40 p-4 sm:gap-4 sm:rounded-[1.6rem] sm:p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
               <input name="name" placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-              <input name="email" placeholder="Correo electrónico" type="email" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+              <input name="email" placeholder="Correo electronico" type="email" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             </div>
             <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-            <textarea name="brief" rows={4} placeholder="Qué quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+            <textarea name="brief" rows={4} placeholder="Que quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             <div className="mt-2 grid gap-4 lg:flex lg:items-center lg:justify-between">
               <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo</p>
               <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-end">
