@@ -60,7 +60,7 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-          <div className="overflow-hidden rounded-[1.5rem] border border-zinc-800 bg-zinc-900/60 p-5 sm:rounded-[2rem] sm:p-6">
+          <div className="racing-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-6">
             <div className="flex min-h-72 items-center justify-center rounded-[1.25rem] border border-zinc-800 bg-black/40 p-8 sm:rounded-[1.6rem]">
               {partner.logo_url ? (
                 <Image src={partner.logo_url} alt={partner.name} width={420} height={220} className="max-h-52 w-auto max-w-full object-contain" priority />
@@ -72,7 +72,7 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
 
           <div className="min-w-0 space-y-6">
             <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.35em] text-zinc-500 sm:tracking-[0.45em]">{partner.category}</p>
+              <p className="racing-eyebrow text-[10px] uppercase tracking-[0.35em] text-zinc-500 sm:tracking-[0.45em]">{partner.category}</p>
               <h1 className="text-balance break-words text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-7xl">{partner.name}</h1>
               <p className="max-w-3xl text-sm leading-7 text-zinc-400 md:text-base">
                 {partner.description ?? "Colaborador seleccionado de la comunidad Tramassso."}
@@ -80,11 +80,11 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
             </div>
 
             <div className="grid gap-3 sm:flex sm:flex-wrap">
-              <Link href="/partners" className="inline-flex justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-white hover:text-white">
+              <Link href="/partners" className="inline-flex justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white">
                 Volver
               </Link>
               {partner.website_url ? (
-                <a href={partner.website_url} target="_blank" rel="noreferrer" className="inline-flex justify-center rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white hover:bg-zinc-900">
+                <a href={partner.website_url} target="_blank" rel="noreferrer" className="racing-button inline-flex justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition">
                   Visitar web
                 </a>
               ) : null}

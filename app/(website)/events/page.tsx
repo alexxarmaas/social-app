@@ -22,7 +22,7 @@ export default async function EventsFeedPage() {
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
-          <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Eventos</p>
+          <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Eventos</p>
           <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Eventos oficiales de Tramassso</h1>
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Quedadas y experiencias de coches en Gran Canaria con inventario publicitario integrado entre las tarjetas.</p>
         </div>
@@ -32,7 +32,7 @@ export default async function EventsFeedPage() {
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event, index) => (
             <Fragment key={event.id}>
-              <article className="group min-w-0 overflow-hidden rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 sm:rounded-[2rem]">
+              <article className="racing-card group min-w-0 overflow-hidden rounded-[1.5rem] border sm:rounded-[2rem]">
                 <div className="relative aspect-[16/11] overflow-hidden bg-zinc-900">
                   {event.cover_image_url ? (
                     <Image src={event.cover_image_url} alt={event.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" />
@@ -51,7 +51,7 @@ export default async function EventsFeedPage() {
                     <span className="min-w-0 truncate">{event.location}</span>
                     <span>{event.gallery_urls.length} imágenes</span>
                   </div>
-                  <Link href={`/events/${event.id}`} className="inline-flex rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-zinc-300 transition hover:border-white hover:text-white">
+                  <Link href={`/events/${event.id}`} className="racing-button inline-flex rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em] transition">
                     Ver detalle
                   </Link>
                 </div>
@@ -65,7 +65,7 @@ export default async function EventsFeedPage() {
         </div>
 
         {!events.length ? (
-          <div className="mt-10 rounded-[2rem] border border-dashed border-zinc-800 bg-white/5 p-10 text-center">
+          <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
             <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Aún no hay eventos publicados</p>
             <p className="mt-3 text-sm text-zinc-400">Pronto publicaremos las próximas quedadas y experiencias de Tramassso.</p>
           </div>

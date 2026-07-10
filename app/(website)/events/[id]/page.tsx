@@ -68,16 +68,16 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="space-y-6">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Detalle del evento</p>
+            <p className="racing-eyebrow text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Detalle del evento</p>
             <h1 className="text-balance text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-7xl">{event.title}</h1>
             <p className="max-w-3xl text-sm leading-7 text-zinc-400 md:text-base">{event.description}</p>
             <div className="grid gap-3 text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:flex sm:flex-wrap sm:tracking-[0.35em]">
-              <span className="min-w-0 rounded-full border border-zinc-800 bg-white/5 px-4 py-2 text-zinc-300">{new Date(event.date).toLocaleString("es-ES")}</span>
-              <span className="min-w-0 rounded-full border border-zinc-800 bg-white/5 px-4 py-2 text-zinc-300">{event.location}</span>
+              <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{new Date(event.date).toLocaleString("es-ES")}</span>
+              <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{event.location}</span>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[1.5rem] border border-zinc-800 bg-zinc-900/80 sm:rounded-[2rem]">
+          <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
               <Image src={event.cover_image_url || luxuryFallbackPath} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" />
             </div>
