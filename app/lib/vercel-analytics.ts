@@ -12,7 +12,7 @@ export async function getVercelStats(): Promise<VercelStats | null> {
   }
 
   try {
-    const url = new URL(`https://vercel.com/api/v1/web-analytics/stats`);
+    const url = new URL(`https://api.vercel.com/v1/query/web-analytics/visits/count`);
     url.searchParams.append("projectId", projectId);
     url.searchParams.append("environment", "production");
     
@@ -20,8 +20,8 @@ export async function getVercelStats(): Promise<VercelStats | null> {
     const to = new Date();
     const from = new Date();
     from.setDate(to.getDate() - 30);
-    url.searchParams.append("from", from.toISOString());
-    url.searchParams.append("to", to.toISOString());
+    url.searchParams.append("since", from.toISOString());
+    url.searchParams.append("until", to.toISOString());
 
     const res = await fetch(url.toString(), {
       headers: {
@@ -37,22 +37,11 @@ export async function getVercelStats(): Promise<VercelStats | null> {
       return null;
     }
 
-    const data = await res.json();
+    const { data } = await res.json();
     
-    let totalPageviews = 0;
-    let totalVisitors = 0;
-
-    // Vercel suele devolver data de forma temporal. Agregamos todo.
-    if (data && Array.isArray(data.data)) {
-      data.data.forEach((point: any) => {
-        totalPageviews += point.pageviews || 0;
-        totalVisitors += point.visitors || 0;
-      });
-    }
-
     return {
-      pageviews: totalPageviews,
-      visitors: totalVisitors,
+      pageviews: data?.pageviews || 0,
+      visitors: data?.visitors || 0,
     };
   } catch (error) {
     console.error("Excepción obteniendo Vercel Analytics:", error);
