@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPremiumMetadata({
   title: "Eventos Tramassso",
-  description: "Eventos oficiales de coches en Gran Canaria con presentación editorial y espacios preparados para patrocinadores.",
+  description: "Eventos de motor en Gran Canaria con estética Tramassso.",
   path: "/events",
   image: null,
 });
@@ -23,11 +23,11 @@ export default async function EventsFeedPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
           <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Eventos</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Eventos oficiales de Tramassso</h1>
-          <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Quedadas y experiencias de coches en Gran Canaria con inventario publicitario integrado entre las tarjetas.</p>
+          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Eventos con carácter</h1>
+          <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Salidas, quedadas y experiencias seleccionadas en Gran Canaria.</p>
         </div>
 
-        {error ? <p className="mt-8 text-sm text-red-300">No hemos podido cargar los eventos en este momento.</p> : null}
+        {error ? <p className="mt-8 text-sm text-red-300">No hemos podido cargar los eventos.</p> : null}
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((event, index) => (
@@ -46,7 +46,7 @@ export default async function EventsFeedPage() {
                   </div>
                 </div>
                 <div className="space-y-4 p-4 text-sm text-zinc-400 sm:p-5">
-                  <p className="leading-7">{event.description}</p>
+                  <p className="line-clamp-3 leading-7">{event.description}</p>
                   <div className="grid gap-2 border-t border-zinc-800 pt-4 text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:flex sm:items-center sm:justify-between sm:gap-3 sm:tracking-[0.35em]">
                     <span className="min-w-0 truncate">{event.location}</span>
                     <span>{event.gallery_urls.length} imágenes</span>
@@ -66,8 +66,8 @@ export default async function EventsFeedPage() {
 
         {!events.length ? (
           <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Aún no hay eventos publicados</p>
-            <p className="mt-3 text-sm text-zinc-400">Pronto publicaremos las próximas quedadas y experiencias de Tramassso.</p>
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Próxima salida en preparación</p>
+            <p className="mt-3 text-sm text-zinc-400">Vuelve pronto para ver nuevos eventos.</p>
           </div>
         ) : null}
       </section>

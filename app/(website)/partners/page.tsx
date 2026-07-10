@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPremiumMetadata({
   title: "Colaboradores Tramassso",
-  description: "Directorio de negocios y marcas colaboradoras de la comunidad Tramassso.",
+  description: "Marcas y negocios colaboradores de Tramassso.",
   path: "/partners",
   image: null,
 });
@@ -21,10 +21,8 @@ export default async function PartnersPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
           <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Colaboradores de Tramassso</h1>
-          <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">
-            Negocios, marcas y profesionales seleccionados para acompañar experiencias, rutas y eventos de la comunidad.
-          </p>
+          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Marcas en pista</h1>
+          <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Colaboradores seleccionados para rutas, eventos y activaciones.</p>
         </div>
 
         {partners.length ? (
@@ -51,24 +49,16 @@ export default async function PartnersPage() {
                   )}
                 </div>
 
-                <p className="mt-5 flex-1 text-sm leading-7 text-zinc-400">
+                <p className="mt-5 line-clamp-4 flex-1 text-sm leading-7 text-zinc-400">
                   {partner.description ?? "Colaborador seleccionado de la comunidad Tramassso."}
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
-                  <Link
-                    href={`/partners/${partner.id}`}
-                    className="racing-button inline-flex w-full justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition sm:w-fit sm:tracking-[0.32em]"
-                  >
+                  <Link href={`/partners/${partner.id}`} className="racing-button inline-flex w-full justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition sm:w-fit sm:tracking-[0.32em]">
                     Ver perfil
                   </Link>
                   {partner.website_url ? (
-                    <a
-                      href={partner.website_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-white hover:text-white sm:w-fit sm:tracking-[0.32em]"
-                    >
+                    <a href={partner.website_url} target="_blank" rel="noreferrer" className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
                       Visitar web
                     </a>
                   ) : null}
@@ -78,8 +68,8 @@ export default async function PartnersPage() {
           </div>
         ) : (
           <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Aún no hay colaboradores publicados</p>
-            <p className="mt-3 text-sm text-zinc-400">Pronto añadiremos negocios y marcas seleccionadas de la comunidad Tramassso.</p>
+            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores en selección</p>
+            <p className="mt-3 text-sm text-zinc-400">Pronto añadiremos nuevas marcas.</p>
           </div>
         )}
       </section>

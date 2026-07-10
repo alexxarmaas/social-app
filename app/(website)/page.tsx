@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
+import { MdEmail, MdInsights, MdLocationOn, MdSpeed } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 
 export const dynamic = "force-dynamic";
@@ -16,51 +16,51 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <section className="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-5 py-10 sm:py-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:py-20">
-        <div className="space-y-6 sm:space-y-8">
-          <div className="space-y-3 sm:space-y-4">
-            <p className="racing-eyebrow text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:text-xs sm:tracking-[0.5em]">Gran Canaria</p>
-            <h2 className="max-w-3xl text-4xl sm:text-5xl font-black uppercase tracking-[0.05em] sm:tracking-[0.08em] text-white md:text-6xl lg:text-7xl leading-tight">
-              Eventos y rutas de coches deportivos con una experiencia premium.
-            </h2>
-            <p className="max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base">
-              Tramassso conecta comunidad, rutas, eventos y marcas en una plataforma pensada para amantes del motor y patrocinadores.
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-5 sm:py-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-center lg:px-8 lg:py-20">
+        <div className="space-y-7">
+          <div className="space-y-4">
+            <p className="racing-eyebrow text-[10px] uppercase tracking-[0.32em] text-zinc-500 sm:text-xs sm:tracking-[0.5em]">Gran Canaria</p>
+            <h1 className="max-w-3xl text-4xl font-black uppercase leading-tight tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-6xl lg:text-7xl">
+              Motor, rutas y comunidad.
+            </h1>
+            <p className="max-w-xl text-sm leading-7 text-zinc-400 md:text-base">
+              Eventos seleccionados, rutas con carácter y marcas conectadas al mundo del motor.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-            <div className="racing-card rounded-[1.5rem] border p-4 sm:rounded-3xl sm:p-5">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdInsights className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-black text-white">1.2M</p>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.35em] text-zinc-500">Impresiones mensuales</p>
+              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">1.2M</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Impacto</p>
             </div>
-            <div className="racing-card rounded-[1.5rem] border p-4 sm:rounded-3xl sm:p-5">
+            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdLocationOn className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-black text-white">GC</p>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.35em] text-zinc-500">Alcance local</p>
+              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">GC</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Local</p>
             </div>
-            <div className="racing-card col-span-2 rounded-[1.5rem] border p-4 sm:col-span-1 sm:rounded-3xl sm:p-5">
+            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdSpeed className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-black text-white">Freemium</p>
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.35em] text-zinc-500">Modelo</p>
+              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">Track</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Racing</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link href="/events" className="racing-button w-full rounded-full px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] transition sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
               Ver eventos
             </Link>
-            <Link href="/routes" className="w-full sm:w-auto text-center rounded-full border border-white/15 px-6 py-3.5 sm:py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] sm:tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
+            <Link href="/routes" className="w-full rounded-full border border-white/15 px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-zinc-200 transition hover:border-red-500/60 hover:text-white sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
               Explorar rutas
             </Link>
-            <Link href="#contact" className="w-full sm:w-auto text-center rounded-full border border-white/15 px-6 py-3.5 sm:py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] sm:tracking-[0.35em] text-zinc-200 transition hover:border-white hover:text-white">
+            <Link href="#contact" className="w-full rounded-full border border-white/15 px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-zinc-200 transition hover:border-red-500/60 hover:text-white sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
               Contactar
             </Link>
           </div>
         </div>
 
         <div className="racing-panel rounded-[1.5rem] p-2 sm:rounded-[2rem] sm:p-3">
-          <div className="relative aspect-[4/5] sm:aspect-[4/5] overflow-hidden rounded-[1.2rem] sm:rounded-[1.6rem] border border-white/5 bg-black">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[1.2rem] border border-white/5 bg-black sm:rounded-[1.6rem]">
             <video
               autoPlay
               muted
@@ -73,25 +73,23 @@ export default async function HomePage() {
               <source src="https://assets.mixkit.co/videos/preview/mixkit-black-sports-car-driving-on-a-scenic-road-39854-large.mp4" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_45%)]" />
-
             <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
               <div className="grid gap-3 rounded-[1.2rem] border border-red-500/25 bg-black/70 p-4 backdrop-blur-md sm:rounded-[1.5rem] sm:p-5">
-                <div className="flex items-center justify-between text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.4em] text-zinc-500">
-                  <span>Dossier patrocinadores GC</span>
+                <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[10px] sm:tracking-[0.4em]">
+                  <span>Tramassso GC</span>
                   <span>2026</span>
                 </div>
-                <div className="grid gap-2 text-xs sm:text-sm text-zinc-300">
+                <div className="grid gap-2 text-xs text-zinc-300 sm:text-sm">
                   <div className="flex items-center justify-between">
-                    <span>Visibilidad de marca</span>
-                    <span className="text-white">Alta</span>
+                    <span>Eventos</span>
+                    <span className="text-white">Seleccionados</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Afinidad de audiencia</span>
-                    <span className="text-white">Premium</span>
+                    <span>Rutas</span>
+                    <span className="text-white">Con mapa</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Canal de reserva</span>
+                    <span>Marcas</span>
                     <span className="text-white">Directo</span>
                   </div>
                 </div>
@@ -101,76 +99,43 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 sm:gap-6 px-4 sm:px-5 pb-14 sm:pb-20 lg:grid-cols-3 lg:px-8">
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdSpeed size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Eventos seleccionados</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Encuentros y experiencias pensadas para una comunidad que cuida el detalle, la ruta y la presentación.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdOutlineHandshake size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Visibilidad para marcas</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Espacios de alto impacto, inventario seleccionado y una presentación limpia pensada para colaboradores del sector motor.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdStraighten size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Rutas con carácter</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Descubre Gran Canaria con una guía de rutas diseñada para destacar contenido premium y relevancia local.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdLocationOn size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Comunidad local</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Una red de conductores, creadores y marcas conectada alrededor de la cultura del motor en Gran Canaria.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdInsights size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Experiencias premium</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Un flujo de contacto directo para eventos seleccionados, patrocinios de ruta y activaciones de marca.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdOutlineHandshake size={22} className="text-zinc-300" />
-          <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Preparado para patrocinadores</h3>
-          <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Formatos publicitarios sobrios y espacios de colaboración listos para campañas, eventos y rutas patrocinadas.</p>
-        </article>
-      </section>
-
       <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-5 sm:pb-20 lg:px-8">
         <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
           <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
             <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Próximo evento</p>
-            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {nextEvent ? nextEvent.title : "Próximamente"}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-zinc-400">
-              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "Estamos preparando nuevos encuentros para la comunidad."}
+            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {nextEvent ? nextEvent.title : "Próxima salida"}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "En preparación."}
             </p>
-            <Link href={nextEvent ? `/events/${nextEvent.id}` : "/events"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+            <Link href={nextEvent ? `/events/${nextEvent.id}` : "/events"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver eventos
             </Link>
           </article>
 
           <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
             <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Ruta destacada</p>
-            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {featuredRoute ? featuredRoute.title : "Rutas en preparación"}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-zinc-400">
-              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa disponible" : ""}` : "Pronto publicaremos rutas escénicas por Gran Canaria."}
+            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {featuredRoute ? featuredRoute.title : "Nueva ruta"}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa" : ""}` : "Trazado en preparación."}
             </p>
-            <Link href={featuredRoute ? `/routes/${featuredRoute.id}` : "/routes"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+            <Link href={featuredRoute ? `/routes/${featuredRoute.id}` : "/routes"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver rutas
             </Link>
           </article>
 
           <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
             <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Colaborador</p>
-            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {featuredPartner ? featuredPartner.name : "Directorio abierto"}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-zinc-400">
-              {featuredPartner ? featuredPartner.category : "Marcas y negocios seleccionados para la comunidad Tramassso."}
+            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {featuredPartner ? featuredPartner.name : "Marcas en pista"}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {featuredPartner ? featuredPartner.category : "Directorio en selección."}
             </p>
-            <Link href={featuredPartner ? `/partners/${featuredPartner.id}` : "/partners"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+            <Link href={featuredPartner ? `/partners/${featuredPartner.id}` : "/partners"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
               Ver colaboradores
             </Link>
           </article>
@@ -180,21 +145,21 @@ export default async function HomePage() {
       <section id="contact" className="mx-auto max-w-7xl px-3 pb-16 sm:px-5 sm:pb-20 lg:px-8">
         <div className="racing-panel grid min-w-0 gap-5 rounded-[1.5rem] p-5 sm:gap-8 sm:rounded-[2.2rem] sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-10">
           <div className="min-w-0 space-y-3 sm:space-y-4">
-            <p className="text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-xs sm:tracking-[0.45em]">Preparado para patrocinadores</p>
-            <h3 className="max-w-full break-words text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.03em] text-white [overflow-wrap:anywhere] sm:text-4xl sm:tracking-[0.08em]">Contacto para colaboraciones</h3>
-            <p className="max-w-lg text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Cuéntanos tu propuesta de marca, tus objetivos de activación o el tipo de presencia que quieres asociar a rutas y eventos.</p>
+            <p className="racing-eyebrow text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-xs sm:tracking-[0.45em]">Marcas y colaboraciones</p>
+            <h2 className="max-w-full break-words text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.03em] text-white [overflow-wrap:anywhere] sm:text-4xl sm:tracking-[0.08em]">Entra en la ruta</h2>
+            <p className="max-w-lg text-xs leading-relaxed text-zinc-400 sm:text-sm sm:leading-7">Cuéntanos qué quieres activar y lo movemos.</p>
           </div>
 
           <form className="grid min-w-0 gap-3 rounded-[1.2rem] border border-white/10 bg-black/40 p-4 sm:gap-4 sm:rounded-[1.6rem] sm:p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
-              <input name="name" placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-              <input name="email" placeholder="Correo electrónico" type="email" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+              <input name="name" placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+              <input name="email" placeholder="Correo electrónico" type="email" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             </div>
-            <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-            <textarea name="brief" rows={5} placeholder="Cuéntanos qué quieres activar" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+            <textarea name="brief" rows={4} placeholder="Qué quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             <div className="mt-2 grid gap-4 sm:flex sm:items-center sm:justify-between">
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo para marcas</p>
-              <button type="submit" className="flex w-full items-center justify-center rounded-full border border-white/15 bg-black px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:border-white hover:bg-zinc-900 sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo</p>
+              <button type="submit" className="racing-button flex w-full items-center justify-center rounded-full px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] transition sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
                 <MdEmail size={16} className="inline-block" />
                 <span className="ml-2">Enviar solicitud</span>
               </button>
