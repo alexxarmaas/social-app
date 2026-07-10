@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -81,6 +82,7 @@ export default function RootLayout({
           ) : null}
           {children}
           <PushNotificationManager />
+          <Analytics />
         </Provider>
       </body>
     </html>
