@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
+import { MdEmail, MdInsights, MdLocationOn, MdOutlineCameraAlt, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 
 export const dynamic = "force-dynamic";
@@ -190,12 +190,18 @@ export default async function HomePage() {
             </div>
             <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             <textarea name="brief" rows={4} placeholder="Qué quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-            <div className="mt-2 grid gap-4 sm:flex sm:items-center sm:justify-between">
+            <div className="mt-2 grid gap-4 lg:flex lg:items-center lg:justify-between">
               <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo</p>
-              <button type="submit" className="racing-button flex w-full items-center justify-center rounded-full px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] transition sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
-                <MdEmail size={16} className="inline-block" />
-                <span className="ml-2">Enviar solicitud</span>
-              </button>
+              <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-end">
+                <a href="https://www.instagram.com/tramassso_/" target="_blank" rel="noreferrer" className="flex w-full items-center justify-center rounded-full border border-red-500/35 bg-red-500/10 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:border-red-500/70 hover:bg-red-500/20 sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
+                  <MdOutlineCameraAlt size={16} className="inline-block" />
+                  <span className="ml-2">DM Instagram</span>
+                </a>
+                <button type="submit" className="racing-button flex w-full items-center justify-center rounded-full px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] transition sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
+                  <MdEmail size={16} className="inline-block" />
+                  <span className="ml-2">Enviar solicitud</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>
