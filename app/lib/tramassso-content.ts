@@ -567,3 +567,23 @@ export function asRouteInput(values: unknown) {
 export function asPartnerInput(values: unknown) {
   return partnerInputSchema.parse(values);
 }
+
+export async function getPublicStats() {
+  const client = createSupabasePublicClient();
+
+  const [
+    { count: eventsCount },
+    { count: routesCount },
+    { count: partnersCount }
+  ] = await Promise.all([
+    client.from("events").select("*", { count: "exact", head: true }),
+    client.from("routes").select("*", { count: "exact", head: true }),
+    client.from("partners").select("*", { count: "exact", head: true })
+  ]);
+
+  return {
+    events: eventsCount ?? 0,
+    routes: routesCount ?? 0,
+    partners: partnersCount ?? 0,
+  };
+}
