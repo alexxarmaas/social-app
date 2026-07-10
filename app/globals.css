@@ -43,6 +43,30 @@ a {
   color: inherit;
 }
 
+#contact,
+#contact * {
+  min-width: 0;
+}
+
+#contact h3 {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  #contact h3 {
+    font-size: 1.45rem;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+  }
+
+  #contact p,
+  #contact input,
+  #contact textarea,
+  #contact button {
+    font-size: 0.75rem;
+  }
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

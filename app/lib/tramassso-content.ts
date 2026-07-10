@@ -150,7 +150,7 @@ interface RouteRow {
   drive_time_minutes: number;
   cover_image_url: string | null;
   gallery_urls: string[] | null;
-  coordinates: unknown;
+  coordinates?: unknown;
   created_at: string;
 }
 
@@ -255,6 +255,10 @@ function contentKindLabel(kind: ContentKind) {
 function formatSupabaseError(kind: ContentKind, error: { message?: string; code?: string }) {
   const message = error.message ?? "Error de Supabase";
 
+  if (kind === "routes" && isMissingCoordinatesColumnError(error)) {
+    return "Falta la columna de coordenadas en Supabase. Ejecuta supabase/partners-and-route-coordinates.sql para activar mapas de rutas.";
+  }
+
   if (message.includes("schema cache") || message.includes(`public.${tableName(kind)}`) || error.code === "PGRST205") {
     return `No existe la tabla de ${contentKindLabel(kind)} en Supabase. Ejecuta la SQL indicada en la documentación y vuelve a intentarlo.`;
   }
@@ -264,7 +268,13 @@ function formatSupabaseError(kind: ContentKind, error: { message?: string; code?
 
 const eventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,created_at";
 const routeColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,created_at";
+const routeColumnsWithoutCoordinates = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,created_at";
 const partnerColumns = "id,name,category,logo_url,website_url,description,is_featured,created_at";
+
+function isMissingCoordinatesColumnError(error: { message?: string; code?: string }) {
+  const message = error.message ?? "";
+  return message.includes("routes.coordinates") || message.includes("column routes.coordinates does not exist") || message.includes("Could not find the 'coordinates' column");
+}
 
 export async function listPublicEvents() {
   const client = createSupabasePublicClient();
@@ -300,6 +310,16 @@ export async function listPublicRoutes() {
   const { data, error } = await client.from("routes").select(routeColumns).order("created_at", { ascending: false });
 
   if (error) {
+    if (isMissingCoordinatesColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).order("created_at", { ascending: false });
+
+      if (!fallback.error) {
+        return {
+          routes: (fallback.data ?? []).map((row) => mapRouteRow(row as RouteRow)),
+        };
+      }
+    }
+
     return { routes: [] as RouteRecord[], error: formatSupabaseError("routes", error) };
   }
 
@@ -313,6 +333,20 @@ export async function getPublicRouteById(id: string) {
   const { data, error } = await client.from("routes").select(routeColumns).eq("id", id).maybeSingle();
 
   if (error || !data) {
+    if (error && isMissingCoordinatesColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).eq("id", id).maybeSingle();
+
+      if (!fallback.error && fallback.data) {
+        return {
+          route: {
+            ...mapRouteRow(fallback.data as RouteRow),
+            difficulty: null,
+            recommended_time: null,
+          },
+        };
+      }
+    }
+
     return { route: null as RouteDetailsRecord | null, error: error ? formatSupabaseError("routes", error) : "Ruta no encontrada" };
   }
 
@@ -370,6 +404,17 @@ export async function listAdminContent(kind: ContentKind): Promise<{ items: Even
   const { data, error } = await query.order(orderColumn, { ascending: false });
 
   if (error) {
+    if (kind === "routes" && isMissingCoordinatesColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).order("created_at", { ascending: false });
+
+      if (!fallback.error) {
+        return {
+          items: (fallback.data ?? []).map((row) => mapRouteRow(row as unknown as RouteRow)),
+          error: formatSupabaseError(kind, error),
+        };
+      }
+    }
+
     return { items: [], error: formatSupabaseError(kind, error) };
   }
 
@@ -436,6 +481,33 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
     const { data, error } = await query;
 
     if (error || !data) {
+      if (error && isMissingCoordinatesColumnError(error)) {
+        if (parsed.coordinates) {
+          return { error: formatSupabaseError("routes", error) };
+        }
+
+        const rowWithoutCoordinates = {
+          title: parsed.title,
+          description: parsed.description,
+          start_point: parsed.start_point,
+          end_point: parsed.end_point,
+          distance_km: parsed.distance_km,
+          drive_time_minutes: parsed.drive_time_minutes,
+          cover_image_url: normalizeUrl(parsed.cover_image_url),
+          gallery_urls: normalizeUrlArray(parsed.gallery_urls),
+        };
+
+        const fallbackQuery = id
+          ? client.from("routes").update(rowWithoutCoordinates).eq("id", id).select(routeColumnsWithoutCoordinates).single()
+          : client.from("routes").insert(rowWithoutCoordinates).select(routeColumnsWithoutCoordinates).single();
+
+        const fallback = await fallbackQuery;
+
+        if (!fallback.error && fallback.data) {
+          return { item: mapRouteRow(fallback.data as RouteRow) };
+        }
+      }
+
       return { error: error ? formatSupabaseError("routes", error) : "No se pudo guardar la ruta" };
     }
 

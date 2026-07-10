@@ -45,9 +45,9 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {eventsError ? <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{eventsError}</p> : null}
-      {routesError ? <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{routesError}</p> : null}
-      {partnersError ? <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{partnersError}</p> : null}
+      {eventsError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{eventsError}</p> : null}
+      {routesError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{routesError}</p> : null}
+      {partnersError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{partnersError}</p> : null}
 
       <AdminEventsManager initialEvents={events} />
       <AdminRoutesManager initialRoutes={routes} />

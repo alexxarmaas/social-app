@@ -122,24 +122,24 @@ export default function HomePage() {
         </article>
       </section>
 
-      <section id="contact" className="mx-auto max-w-7xl px-4 sm:px-5 pb-16 sm:pb-20 lg:px-8">
-        <div className="grid gap-6 sm:gap-8 rounded-[1.5rem] sm:rounded-[2.2rem] border border-white/10 bg-zinc-900/60 p-5 sm:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.45em] text-zinc-500">Preparado para patrocinadores</p>
-            <h3 className="text-3xl sm:text-4xl font-black uppercase tracking-[0.05em] sm:tracking-[0.08em] text-white">Contacto para colaboraciones</h3>
+      <section id="contact" className="mx-auto max-w-7xl px-3 pb-16 sm:px-5 sm:pb-20 lg:px-8">
+        <div className="grid min-w-0 gap-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-900/60 p-5 sm:gap-8 sm:rounded-[2.2rem] sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-10">
+          <div className="min-w-0 space-y-3 sm:space-y-4">
+            <p className="text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-xs sm:tracking-[0.45em]">Preparado para patrocinadores</p>
+            <h3 className="max-w-full break-words text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.03em] text-white [overflow-wrap:anywhere] sm:text-4xl sm:tracking-[0.08em]">Contacto para colaboraciones</h3>
             <p className="max-w-lg text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Cuéntanos tu propuesta de marca, tus objetivos de activación o el tipo de presencia que quieres asociar a rutas y eventos.</p>
           </div>
 
-          <form className="grid gap-3 sm:gap-4 rounded-[1.2rem] sm:rounded-[1.6rem] border border-white/10 bg-black/40 p-4 sm:p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
+          <form className="grid min-w-0 gap-3 rounded-[1.2rem] border border-white/10 bg-black/40 p-4 sm:gap-4 sm:rounded-[1.6rem] sm:p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
-              <input name="name" placeholder="Nombre" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+              <input name="name" placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
               <input name="email" placeholder="Correo electrónico" type="email" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
             </div>
-            <input name="brand" placeholder="Marca o empresa" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
+            <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             <textarea name="brief" rows={5} placeholder="Cuéntanos qué quieres activar" className="rounded-xl sm:rounded-2xl border border-white/10 bg-zinc-950 px-4 py-3 sm:py-3.5 text-xs sm:text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30" />
-            <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-4">
-              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.35em] text-zinc-500">Contacto directo para marcas</p>
-              <button type="submit" className="w-full sm:w-auto rounded-full border border-white/15 bg-black px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] sm:tracking-[0.32em] text-white transition hover:border-white hover:bg-zinc-900 flex justify-center items-center">
+            <div className="mt-2 grid gap-4 sm:flex sm:items-center sm:justify-between">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo para marcas</p>
+              <button type="submit" className="flex w-full items-center justify-center rounded-full border border-white/15 bg-black px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white transition hover:border-white hover:bg-zinc-900 sm:w-auto sm:px-5 sm:py-3.5 sm:text-xs sm:tracking-[0.32em]">
                 <MdEmail size={16} className="inline-block" />
                 <span className="ml-2">Enviar solicitud</span>
               </button>
