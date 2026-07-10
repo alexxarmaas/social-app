@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { z } from "zod";
-import { routeInputSchema, type RouteRecord } from "@/app/lib/tramassso-content";
+import { routeCoordinatesSchema, routeInputSchema, type RouteRecord } from "@/app/lib/tramassso-content";
 import CloudinaryUploader from "@/components/admin/CloudinaryUploader";
+import RouteMap from "@/components/routes/RouteMap";
 
 interface AdminRoutesManagerProps {
   initialRoutes: RouteRecord[];
@@ -68,6 +69,11 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
 
   const coverImageUrl = watch("cover_image_url");
   const galleryUrls = watch("gallery_urls") ?? [];
+  const coordinatesValue = watch("coordinates");
+  const previewCoordinates = useMemo(() => {
+    const parsed = routeCoordinatesSchema.safeParse(coordinatesValue);
+    return parsed.success ? parsed.data : null;
+  }, [coordinatesValue]);
 
   const saveRoute = async (values: RouteFormOutput) => {
     setSaving(true);
@@ -302,6 +308,17 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
             <span className="text-xs leading-5 text-zinc-500">Pega un array JSON con al menos dos puntos. Déjalo vacío si la ruta no tiene mapa.</span>
             {errors.coordinates ? <span className="text-xs text-red-400">{errors.coordinates.message}</span> : null}
           </label>
+
+          {previewCoordinates && previewCoordinates.length >= 2 ? (
+            <div className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Vista previa del mapa</span>
+              <RouteMap coordinates={previewCoordinates} />
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-5 text-xs leading-5 text-zinc-500">
+              La vista previa del mapa aparecerá cuando las coordenadas sean un JSON válido con al menos dos puntos.
+            </div>
+          )}
 
           <div className="grid gap-3 pt-2 sm:flex sm:items-center">
             <button type="submit" disabled={saving} className="w-full rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:tracking-[0.32em]">

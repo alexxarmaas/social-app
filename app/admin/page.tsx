@@ -49,9 +49,21 @@ export default async function AdminPage() {
       {routesError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{routesError}</p> : null}
       {partnersError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{partnersError}</p> : null}
 
-      <AdminEventsManager initialEvents={events} />
-      <AdminRoutesManager initialRoutes={routes} />
-      <AdminPartnersManager initialPartners={partners} />
+      <nav className="sticky top-3 z-10 flex gap-2 overflow-x-auto rounded-2xl border border-zinc-800 bg-black/75 p-2 backdrop-blur">
+        <a href="#admin-events" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Eventos</a>
+        <a href="#admin-routes" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Rutas</a>
+        <a href="#admin-partners" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Colaboradores</a>
+      </nav>
+
+      <div id="admin-events" className="scroll-mt-24">
+        <AdminEventsManager initialEvents={events} />
+      </div>
+      <div id="admin-routes" className="scroll-mt-24">
+        <AdminRoutesManager initialRoutes={routes} />
+      </div>
+      <div id="admin-partners" className="scroll-mt-24">
+        <AdminPartnersManager initialPartners={partners} />
+      </div>
     </div>
   );
 }

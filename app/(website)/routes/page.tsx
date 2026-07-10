@@ -40,6 +40,11 @@ export default async function RoutesGuidePage() {
                     <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.4em] text-zinc-600">Sin portada</div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  {route.coordinates && route.coordinates.length >= 2 ? (
+                    <span className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/70 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-white backdrop-blur">
+                      Mapa disponible
+                    </span>
+                  ) : null}
                   <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
                     <p className="truncate text-[10px] uppercase tracking-[0.28em] text-zinc-400 sm:tracking-[0.45em]">{route.start_point}</p>
                     <h2 className="mt-2 text-xl font-semibold uppercase tracking-[0.06em] text-white sm:text-2xl sm:tracking-[0.08em]">{route.title}</h2>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { listPublicPartners } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
@@ -54,16 +55,24 @@ export default async function PartnersPage() {
                   {partner.description ?? "Colaborador seleccionado de la comunidad Tramassso."}
                 </p>
 
-                {partner.website_url ? (
-                  <a
-                    href={partner.website_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-6 inline-flex w-full justify-center rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white hover:bg-zinc-900 sm:w-fit sm:tracking-[0.32em]"
+                <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
+                  <Link
+                    href={`/partners/${partner.id}`}
+                    className="inline-flex w-full justify-center rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-white transition hover:border-white hover:bg-zinc-900 sm:w-fit sm:tracking-[0.32em]"
                   >
-                    Visitar web
-                  </a>
-                ) : null}
+                    Ver perfil
+                  </Link>
+                  {partner.website_url ? (
+                    <a
+                      href={partner.website_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-white hover:text-white sm:w-fit sm:tracking-[0.32em]"
+                    >
+                      Visitar web
+                    </a>
+                  ) : null}
+                </div>
               </article>
             ))}
           </div>

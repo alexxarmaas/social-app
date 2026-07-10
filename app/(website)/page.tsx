@@ -1,7 +1,19 @@
 import Link from "next/link";
 import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
+import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [{ events }, { routes }, { partners }] = await Promise.all([
+    listPublicEvents(),
+    listPublicRoutes(),
+    listPublicPartners(),
+  ]);
+  const nextEvent = events[0] ?? null;
+  const featuredRoute = routes.find((route) => route.coordinates && route.coordinates.length >= 2) ?? routes[0] ?? null;
+  const featuredPartner = partners.find((partner) => partner.is_featured) ?? partners[0] ?? null;
+
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-50 overflow-x-hidden">
       <section className="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-5 py-10 sm:py-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:py-20">
@@ -120,6 +132,49 @@ export default function HomePage() {
           <h3 className="mt-3 sm:mt-4 text-xl sm:text-2xl font-semibold uppercase tracking-[0.1em] sm:tracking-[0.16em] text-white">Preparado para patrocinadores</h3>
           <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-relaxed sm:leading-7 text-zinc-400">Formatos publicitarios sobrios y espacios de colaboración listos para campañas, eventos y rutas patrocinadas.</p>
         </article>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-5 sm:pb-20 lg:px-8">
+        <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
+          <article className="min-w-0 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 p-5 sm:rounded-[2rem] sm:p-6">
+            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Próximo evento</p>
+            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {nextEvent ? nextEvent.title : "Próximamente"}
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "Estamos preparando nuevos encuentros para la comunidad."}
+            </p>
+            <Link href={nextEvent ? `/events/${nextEvent.id}` : "/events"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+              Ver eventos
+            </Link>
+          </article>
+
+          <article className="min-w-0 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 p-5 sm:rounded-[2rem] sm:p-6">
+            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Ruta destacada</p>
+            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {featuredRoute ? featuredRoute.title : "Rutas en preparación"}
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa disponible" : ""}` : "Pronto publicaremos rutas escénicas por Gran Canaria."}
+            </p>
+            <Link href={featuredRoute ? `/routes/${featuredRoute.id}` : "/routes"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+              Ver rutas
+            </Link>
+          </article>
+
+          <article className="min-w-0 rounded-[1.5rem] border border-zinc-800 bg-zinc-950/80 p-5 sm:rounded-[2rem] sm:p-6">
+            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Colaborador</p>
+            <h3 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              {featuredPartner ? featuredPartner.name : "Directorio abierto"}
+            </h3>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              {featuredPartner ? featuredPartner.category : "Marcas y negocios seleccionados para la comunidad Tramassso."}
+            </p>
+            <Link href={featuredPartner ? `/partners/${featuredPartner.id}` : "/partners"} className="mt-5 inline-flex rounded-full border border-white/15 bg-black px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white hover:bg-zinc-900">
+              Ver colaboradores
+            </Link>
+          </article>
+        </div>
       </section>
 
       <section id="contact" className="mx-auto max-w-7xl px-3 pb-16 sm:px-5 sm:pb-20 lg:px-8">

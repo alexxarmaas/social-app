@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPublicEventById } from "@/app/lib/tramassso-content";
-import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath } from "@/app/lib/seo";
+import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -40,8 +40,31 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description,
+    startDate: event.date,
+    image: event.cover_image_url ? [event.cover_image_url] : [luxuryFallbackImage],
+    url: new URL(`/events/${event.id}`, metadataBase).toString(),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: event.location,
+      address: event.location,
+    },
+    organizer: {
+      "@type": "Organization",
+      name: "Tramassso",
+      url: metadataBase.toString(),
+    },
+  };
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="space-y-6">
