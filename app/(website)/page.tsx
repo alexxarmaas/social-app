@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MdEmail, MdInsights, MdLocationOn, MdSpeed } from "react-icons/md";
+import { MdEmail, MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 
 export const dynamic = "force-dynamic";
@@ -97,6 +97,39 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 pb-10 sm:gap-5 sm:px-5 sm:pb-14 lg:grid-cols-3 lg:px-8">
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdSpeed size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Eventos seleccionados</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Quedadas con ruta, estética y comunidad.</p>
+        </article>
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdOutlineHandshake size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Visibilidad para marcas</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Presencia directa en eventos y contenido.</p>
+        </article>
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdStraighten size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Rutas con carácter</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Trazados por Gran Canaria con mapa.</p>
+        </article>
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdLocationOn size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Comunidad local</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Motor, creadores y marcas en Gran Canaria.</p>
+        </article>
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdInsights size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Experiencias premium</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Activaciones cuidadas, sin ruido.</p>
+        </article>
+        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
+          <MdOutlineHandshake size={22} className="relative z-10 text-red-300" />
+          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Patrocinadores</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">Formatos listos para rutas y eventos.</p>
+        </article>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-5 sm:pb-20 lg:px-8">
