@@ -31,8 +31,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
             <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdInsights className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">1.2M</p>
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Impacto</p>
+              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">{events.length}</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Eventos</p>
             </div>
             <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdLocationOn className="relative z-10 text-red-300" size={20} />
@@ -41,8 +41,8 @@ export default async function HomePage() {
             </div>
             <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
               <MdSpeed className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">Track</p>
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Racing</p>
+              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">{routes.length}</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Rutas</p>
             </div>
           </div>
 
@@ -185,11 +185,11 @@ export default async function HomePage() {
 
           <form className="grid min-w-0 gap-3 rounded-[1.2rem] border border-white/10 bg-black/40 p-4 sm:gap-4 sm:rounded-[1.6rem] sm:p-5" action="mailto:partnerships@tramassso.com" method="post" encType="text/plain">
             <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
-              <input name="name" placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-              <input name="email" placeholder="Correo electronico" type="email" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+              <input aria-label="Nombre" name="name" required placeholder="Nombre" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+              <input aria-label="Correo electronico" name="email" required placeholder="Correo electronico" type="email" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             </div>
-            <input name="brand" placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
-            <textarea name="brief" rows={4} placeholder="Que quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+            <input aria-label="Marca o empresa" name="brand" required placeholder="Marca o empresa" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
+            <textarea aria-label="Propuesta de colaboracion" name="brief" required rows={4} placeholder="Que quieres activar" className="min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-xs text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/60 sm:rounded-2xl sm:py-3.5 sm:text-sm" />
             <div className="mt-2 grid gap-4 lg:flex lg:items-center lg:justify-between">
               <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.35em]">Contacto directo</p>
               <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-end">

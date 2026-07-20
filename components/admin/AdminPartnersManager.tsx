@@ -102,7 +102,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
   };
 
   const deletePartner = async (id: string) => {
-    if (!window.confirm("¿Eliminar este colaborador?")) {
+    if (!window.confirm("¿Eliminar este colaborador? Esta accion no se puede deshacer.")) {
       return;
     }
 

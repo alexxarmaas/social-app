@@ -34,3 +34,4 @@ yarn-error.log*
 
 # uploads locales
 public/uploads
+*.db

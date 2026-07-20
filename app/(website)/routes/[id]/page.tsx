@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPublicRouteById } from "@/app/lib/tramassso-content";
+import { serializeJsonLd } from "@/app/lib/json-ld";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 import RouteMap from "@/components/routes/RouteMap";
 
@@ -72,7 +73,7 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <div className="space-y-6">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { safeInternalPath } from "@/app/lib/safe-redirect";
 
 export default function AdminLoginForm() {
   const router = useRouter();
@@ -17,9 +18,7 @@ export default function AdminLoginForm() {
     try {
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      if (next) {
-        setNextPath(next);
-      }
+      setNextPath(safeInternalPath(next));
     } catch {
       // Sin accion: el fallback es /admin.
     }
@@ -40,7 +39,8 @@ export default function AdminLoginForm() {
       if (response?.error) {
         setError("Credenciales invalidas.");
       } else {
-        router.push(nextPath);
+        router.push(safeInternalPath(nextPath));
+        router.refresh();
       }
     } catch {
       setError("No se pudo iniciar sesion.");
@@ -78,6 +78,7 @@ export default function AdminLoginForm() {
                 className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30"
                 placeholder="tu@correo.com"
                 autoComplete="email"
+                required
               />
             </label>
 
@@ -90,6 +91,7 @@ export default function AdminLoginForm() {
                 className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-white/30"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                required
               />
             </label>
 

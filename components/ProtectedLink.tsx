@@ -1,7 +1,4 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 interface ProtectedLinkProps {
     href: string;
@@ -10,21 +7,9 @@ interface ProtectedLinkProps {
 }
 
 export default function ProtectedLink({ href, children, className = "" }: ProtectedLinkProps) {
-    const router = useRouter();
-    const { data: session } = useSession();
-
-    const handleClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (session) {
-            router.push(href);
-        } else {
-            router.push(`/acceso-interno-tramassso?next=${encodeURIComponent(href)}`);
-        }
-    };
-
     return (
-        <a href={href} onClick={handleClick} className={className}>
+        <Link href={href} className={className}>
             {children}
-        </a>
+        </Link>
     );
 }

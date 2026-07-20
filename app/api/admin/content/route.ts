@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import { getCurrentAdminSession } from "@/app/lib/admin-auth";
 import { deleteContent, listAdminContent, saveContent } from "@/app/lib/tramassso-content";
 import type { ContentKind } from "@/app/lib/tramassso-content";
+import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
 
 async function requireAdmin() {
   const session = await getCurrentAdminSession();
@@ -58,6 +59,16 @@ function revalidateContent(kind?: ContentKind, id?: string) {
   }
 }
 
+function enforceWriteLimit(request: NextRequest) {
+  const result = checkRateLimit(`admin-content:${requestIdentifier(request.headers)}`, 40, 60 * 1000);
+  return result.allowed
+    ? null
+    : NextResponse.json(
+        { error: "Demasiadas solicitudes. Intentalo de nuevo en unos segundos." },
+        { status: 429, headers: { "Retry-After": String(result.retryAfter) } },
+      );
+}
+
 export async function GET(request: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
@@ -82,6 +93,8 @@ export async function POST(request: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
+  const limited = enforceWriteLimit(request);
+  if (limited) return limited;
 
   try {
     const body: { kind?: string; payload?: unknown } = await request.json();
@@ -108,6 +121,8 @@ export async function PUT(request: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
+  const limited = enforceWriteLimit(request);
+  if (limited) return limited;
 
   try {
     const body: { kind?: string; id?: string; payload?: unknown } = await request.json();
@@ -134,20 +149,26 @@ export async function DELETE(request: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
+  const limited = enforceWriteLimit(request);
+  if (limited) return limited;
 
-  const body: { kind?: string; id?: string } = await request.json();
-  const kind = parseKind(body.kind ?? null);
+  try {
+    const body: { kind?: string; id?: string } = await request.json();
+    const kind = parseKind(body.kind ?? null);
 
-  if (!kind || !body.id) {
-    return NextResponse.json({ error: "Datos no validos." }, { status: 400 });
+    if (!kind || !body.id) {
+      return NextResponse.json({ error: "Datos no validos." }, { status: 400 });
+    }
+
+    const result = await deleteContent(kind, body.id);
+
+    if ("error" in result && result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+
+    revalidateContent(kind, body.id);
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: errorMessage(error) }, { status: 400 });
   }
-
-  const result = await deleteContent(kind, body.id);
-
-  if ("error" in result && result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
-  }
-
-  revalidateContent(kind, body.id);
-  return NextResponse.json(result);
 }

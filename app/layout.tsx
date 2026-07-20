@@ -1,25 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import Script from "next/script";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { getValidAdsenseClientId } from "@/app/lib/adsense";
 import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 import Provider from "@/components/SessionProvider";
-import PushNotificationManager from "@/components/notifications/PushNotificationManager";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import AdsConsent from "@/components/ads/AdsConsent";
 
 const aeroblade = localFont({
   src: "./Aeroblade.ttf",
@@ -46,20 +34,12 @@ export const metadata: Metadata = {
     description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
     images: [luxuryFallbackImage],
   },
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Tramassso",
-  },
 };
 
 export const viewport: Viewport = {
   themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -71,18 +51,10 @@ export default function RootLayout({
 
   return (
     <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${aeroblade.variable} antialiased`}>
+      <body className={`${aeroblade.variable} antialiased`}>
         <Provider>
-          {adsenseClientId ? (
-            <Script
-              id="adsense-script"
-              strategy="afterInteractive"
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-              crossOrigin="anonymous"
-            />
-          ) : null}
+          {adsenseClientId ? <AdsConsent clientId={adsenseClientId} /> : null}
           {children}
-          <PushNotificationManager />
           <Analytics />
           <SpeedInsights />
         </Provider>

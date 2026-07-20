@@ -1,6 +1,7 @@
 import { getPublicStats } from "@/app/lib/tramassso-content";
 import { getVercelStats } from "@/app/lib/vercel-analytics";
 import { MdOutlineAnalytics, MdDirectionsCar, MdOutlineHandshake, MdMap, MdShowChart, MdPeople } from "react-icons/md";
+import Link from "next/link";
 
 export default async function WebsiteFooter() {
   const [stats, vercelStats] = await Promise.all([
@@ -56,6 +57,10 @@ export default async function WebsiteFooter() {
               <p className="mt-1 text-xs text-zinc-600">Agrega VERCEL_TOKEN y VERCEL_PROJECT_ID en las variables de entorno.</p>
             </div>
           )}
+        </div>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-900 pt-6 text-xs text-zinc-500">
+          <p>© {new Date().getFullYear()} Tramassso</p>
+          <Link className="transition hover:text-white" href="/privacidad">Privacidad</Link>
         </div>
       </div>
     </footer>
