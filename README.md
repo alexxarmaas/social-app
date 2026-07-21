@@ -44,6 +44,8 @@ Ejecuta `supabase/migrations/20260708_tramassso_content.sql` completo en el SQL 
 
 Las solicitudes enviadas desde la portada quedan guardadas en `/admin`, sin Resend ni otro proveedor de correo. El administrador puede marcarlas como nuevas, vistas o respondidas.
 
+Para recibir además una notificación en el correo de Nominalia, configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y `CONTACT_TO_EMAIL`. La web guarda primero la solicitud en Supabase; si el SMTP no está disponible, el visitante recibe confirmación igualmente y la solicitud permanece en el panel.
+
 ## Cuenta administradora
 
 Define `SUPERADMIN_EMAIL` y `SUPERADMIN_PASSWORD` en `.env` y ejecuta:
