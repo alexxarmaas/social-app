@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { getValidAdsenseClientId } from "@/app/lib/adsense";
 import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 import Provider from "@/components/SessionProvider";
-import AdsConsent from "@/components/ads/AdsConsent";
 
 const aeroblade = localFont({
   src: "./Aeroblade.ttf",
@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
     images: [luxuryFallbackImage],
   },
+  other: {
+    "google-adsense-account": "ca-pub-2456720977453256",
+  },
 };
 
 export const viewport: Viewport = {
@@ -53,7 +56,14 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${aeroblade.variable} antialiased`}>
         <Provider>
-          {adsenseClientId ? <AdsConsent clientId={adsenseClientId} /> : null}
+          {adsenseClientId ? (
+            <Script
+              id="adsense-script"
+              strategy="afterInteractive"
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+              crossOrigin="anonymous"
+            />
+          ) : null}
           {children}
           <Analytics />
           <SpeedInsights />

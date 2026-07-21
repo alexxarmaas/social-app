@@ -74,6 +74,10 @@ npm run create-superadmin
 
 Consulta [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Antes de publicar, ejecuta `npm run check`, `npm run build` y `npm audit --omit=dev`.
 
+## Google AdSense
+
+El dominio publica el identificador de editor en `/ads.txt` y en la metaetiqueta de verificacion. Antes de activar anuncios para trafico europeo, configura el mensaje de regulaciones europeas en AdSense mediante la CMP certificada de Google. Las unidades responsive de eventos y rutas se activan con `NEXT_PUBLIC_ADSENSE_SLOT_EVENTS_1` y `NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1`.
+
 ## Seguridad
 
 - No subas `.env`, bases de datos ni archivos de usuarios al repositorio.

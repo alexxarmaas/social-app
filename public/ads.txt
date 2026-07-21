@@ -1,2 +1,1 @@
-# Replace with your actual AdSense publisher line before going live.
-# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+google.com, pub-2456720977453256, DIRECT, f08c47fec0942fa0
