@@ -63,6 +63,11 @@ export default async function PartnersPage() {
                       Visitar web
                     </TrackSponsorClick>
                   ) : null}
+                  {partner.instagram_url ? (
+                    <TrackSponsorClick sponsorName={`${partner.name} · Instagram`} websiteUrl={partner.instagram_url} className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
+                      Instagram
+                    </TrackSponsorClick>
+                  ) : null}
                 </div>
               </article>
             ))}

@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AdBanner from "@/components/ads/AdBanner";
-import { listPublicEvents } from "@/app/lib/tramassso-content";
+import { listPastEvents, listPublicEvents } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
 export const revalidate = 60;
@@ -16,7 +16,7 @@ export const metadata: Metadata = buildPremiumMetadata({
 });
 
 export default async function EventsFeedPage() {
-  const { events, error } = await listPublicEvents();
+  const [{ events, error }, { events: pastEvents }] = await Promise.all([listPublicEvents(), listPastEvents()]);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
@@ -69,6 +69,15 @@ export default async function EventsFeedPage() {
             <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Proxima salida en preparacion</p>
             <p className="mt-3 text-sm text-zinc-400">Vuelve pronto para ver nuevos eventos.</p>
           </div>
+        ) : null}
+
+        {pastEvents.length ? (
+          <section className="mt-16 border-t border-zinc-900 pt-10">
+            <div><p className="racing-eyebrow text-xs uppercase tracking-[0.4em]">Archivo</p><h2 className="mt-3 text-3xl font-black uppercase text-white">Eventos realizados</h2></div>
+            <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {pastEvents.map((event) => <Link key={event.id} href={`/events/${event.id}`} className="group rounded-3xl border border-zinc-800 bg-black/30 p-5 transition hover:border-red-500/40"><p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">{new Date(event.date).toLocaleDateString("es-ES")}</p><h3 className="mt-3 text-xl font-semibold text-white group-hover:text-red-100">{event.title}</h3><p className="mt-2 text-sm text-zinc-500">{event.location} · {event.gallery_urls.length} imagenes</p></Link>)}
+            </div>
+          </section>
         ) : null}
       </section>
     </main>

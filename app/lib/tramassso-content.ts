@@ -80,6 +80,9 @@ export const routeInputSchema = z.object({
   cover_image_url: imageUrlSchema.or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
   coordinates: routeCoordinatesSchema.optional(),
+  difficulty: z.enum(["facil", "media", "exigente"]).default("media"),
+  route_type: z.enum(["carretera", "costa", "montana", "nocturna", "exposicion"]).default("carretera"),
+  recommended_time: z.string().trim().max(120, "La recomendacion no puede superar 120 caracteres.").or(z.literal("")).nullish(),
 });
 
 export const partnerInputSchema = z.object({
@@ -87,13 +90,23 @@ export const partnerInputSchema = z.object({
   category: z.string().trim().min(2, "Indica la categoria.").max(80, "La categoria no puede superar 80 caracteres."),
   logo_url: imageUrlSchema.or(z.literal("")).nullish(),
   website_url: optionalUrlSchema,
+  instagram_url: optionalUrlSchema,
   description: z.string().trim().max(1000, "La descripcion no puede superar 1000 caracteres.").or(z.literal("")).nullish(),
   is_featured: z.coerce.boolean().default(false),
+});
+
+export const contactRequestInputSchema = z.object({
+  name: z.string().trim().min(2, "Indica tu nombre.").max(100),
+  email: z.string().trim().email("Indica un correo valido.").max(160),
+  brand: z.string().trim().min(2, "Indica la marca o empresa.").max(160),
+  brief: z.string().trim().min(10, "Cuentanos un poco mas sobre la propuesta.").max(3000),
+  website: z.string().max(200).optional(),
 });
 
 export type EventInput = z.infer<typeof eventInputSchema>;
 export type RouteInput = z.infer<typeof routeInputSchema>;
 export type PartnerInput = z.infer<typeof partnerInputSchema>;
+export type ContactRequestInput = z.infer<typeof contactRequestInputSchema>;
 
 export interface EventRecord {
   id: string;
@@ -117,6 +130,9 @@ export interface RouteRecord {
   cover_image_url: string | null;
   gallery_urls: string[];
   coordinates: RouteCoordinate[] | null;
+  difficulty: "facil" | "media" | "exigente";
+  route_type: "carretera" | "costa" | "montana" | "nocturna" | "exposicion";
+  recommended_time: string | null;
   created_at: string;
 }
 
@@ -126,8 +142,19 @@ export interface PartnerRecord {
   category: string;
   logo_url: string | null;
   website_url: string | null;
+  instagram_url: string | null;
   description: string | null;
   is_featured: boolean;
+  created_at: string;
+}
+
+export interface ContactRequestRecord {
+  id: string;
+  name: string;
+  email: string;
+  brand: string;
+  brief: string;
+  status: "nuevo" | "visto" | "respondido";
   created_at: string;
 }
 
@@ -135,10 +162,7 @@ export interface EventDetailsRecord extends EventRecord {
   organizer_name: string | null;
 }
 
-export interface RouteDetailsRecord extends RouteRecord {
-  difficulty: string | null;
-  recommended_time: string | null;
-}
+export type RouteDetailsRecord = RouteRecord;
 
 export type ContentKind = "events" | "routes" | "partners";
 
@@ -164,6 +188,9 @@ interface RouteRow {
   cover_image_url: string | null;
   gallery_urls: string[] | null;
   coordinates?: unknown;
+  difficulty?: "facil" | "media" | "exigente" | null;
+  route_type?: "carretera" | "costa" | "montana" | "nocturna" | "exposicion" | null;
+  recommended_time?: string | null;
   created_at: string;
 }
 
@@ -173,6 +200,7 @@ interface PartnerRow {
   category: string;
   logo_url: string | null;
   website_url: string | null;
+  instagram_url?: string | null;
   description: string | null;
   is_featured: boolean;
   created_at: string;
@@ -232,6 +260,9 @@ function mapRouteRow(row: RouteRow): RouteRecord {
     cover_image_url: row.cover_image_url,
     gallery_urls: row.gallery_urls ?? [],
     coordinates: normalizeCoordinates(row.coordinates),
+    difficulty: row.difficulty ?? "media",
+    route_type: row.route_type ?? "carretera",
+    recommended_time: row.recommended_time ?? null,
     created_at: row.created_at,
   };
 }
@@ -243,6 +274,7 @@ function mapPartnerRow(row: PartnerRow): PartnerRecord {
     category: row.category,
     logo_url: row.logo_url,
     website_url: row.website_url,
+    instagram_url: row.instagram_url ?? null,
     description: row.description,
     is_featured: row.is_featured,
     created_at: row.created_at,
@@ -268,8 +300,8 @@ function contentKindLabel(kind: ContentKind) {
 function formatSupabaseError(kind: ContentKind, error: { message?: string; code?: string }) {
   const message = error.message ?? "Error de Supabase";
 
-  if (kind === "routes" && isMissingCoordinatesColumnError(error)) {
-    return "Falta la columna de coordenadas en Supabase. Ejecuta supabase/partners-and-route-coordinates.sql para activar mapas de rutas.";
+  if (kind === "routes" && isMissingEnhancedRouteColumnError(error)) {
+    return "Faltan campos de rutas en Supabase. Ejecuta supabase/migrations/20260708_tramassso_content.sql y vuelve a intentarlo.";
   }
 
   if (message.includes("schema cache") || message.includes(`public.${tableName(kind)}`) || error.code === "PGRST205") {
@@ -280,13 +312,27 @@ function formatSupabaseError(kind: ContentKind, error: { message?: string; code?
 }
 
 const eventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,created_at";
-const routeColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,created_at";
-const routeColumnsWithoutCoordinates = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,created_at";
-const partnerColumns = "id,name,category,logo_url,website_url,description,is_featured,created_at";
+const routeColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,difficulty,route_type,recommended_time,created_at";
+const routeColumnsWithoutCoordinates = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,difficulty,route_type,recommended_time,created_at";
+const legacyRouteColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,created_at";
+const partnerColumns = "id,name,category,logo_url,website_url,instagram_url,description,is_featured,created_at";
+const legacyPartnerColumns = "id,name,category,logo_url,website_url,description,is_featured,created_at";
 
 function isMissingCoordinatesColumnError(error: { message?: string; code?: string }) {
   const message = error.message ?? "";
   return message.includes("routes.coordinates") || message.includes("column routes.coordinates does not exist") || message.includes("Could not find the 'coordinates' column");
+}
+
+function isMissingEnhancedRouteColumnError(error: { message?: string }) {
+  const message = error.message ?? "";
+  return ["coordinates", "difficulty", "route_type", "recommended_time"].some((column) =>
+    message.includes(`routes.${column}`) || message.includes(`'${column}' column`),
+  );
+}
+
+function isMissingInstagramColumnError(error: { message?: string }) {
+  const message = error.message ?? "";
+  return message.includes("partners.instagram_url") || message.includes("'instagram_url' column");
 }
 
 export async function listPublicEvents() {
@@ -300,6 +346,13 @@ export async function listPublicEvents() {
   return {
     events: (data ?? []).map((row) => mapEventRow(row as EventRow)),
   };
+}
+
+export async function listPastEvents(limit = 12) {
+  const client = createSupabasePublicClient();
+  const { data, error } = await client.from("events").select(eventColumns).lt("date", new Date().toISOString()).order("date", { ascending: false }).limit(limit);
+  if (error) return { events: [] as EventRecord[], error: formatSupabaseError("events", error) };
+  return { events: (data ?? []).map((row) => mapEventRow(row as EventRow)) };
 }
 
 export async function getPublicEventById(id: string) {
@@ -323,8 +376,8 @@ export async function listPublicRoutes() {
   const { data, error } = await client.from("routes").select(routeColumns).order("created_at", { ascending: false });
 
   if (error) {
-    if (isMissingCoordinatesColumnError(error)) {
-      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).order("created_at", { ascending: false });
+    if (isMissingEnhancedRouteColumnError(error)) {
+      const fallback = await client.from("routes").select(legacyRouteColumns).order("created_at", { ascending: false });
 
       if (!fallback.error) {
         return {
@@ -346,16 +399,12 @@ export async function getPublicRouteById(id: string) {
   const { data, error } = await client.from("routes").select(routeColumns).eq("id", id).maybeSingle();
 
   if (error || !data) {
-    if (error && isMissingCoordinatesColumnError(error)) {
-      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).eq("id", id).maybeSingle();
+    if (error && isMissingEnhancedRouteColumnError(error)) {
+      const fallback = await client.from("routes").select(legacyRouteColumns).eq("id", id).maybeSingle();
 
       if (!fallback.error && fallback.data) {
         return {
-          route: {
-            ...mapRouteRow(fallback.data as RouteRow),
-            difficulty: null,
-            recommended_time: null,
-          },
+          route: mapRouteRow(fallback.data as RouteRow),
         };
       }
     }
@@ -364,11 +413,7 @@ export async function getPublicRouteById(id: string) {
   }
 
   return {
-    route: {
-      ...mapRouteRow(data as RouteRow),
-      difficulty: null,
-      recommended_time: null,
-    },
+    route: mapRouteRow(data as RouteRow),
   };
 }
 
@@ -381,6 +426,10 @@ export async function listPublicPartners() {
     .order("created_at", { ascending: false });
 
   if (error) {
+    if (isMissingInstagramColumnError(error)) {
+      const fallback = await client.from("partners").select(legacyPartnerColumns).order("is_featured", { ascending: false }).order("created_at", { ascending: false });
+      if (!fallback.error) return { partners: (fallback.data ?? []).map((row) => mapPartnerRow(row as PartnerRow)) };
+    }
     return { partners: [] as PartnerRecord[], error: formatSupabaseError("partners", error) };
   }
 
@@ -394,6 +443,10 @@ export async function getPublicPartner(id: string) {
   const { data, error } = await client.from("partners").select(partnerColumns).eq("id", id).maybeSingle();
 
   if (error || !data) {
+    if (error && isMissingInstagramColumnError(error)) {
+      const fallback = await client.from("partners").select(legacyPartnerColumns).eq("id", id).maybeSingle();
+      if (!fallback.error && fallback.data) return { partner: mapPartnerRow(fallback.data as PartnerRow) };
+    }
     return { partner: null as PartnerRecord | null, error: error ? formatSupabaseError("partners", error) : "Colaborador no encontrado" };
   }
 
@@ -417,8 +470,8 @@ export async function listAdminContent(kind: ContentKind): Promise<{ items: Even
   const { data, error } = await query.order(orderColumn, { ascending: false });
 
   if (error) {
-    if (kind === "routes" && isMissingCoordinatesColumnError(error)) {
-      const fallback = await client.from("routes").select(routeColumnsWithoutCoordinates).order("created_at", { ascending: false });
+    if (kind === "routes" && isMissingEnhancedRouteColumnError(error)) {
+      const fallback = await client.from("routes").select(legacyRouteColumns).order("created_at", { ascending: false });
 
       if (!fallback.error) {
         return {
@@ -426,6 +479,11 @@ export async function listAdminContent(kind: ContentKind): Promise<{ items: Even
           error: formatSupabaseError(kind, error),
         };
       }
+    }
+
+    if (kind === "partners" && isMissingInstagramColumnError(error)) {
+      const fallback = await client.from("partners").select(legacyPartnerColumns).order("is_featured", { ascending: false }).order("created_at", { ascending: false });
+      if (!fallback.error) return { items: (fallback.data ?? []).map((row) => mapPartnerRow(row as PartnerRow)) };
     }
 
     return { items: [], error: formatSupabaseError(kind, error) };
@@ -485,6 +543,9 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
       cover_image_url: normalizeUrl(parsed.cover_image_url),
       gallery_urls: normalizeUrlArray(parsed.gallery_urls),
       coordinates: parsed.coordinates ?? null,
+      difficulty: parsed.difficulty,
+      route_type: parsed.route_type,
+      recommended_time: normalizeNullableText(parsed.recommended_time),
     };
 
     const query = id
@@ -508,6 +569,9 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
           drive_time_minutes: parsed.drive_time_minutes,
           cover_image_url: normalizeUrl(parsed.cover_image_url),
           gallery_urls: normalizeUrlArray(parsed.gallery_urls),
+          difficulty: parsed.difficulty,
+          route_type: parsed.route_type,
+          recommended_time: normalizeNullableText(parsed.recommended_time),
         };
 
         const fallbackQuery = id
@@ -533,6 +597,7 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
     category: parsed.category,
     logo_url: normalizeUrl(parsed.logo_url),
     website_url: normalizeUrl(parsed.website_url),
+    instagram_url: normalizeUrl(parsed.instagram_url),
     description: normalizeNullableText(parsed.description),
     is_featured: parsed.is_featured,
   };
@@ -606,3 +671,34 @@ async function readPublicStats() {
 }
 
 export const getPublicStats = unstable_cache(readPublicStats, ["public-stats"], { revalidate: 300 });
+
+export async function createContactRequest(input: unknown) {
+  const parsed = contactRequestInputSchema.parse(input);
+  if (parsed.website) return { success: true };
+  const client = createSupabaseServiceClient();
+  const { error } = await client.from("contact_requests").insert({
+    name: parsed.name,
+    email: parsed.email.toLowerCase(),
+    brand: parsed.brand,
+    brief: parsed.brief,
+  });
+  return error ? { error: "No se pudo guardar la solicitud." } : { success: true };
+}
+
+export async function listContactRequests(): Promise<{ items: ContactRequestRecord[]; error?: string }> {
+  const client = createSupabaseServiceClient();
+  const { data, error } = await client.from("contact_requests").select("id,name,email,brand,brief,status,created_at").order("created_at", { ascending: false });
+  return error ? { items: [], error: "No se pudieron cargar las solicitudes." } : { items: (data ?? []) as ContactRequestRecord[] };
+}
+
+export async function updateContactRequest(id: string, status: ContactRequestRecord["status"]) {
+  const client = createSupabaseServiceClient();
+  const { data, error } = await client.from("contact_requests").update({ status }).eq("id", id).select("id").maybeSingle();
+  return error || !data ? { error: "No se pudo actualizar la solicitud." } : { success: true };
+}
+
+export async function deleteContactRequest(id: string) {
+  const client = createSupabaseServiceClient();
+  const { data, error } = await client.from("contact_requests").delete().eq("id", id).select("id").maybeSingle();
+  return error || !data ? { error: "No se pudo eliminar la solicitud." } : { success: true };
+}

@@ -5,6 +5,8 @@ import { getPublicRouteById } from "@/app/lib/tramassso-content";
 import { serializeJsonLd } from "@/app/lib/json-ld";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 import RouteMap from "@/components/routes/RouteMap";
+import ContentActions from "@/components/content/ContentActions";
+import LightboxGallery from "@/components/content/LightboxGallery";
 
 export const revalidate = 60;
 
@@ -80,7 +82,7 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
             <p className="racing-eyebrow text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Detalle de la ruta</p>
             <h1 className="text-balance text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-7xl">{route.title}</h1>
             <p className="max-w-3xl text-sm leading-7 text-zinc-400 md:text-base">{route.description}</p>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="racing-card min-w-0 rounded-2xl border p-4 sm:rounded-3xl">
                 <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">Salida</p>
                 <p className="mt-2 break-words text-white">{route.start_point}</p>
@@ -93,20 +95,20 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
                 <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">Distancia</p>
                 <p className="mt-2 text-white">{route.distance_km} km</p>
               </div>
+              <div className="racing-card min-w-0 rounded-2xl border p-4 sm:rounded-3xl">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">Dificultad</p>
+                <p className="mt-2 capitalize text-white">{route.difficulty}</p>
+              </div>
             </div>
+            <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.2em] text-zinc-400"><span className="rounded-full border border-white/10 px-3 py-2 capitalize">{route.route_type}</span>{route.recommended_time ? <span className="rounded-full border border-white/10 px-3 py-2">{route.recommended_time}</span> : null}</div>
+            <ContentActions title={route.title} location={route.start_point} kind="route" />
           </div>
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
               <Image src={route.cover_image_url || luxuryFallbackPath} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" priority />
             </div>
-            <div className="grid gap-3 border-t border-zinc-800 p-4 text-sm text-zinc-400 sm:p-5">
-              {route.gallery_urls.length > 0 ? route.gallery_urls.slice(0, 3).map((imageUrl) => (
-                <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
-                  <Image src={imageUrl} alt={route.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
-                </div>
-              )) : <p>Aun no hay imagenes en la galeria.</p>}
-            </div>
+            <div className="border-t border-zinc-800 p-4 sm:p-5"><LightboxGallery images={route.gallery_urls} title={route.title} /></div>
           </div>
         </div>
 

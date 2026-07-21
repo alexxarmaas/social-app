@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { getPublicEventById } from "@/app/lib/tramassso-content";
 import { serializeJsonLd } from "@/app/lib/json-ld";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
+import EventCountdown from "@/components/events/EventCountdown";
+import ContentActions from "@/components/content/ContentActions";
+import LightboxGallery from "@/components/content/LightboxGallery";
 
 export const revalidate = 60;
 
@@ -76,19 +79,15 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
               <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{new Date(event.date).toLocaleString("es-ES")}</span>
               <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{event.location}</span>
             </div>
+            <EventCountdown date={event.date} />
+            <ContentActions title={event.title} location={event.location} date={event.date} kind="event" />
           </div>
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
             <div className="relative aspect-[4/5]">
               <Image src={event.cover_image_url || luxuryFallbackPath} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" priority />
             </div>
-            <div className="grid gap-3 border-t border-zinc-800 p-4 text-sm text-zinc-400 sm:p-5">
-              {event.gallery_urls.length > 0 ? event.gallery_urls.slice(0, 3).map((imageUrl) => (
-                <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
-                  <Image src={imageUrl} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
-                </div>
-              )) : <p>Aun no hay imagenes en la galeria.</p>}
-            </div>
+            <div className="border-t border-zinc-800 p-4 sm:p-5"><LightboxGallery images={event.gallery_urls} title={event.title} /></div>
           </div>
         </div>
       </section>
