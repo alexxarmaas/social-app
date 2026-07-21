@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { createContactRequest } from "@/app/lib/tramassso-content";
+import { contactRequestInputSchema, createContactRequest } from "@/app/lib/tramassso-content";
+import { sendContactNotification } from "@/app/lib/contact-email";
 import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
@@ -10,10 +11,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = contactRequestInputSchema.parse(await request.json());
+    if (body.website) return NextResponse.json({ success: true }, { status: 201 });
+
     const result = await createContactRequest(body);
     if ("error" in result) return NextResponse.json(result, { status: 400 });
-    return NextResponse.json(result, { status: 201 });
+    const notification = await sendContactNotification(body);
+    return NextResponse.json({ ...result, notification: notification.delivered ? "delivered" : "pending" }, { status: 201 });
   } catch (error) {
     const message = error instanceof ZodError
       ? error.issues.map((issue) => issue.message).join(" ")
