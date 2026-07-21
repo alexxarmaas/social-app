@@ -36,7 +36,7 @@ Abre `http://localhost:3000`. El panel está en `/admin` y el acceso interno en 
 
 ## Configuración de Supabase
 
-Ejecuta `supabase/migrations/20260708_tramassso_content.sql` completo en el SQL Editor del proyecto. La migración crea y actualiza eventos, rutas, colaboradores y las solicitudes del formulario de contacto; es idempotente y puede repetirse tras un despliegue. Configura estas variables:
+Ejecuta `supabase/migrations/20260708_tramassso_content.sql` y después `supabase/migrations/20260721_engagement_features.sql` completos en el SQL Editor del proyecto. Las migraciones son idempotentes: crean el contenido, los modos de participación, la bandeja de inscripciones y el almacenamiento de GPX, y pueden repetirse tras un despliegue. Configura estas variables:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -45,6 +45,12 @@ Ejecuta `supabase/migrations/20260708_tramassso_content.sql` completo en el SQL 
 Las solicitudes enviadas desde la portada quedan guardadas en `/admin`, sin Resend ni otro proveedor de correo. El administrador puede marcarlas como nuevas, vistas o respondidas.
 
 Para recibir además una notificación en el correo de Nominalia, configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y `CONTACT_TO_EMAIL`. La web guarda primero la solicitud en Supabase; si el SMTP no está disponible, el visitante recibe confirmación igualmente y la solicitud permanece en el panel.
+
+## Eventos, inscripciones y rutas
+
+Cada evento admite cuatro modos: solo información, lista de interesados de Tramassso, inscripción gestionada por Tramassso o enlace oficial externo. Las solicitudes propias aparecen en `/admin`, se pueden confirmar, cancelar y exportar como CSV; no se crean cuentas para organizadores externos. Todos los eventos ofrecen enlaces de Google Calendar y archivos `.ics`.
+
+Las rutas admiten archivos GPX de hasta 1,5 MB. El panel extrae automáticamente el trazado para el mapa y publica la descarga del GPX en la ficha de la ruta.
 
 ## Cuenta administradora
 

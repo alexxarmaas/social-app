@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPublicEventById } from "@/app/lib/tramassso-content";
+import { getEventAvailability } from "@/app/lib/event-registrations";
 import { serializeJsonLd } from "@/app/lib/json-ld";
 import { buildPremiumMetadata, luxuryFallbackImage, luxuryFallbackPath, metadataBase } from "@/app/lib/seo";
 import EventCountdown from "@/components/events/EventCountdown";
 import ContentActions from "@/components/content/ContentActions";
 import LightboxGallery from "@/components/content/LightboxGallery";
+import EventCalendarActions from "@/components/events/EventCalendarActions";
+import EventParticipation from "@/components/events/EventParticipation";
 
 export const revalidate = 60;
 
@@ -44,6 +47,10 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
     notFound();
   }
 
+  const { remaining } = event.participation_mode === "managed"
+    ? await getEventAvailability(event.id, event.max_participants)
+    : { remaining: null };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -59,11 +66,13 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
       name: event.location,
       address: event.location,
     },
-    organizer: {
-      "@type": "Organization",
-      name: "Tramassso",
-      url: metadataBase.toString(),
-    },
+    ...(event.organizer_name ? {
+      organizer: {
+        "@type": "Organization",
+        name: event.organizer_name,
+        ...(event.organizer_name.toLowerCase() === "tramassso" ? { url: metadataBase.toString() } : {}),
+      },
+    } : {}),
   };
 
   return (
@@ -81,6 +90,7 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
             </div>
             <EventCountdown date={event.date} />
             <ContentActions title={event.title} location={event.location} date={event.date} kind="event" />
+            <EventCalendarActions event={event} />
           </div>
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
@@ -89,6 +99,10 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
             </div>
             <div className="border-t border-zinc-800 p-4 sm:p-5"><LightboxGallery images={event.gallery_urls} title={event.title} /></div>
           </div>
+        </div>
+
+        <div className="mt-10 max-w-3xl">
+          <EventParticipation event={event} remaining={remaining} />
         </div>
       </section>
     </main>

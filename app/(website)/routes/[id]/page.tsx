@@ -102,6 +102,11 @@ export default async function RouteDetailsPage({ params }: RoutePageProps) {
             </div>
             <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.2em] text-zinc-400"><span className="rounded-full border border-white/10 px-3 py-2 capitalize">{route.route_type}</span>{route.recommended_time ? <span className="rounded-full border border-white/10 px-3 py-2">{route.recommended_time}</span> : null}</div>
             <ContentActions title={route.title} location={route.start_point} kind="route" />
+            {route.gpx_filename ? (
+              <a href={`/api/routes/${route.id}/gpx`} className="inline-flex rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200">
+                Descargar ruta GPX
+              </a>
+            ) : null}
           </div>
 
           <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
