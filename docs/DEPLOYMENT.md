@@ -1,0 +1,11 @@
+# Despliegue en Vercel
+
+1. Importa el repositorio en Vercel y usa Node.js 22.
+2. Añade las variables de `.env.example` en cada entorno que corresponda.
+3. Usa una URL PostgreSQL con SSL para `DATABASE_URL`.
+4. Ejecuta `npx prisma migrate deploy` contra la base de producción antes del primer tráfico.
+5. Ejecuta la migración SQL de `supabase/migrations` en el proyecto Supabase.
+6. Configura el dominio definitivo en `NEXTAUTH_URL` y actualiza `metadataBase` en `app/lib/seo.ts` si no es `https://tramassso.com`.
+7. Despliega y verifica `/`, `/events`, `/routes`, `/partners`, el login y el panel `/admin`.
+
+No uses claves de servicio en variables `NEXT_PUBLIC_*`. AdSense es opcional y solo se carga tras el consentimiento del visitante.

@@ -5,6 +5,13 @@ import { hash } from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+    if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+        throw new Error('Seed cancelado: define ALLOW_DESTRUCTIVE_SEED=true para confirmar que se borraran datos.');
+    }
+    const seedPassword = process.env.SEED_USER_PASSWORD;
+    if (!seedPassword || seedPassword.length < 12) {
+        throw new Error('Define SEED_USER_PASSWORD con al menos 12 caracteres.');
+    }
     console.log('Start seeding ...');
 
     // Clean up existing data
@@ -17,7 +24,7 @@ async function main() {
     await prisma.user.deleteMany();
 
     // Create Users
-    const password = await hash('password123', 12);
+    const password = await hash(seedPassword, 12);
 
     const user1 = await prisma.user.create({
         data: {

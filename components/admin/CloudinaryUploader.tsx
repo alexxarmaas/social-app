@@ -26,6 +26,9 @@ interface CloudinaryUploadSignature {
   signature: string;
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
+
 async function getUploadSignature(): Promise<CloudinaryUploadSignature> {
   const response = await fetch("/api/admin/cloudinary-signature", {
     method: "POST",
@@ -50,6 +53,12 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
   const [error, setError] = useState<string | null>(null);
 
   const uploadFile = async (file: File) => {
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+      throw new Error("Formato no permitido. Usa JPG, PNG, WebP, GIF o AVIF.");
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error("La imagen no puede superar 10 MB.");
+    }
     const signature = await getUploadSignature();
     const formData = new FormData();
 

@@ -113,6 +113,9 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
   };
 
   const deleteRoute = async (id: string) => {
+    if (!window.confirm("¿Eliminar esta ruta? Esta accion no se puede deshacer.")) {
+      return;
+    }
     setSaving(true);
     setMessage(null);
 

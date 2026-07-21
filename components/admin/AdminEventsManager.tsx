@@ -27,7 +27,8 @@ function toDateTimeLocalValue(value: string) {
     return "";
   }
 
-  return date.toISOString().slice(0, 16);
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 16);
 }
 
 export default function AdminEventsManager({ initialEvents }: AdminEventsManagerProps) {
@@ -103,6 +104,9 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
   };
 
   const deleteEvent = async (id: string) => {
+    if (!window.confirm("¿Eliminar este evento? Esta accion no se puede deshacer.")) {
+      return;
+    }
     setSaving(true);
     setMessage(null);
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import TrackSponsorClick from "@/components/TrackSponsorClick";
 import { notFound } from "next/navigation";
 import { getPublicPartner } from "@/app/lib/tramassso-content";
+import { serializeJsonLd } from "@/app/lib/json-ld";
 import { buildPremiumMetadata, luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 
 export const revalidate = 60;
@@ -58,7 +59,7 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
           <div className="racing-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-6">

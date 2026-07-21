@@ -4,8 +4,6 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const DEFAULT_SUPERADMIN_EMAIL = "alexarmas2002@outlook.es";
-const DEFAULT_SUPERADMIN_NAME = "Alejandro Armas";
 const SUPERADMIN_ROLE = "superadmin";
 
 function normalizeEmail(value: string) {
@@ -37,11 +35,21 @@ async function findAvailableUsername(baseUsername: string, email: string) {
 }
 
 async function main() {
-  const email = normalizeEmail(process.env.SUPERADMIN_EMAIL || DEFAULT_SUPERADMIN_EMAIL);
+  const configuredEmail = process.env.SUPERADMIN_EMAIL;
   const password = process.env.SUPERADMIN_PASSWORD;
+
+  if (!configuredEmail) {
+    throw new Error("Falta SUPERADMIN_EMAIL.");
+  }
+
+  const email = normalizeEmail(configuredEmail);
 
   if (!password) {
     throw new Error("Falta SUPERADMIN_PASSWORD. Define una contrasena segura antes de ejecutar este comando.");
+  }
+
+  if (password.length < 12) {
+    throw new Error("SUPERADMIN_PASSWORD debe tener al menos 12 caracteres.");
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -52,14 +60,14 @@ async function main() {
     update: {
       password: passwordHash,
       role: SUPERADMIN_ROLE,
-      name: DEFAULT_SUPERADMIN_NAME,
+      name: "Administrador",
     },
     create: {
       email,
       username,
       password: passwordHash,
       role: SUPERADMIN_ROLE,
-      name: DEFAULT_SUPERADMIN_NAME,
+      name: "Administrador",
     },
     select: {
       id: true,

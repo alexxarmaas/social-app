@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { getCurrentAdminSession } from "@/app/lib/admin-auth";
+import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
+import type { NextRequest } from "next/server";
 
 const CLOUDINARY_FOLDER = "tramassso";
 
@@ -28,11 +30,19 @@ function signUploadParameters(parameters: Record<string, string | number>, apiSe
     .digest("hex");
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const session = await getCurrentAdminSession();
 
   if (!session) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
+  }
+
+  const rateLimit = checkRateLimit(`cloudinary:${requestIdentifier(request.headers)}`, 20, 60 * 1000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } },
+    );
   }
 
   try {

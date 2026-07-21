@@ -1,8 +1,21 @@
 import { z } from "zod";
 import { createSupabasePublicClient, createSupabaseServiceClient } from "@/app/lib/supabase";
+import { unstable_cache } from "next/cache";
 
-const urlListSchema = z.array(z.string().url("Cada imagen debe ser una URL valida.")).default([]);
-const optionalUrlSchema = z.string().trim().url("La URL debe ser valida.").or(z.literal("")).nullish();
+const httpsUrlSchema = z.string().trim().url("La URL debe ser valida.").refine(
+  (value) => URL.canParse(value) && new URL(value).protocol === "https:",
+  "La URL debe usar HTTPS.",
+);
+const imageUrlSchema = httpsUrlSchema.refine(
+  (value) => URL.canParse(value) && ["res.cloudinary.com", "images.unsplash.com"].includes(new URL(value).hostname),
+  "La imagen debe proceder de Cloudinary o Unsplash.",
+);
+const urlListSchema = z.array(imageUrlSchema).max(20, "No puedes añadir mas de 20 imagenes.").default([]);
+const optionalUrlSchema = httpsUrlSchema.or(z.literal("")).nullish();
+const isoDateSchema = z.string().refine(
+  (value) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})?$/.test(value) && !Number.isNaN(Date.parse(value)),
+  "La fecha debe tener un formato ISO valido.",
+).transform((value) => new Date(value).toISOString());
 
 export const routeCoordinateSchema = z.object({
   lat: z.coerce.number().min(-90, "La latitud debe estar entre -90 y 90.").max(90, "La latitud debe estar entre -90 y 90."),
@@ -51,9 +64,9 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
 export const eventInputSchema = z.object({
   title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres.").max(120, "El titulo no puede superar 120 caracteres."),
   description: z.string().trim().min(20, "La descripcion debe tener al menos 20 caracteres.").max(5000, "La descripcion no puede superar 5000 caracteres."),
-  date: z.string().min(1, "Indica la fecha del evento."),
+  date: isoDateSchema,
   location: z.string().trim().min(2, "Indica la ubicacion.").max(200, "La ubicacion no puede superar 200 caracteres."),
-  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL valida.").or(z.literal("")).optional(),
+  cover_image_url: imageUrlSchema.or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
 });
 
@@ -64,7 +77,7 @@ export const routeInputSchema = z.object({
   end_point: z.string().trim().min(2, "Indica el punto de llegada.").max(200, "El punto de llegada no puede superar 200 caracteres."),
   distance_km: z.coerce.number().positive("La distancia debe ser mayor que 0.").max(1000, "La distancia no puede superar 1000 km."),
   drive_time_minutes: z.coerce.number().int("El tiempo debe ser un numero entero.").positive("El tiempo debe ser mayor que 0.").max(1440, "El tiempo no puede superar 1440 minutos."),
-  cover_image_url: z.string().trim().url("La imagen principal debe ser una URL valida.").or(z.literal("")).optional(),
+  cover_image_url: imageUrlSchema.or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
   coordinates: routeCoordinatesSchema.optional(),
 });
@@ -72,7 +85,7 @@ export const routeInputSchema = z.object({
 export const partnerInputSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres.").max(120, "El nombre no puede superar 120 caracteres."),
   category: z.string().trim().min(2, "Indica la categoria.").max(80, "La categoria no puede superar 80 caracteres."),
-  logo_url: optionalUrlSchema,
+  logo_url: imageUrlSchema.or(z.literal("")).nullish(),
   website_url: optionalUrlSchema,
   description: z.string().trim().max(1000, "La descripcion no puede superar 1000 caracteres.").or(z.literal("")).nullish(),
   is_featured: z.coerce.boolean().default(false),
@@ -186,7 +199,7 @@ function normalizeUrlArray(value: unknown) {
     return [] as string[];
   }
 
-  return value.filter((item): item is string => typeof item === "string");
+  return value.filter((item): item is string => typeof item === "string" && item.startsWith("https://"));
 }
 
 function normalizeCoordinates(value: unknown): RouteCoordinate[] | null {
@@ -263,7 +276,7 @@ function formatSupabaseError(kind: ContentKind, error: { message?: string; code?
     return `No existe la tabla de ${contentKindLabel(kind)} en Supabase. Ejecuta la SQL indicada en la documentacion y vuelve a intentarlo.`;
   }
 
-  return message;
+  return "No se pudo completar la operacion con el servicio de contenido.";
 }
 
 const eventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,created_at";
@@ -278,7 +291,7 @@ function isMissingCoordinatesColumnError(error: { message?: string; code?: strin
 
 export async function listPublicEvents() {
   const client = createSupabasePublicClient();
-  const { data, error } = await client.from("events").select(eventColumns).order("date", { ascending: true });
+  const { data, error } = await client.from("events").select(eventColumns).gte("date", new Date().toISOString()).order("date", { ascending: true });
 
   if (error) {
     return { events: [] as EventRecord[], error: formatSupabaseError("events", error) };
@@ -543,10 +556,14 @@ export async function savePartner(input: unknown, id?: string) {
 
 export async function deleteContent(kind: ContentKind, id: string) {
   const client = createSupabaseServiceClient();
-  const { error } = await client.from(tableName(kind)).delete().eq("id", id);
+  const { data, error } = await client.from(tableName(kind)).delete().eq("id", id).select("id").maybeSingle();
 
   if (error) {
     return { error: formatSupabaseError(kind, error) };
+  }
+
+  if (!data) {
+    return { error: "El contenido no existe o ya fue eliminado." };
   }
 
   return { success: true };
@@ -568,7 +585,7 @@ export function asPartnerInput(values: unknown) {
   return partnerInputSchema.parse(values);
 }
 
-export async function getPublicStats() {
+async function readPublicStats() {
   const client = createSupabasePublicClient();
 
   const [
@@ -587,3 +604,5 @@ export async function getPublicStats() {
     partners: partnersCount ?? 0,
   };
 }
+
+export const getPublicStats = unstable_cache(readPublicStats, ["public-stats"], { revalidate: 300 });
