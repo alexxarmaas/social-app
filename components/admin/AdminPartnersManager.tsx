@@ -20,6 +20,7 @@ const emptyValues: PartnerFormInput = {
   category: "",
   logo_url: "",
   website_url: "",
+  instagram_url: "",
   description: "",
   is_featured: false,
 };
@@ -51,6 +52,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
       category: selectedPartner.category,
       logo_url: selectedPartner.logo_url ?? "",
       website_url: selectedPartner.website_url ?? "",
+      instagram_url: selectedPartner.instagram_url ?? "",
       description: selectedPartner.description ?? "",
       is_featured: selectedPartner.is_featured,
     });
@@ -250,6 +252,12 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
             <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Web</span>
             <input {...register("website_url")} placeholder="https://ejemplo.com" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
             {errors.website_url ? <span className="text-xs text-red-400">{errors.website_url.message}</span> : null}
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Instagram</span>
+            <input {...register("instagram_url")} placeholder="https://instagram.com/marca" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
+            {errors.instagram_url ? <span className="text-xs text-red-400">{errors.instagram_url.message}</span> : null}
           </label>
 
           <label className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-black/30 px-4 py-3">

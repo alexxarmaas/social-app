@@ -4,7 +4,7 @@
 2. Añade las variables de `.env.example` en cada entorno que corresponda.
 3. Usa una URL PostgreSQL con SSL para `DATABASE_URL`.
 4. Ejecuta `npx prisma migrate deploy` contra la base de producción antes del primer tráfico.
-5. Ejecuta la migración SQL de `supabase/migrations` en el proyecto Supabase.
+5. Ejecuta completa la migración `supabase/migrations/20260708_tramassso_content.sql` en el SQL Editor de Supabase. Hazlo también al actualizar una instalación existente: añade los filtros de rutas, Instagram de colaboradores y la bandeja de solicitudes.
 6. Configura el dominio definitivo en `NEXTAUTH_URL` y actualiza `metadataBase` en `app/lib/seo.ts` si no es `https://tramassso.com`.
 7. Despliega y verifica `/`, `/events`, `/routes`, `/partners`, el login y el panel `/admin`.
 

@@ -12,6 +12,13 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tramassso
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-secret-with-at-least-32-characters
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +28,3 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tramassso
-          NEXTAUTH_URL: http://localhost:3000
-          NEXTAUTH_SECRET: ci-only-secret-with-at-least-32-characters

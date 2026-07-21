@@ -36,11 +36,13 @@ Abre `http://localhost:3000`. El panel está en `/admin` y el acceso interno en 
 
 ## Configuración de Supabase
 
-Ejecuta `supabase/migrations/20260708_tramassso_content.sql` en el SQL Editor del proyecto. Configura estas variables:
+Ejecuta `supabase/migrations/20260708_tramassso_content.sql` completo en el SQL Editor del proyecto. La migración crea y actualiza eventos, rutas, colaboradores y las solicitudes del formulario de contacto; es idempotente y puede repetirse tras un despliegue. Configura estas variables:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (solo servidor; nunca debe exponerse en el navegador)
+
+Las solicitudes enviadas desde la portada quedan guardadas en `/admin`, sin Resend ni otro proveedor de correo. El administrador puede marcarlas como nuevas, vistas o respondidas.
 
 ## Cuenta administradora
 

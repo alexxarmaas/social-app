@@ -26,6 +26,9 @@ const emptyValues: RouteFormInput = {
   cover_image_url: "",
   gallery_urls: [],
   coordinates: "",
+  difficulty: "media",
+  route_type: "carretera",
+  recommended_time: "",
 };
 
 function formatCoordinatesForTextarea(route: RouteRecord) {
@@ -64,6 +67,9 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
       cover_image_url: selectedRoute.cover_image_url ?? "",
       gallery_urls: selectedRoute.gallery_urls,
       coordinates: formatCoordinatesForTextarea(selectedRoute),
+      difficulty: selectedRoute.difficulty,
+      route_type: selectedRoute.route_type,
+      recommended_time: selectedRoute.recommended_time ?? "",
     });
   }, [reset, selectedRoute]);
 
@@ -246,6 +252,33 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
               {errors.end_point ? <span className="text-xs text-red-400">{errors.end_point.message}</span> : null}
             </label>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Dificultad</span>
+              <select {...register("difficulty")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400">
+                <option value="facil">Fácil</option>
+                <option value="media">Media</option>
+                <option value="exigente">Exigente</option>
+              </select>
+            </label>
+            <label className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Tipo de ruta</span>
+              <select {...register("route_type")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400">
+                <option value="carretera">Carretera</option>
+                <option value="costa">Costa</option>
+                <option value="montana">Montaña</option>
+                <option value="nocturna">Nocturna</option>
+                <option value="exposicion">Exposición</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="grid gap-2">
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Mejor momento</span>
+            <input {...register("recommended_time")} placeholder="Ej. Al amanecer o entre semana" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
+            {errors.recommended_time ? <span className="text-xs text-red-400">{errors.recommended_time.message}</span> : null}
+          </label>
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2">
