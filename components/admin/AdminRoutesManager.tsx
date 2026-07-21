@@ -29,7 +29,24 @@ const emptyValues: RouteFormInput = {
   difficulty: "media",
   route_type: "carretera",
   recommended_time: "",
+  gpx_filename: "",
+  gpx_data: undefined,
 };
+
+const MAX_GPX_BYTES = 1_500_000;
+
+function coordinatesFromGpx(text: string) {
+  const document = new DOMParser().parseFromString(text, "application/xml");
+  if (document.querySelector("parsererror") || !document.querySelector("gpx")) throw new Error("El archivo GPX no es valido.");
+  const points = Array.from(document.querySelectorAll("trkpt, rtept, wpt")).map((point) => ({
+    lat: Number(point.getAttribute("lat")),
+    lng: Number(point.getAttribute("lon")),
+  })).filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng));
+  if (points.length < 2) throw new Error("El GPX debe contener al menos dos puntos.");
+  if (points.length <= 1000) return points;
+  const step = (points.length - 1) / 999;
+  return Array.from({ length: 1000 }, (_, index) => points[Math.round(index * step)]);
+}
 
 function formatCoordinatesForTextarea(route: RouteRecord) {
   return route.coordinates ? JSON.stringify(route.coordinates, null, 2) : "";
@@ -70,16 +87,39 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
       difficulty: selectedRoute.difficulty,
       route_type: selectedRoute.route_type,
       recommended_time: selectedRoute.recommended_time ?? "",
+      gpx_filename: selectedRoute.gpx_filename ?? "",
+      gpx_data: undefined,
     });
   }, [reset, selectedRoute]);
 
   const coverImageUrl = watch("cover_image_url");
   const galleryUrls = watch("gallery_urls") ?? [];
   const coordinatesValue = watch("coordinates");
+  const gpxFilename = watch("gpx_filename");
   const previewCoordinates = useMemo(() => {
     const parsed = routeCoordinatesSchema.safeParse(coordinatesValue);
     return parsed.success ? parsed.data : null;
   }, [coordinatesValue]);
+
+  const loadGpx = async (file: File | undefined) => {
+    if (!file) return;
+    setMessage(null);
+    if (file.size > MAX_GPX_BYTES) {
+      setMessage("El archivo GPX no puede superar 1,5 MB.");
+      return;
+    }
+    try {
+      const text = await file.text();
+      if (/<!DOCTYPE|<!ENTITY/i.test(text)) throw new Error("El archivo GPX contiene elementos no permitidos.");
+      const points = coordinatesFromGpx(text);
+      setValue("gpx_filename", file.name.slice(0, 180), { shouldDirty: true, shouldValidate: true });
+      setValue("gpx_data", text, { shouldDirty: true, shouldValidate: true });
+      setValue("coordinates", JSON.stringify(points, null, 2), { shouldDirty: true, shouldValidate: true });
+      setMessage(`GPX cargado con ${points.length} puntos.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo leer el GPX.");
+    }
+  };
 
   const saveRoute = async (values: RouteFormOutput) => {
     setSaving(true);
@@ -332,6 +372,19 @@ export default function AdminRoutesManager({ initialRoutes }: AdminRoutesManager
               )}
             </div>
           </div>
+
+          <label className="grid gap-2">
+            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Archivo GPX</span>
+            <input type="hidden" {...register("gpx_filename")} />
+            <input type="hidden" {...register("gpx_data")} />
+            <input type="file" accept=".gpx,application/gpx+xml,application/xml,text/xml" onChange={(event) => void loadGpx(event.target.files?.[0])} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-sm text-zinc-400 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-xs file:font-medium file:uppercase file:text-black" />
+            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+              <span>{gpxFilename || "Sin archivo GPX"}</span>
+              {gpxFilename ? <button type="button" onClick={() => { setValue("gpx_filename", "", { shouldDirty: true }); setValue("gpx_data", "", { shouldDirty: true }); }} className="text-red-300 hover:text-red-200">Quitar GPX</button> : null}
+            </div>
+            <span className="text-xs leading-5 text-zinc-500">Al subirlo, el trazado del mapa se extrae automaticamente. Maximo 1,5 MB.</span>
+            {errors.gpx_data ? <span className="text-xs text-red-400">{errors.gpx_data.message}</span> : null}
+          </label>
 
           <label className="grid gap-2">
             <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Coordenadas de la ruta</span>

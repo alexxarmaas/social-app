@@ -3,6 +3,8 @@ import test from "node:test";
 import { serializeJsonLd } from "../app/lib/json-ld";
 import { safeInternalPath } from "../app/lib/safe-redirect";
 import { contactRequestInputSchema, eventInputSchema, partnerInputSchema, routeInputSchema } from "../app/lib/tramassso-content";
+import { registrationInputSchema } from "../app/lib/event-registrations";
+import { createEventIcs, googleCalendarUrl } from "../app/lib/event-calendar";
 
 test("JSON-LD escapes HTML-significant characters", () => {
   const output = serializeJsonLd({ name: "</script><script>alert(1)</script>&" });
@@ -44,4 +46,26 @@ test("contact requests reject invalid emails and accept the anti-spam field", ()
   const request = { name: "Alex", email: "correo-invalido", brand: "Marca", brief: "Propuesta con suficiente detalle.", website: "" };
   assert.equal(contactRequestInputSchema.safeParse(request).success, false);
   assert.equal(contactRequestInputSchema.safeParse({ ...request, email: "alex@example.com", website: "bot.example" }).success, true);
+});
+
+test("event participation validates external URLs and capacity", () => {
+  const event = { title: "Evento valido", description: "Descripcion suficientemente larga", date: "2027-07-21T10:00:00Z", location: "Gran Canaria", cover_image_url: "", gallery_urls: [], participation_mode: "external", organizer_name: "Organizador", external_registration_url: "", max_participants: null };
+  assert.equal(eventInputSchema.safeParse(event).success, false);
+  assert.equal(eventInputSchema.safeParse({ ...event, external_registration_url: "https://example.com/registro" }).success, true);
+  assert.equal(eventInputSchema.safeParse({ ...event, participation_mode: "managed", external_registration_url: "", max_participants: 0 }).success, false);
+});
+
+test("registrations require consent and constrain companions", () => {
+  const request = { name: "Alex", email: "alex@example.com", phone: "", vehicle: "Coche", companions: 2, privacy: false, website: "" };
+  assert.equal(registrationInputSchema.safeParse(request).success, false);
+  assert.equal(registrationInputSchema.safeParse({ ...request, privacy: true }).success, true);
+  assert.equal(registrationInputSchema.safeParse({ ...request, privacy: true, companions: 21 }).success, false);
+});
+
+test("calendar exports escape event content and create Google links", () => {
+  const event = { id: "event-1", title: "Ruta, motor", description: "Linea 1\nLinea 2", date: "2027-07-21T10:00:00Z", location: "Las Palmas; GC", url: "https://tramassso.com/events/event-1" };
+  const ics = createEventIcs(event);
+  assert.match(ics, /SUMMARY:Ruta\\, motor/);
+  assert.match(ics, /LOCATION:Las Palmas\\; GC/);
+  assert.match(googleCalendarUrl(event), /^https:\/\/calendar\.google\.com\/calendar\/render\?/);
 });

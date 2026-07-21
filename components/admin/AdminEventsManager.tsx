@@ -4,20 +4,28 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { eventInputSchema, type EventInput, type EventRecord } from "@/app/lib/tramassso-content";
+import { z } from "zod";
+import { eventInputSchema, type EventRecord } from "@/app/lib/tramassso-content";
 import CloudinaryUploader from "@/components/admin/CloudinaryUploader";
 
 interface AdminEventsManagerProps {
   initialEvents: EventRecord[];
 }
 
-const emptyValues: EventInput = {
+type EventFormInput = z.input<typeof eventInputSchema>;
+type EventFormOutput = z.output<typeof eventInputSchema>;
+
+const emptyValues: EventFormInput = {
   title: "",
   description: "",
   date: "",
   location: "",
   cover_image_url: "",
   gallery_urls: [],
+  participation_mode: "information",
+  organizer_name: "",
+  external_registration_url: "",
+  max_participants: null,
 };
 
 function toDateTimeLocalValue(value: string) {
@@ -42,7 +50,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
     [events, selectedId],
   );
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<EventInput>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<EventFormInput, undefined, EventFormOutput>({
     resolver: zodResolver(eventInputSchema),
     defaultValues: emptyValues,
   });
@@ -60,13 +68,18 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
       location: selectedEvent.location,
       cover_image_url: selectedEvent.cover_image_url ?? "",
       gallery_urls: selectedEvent.gallery_urls,
+      participation_mode: selectedEvent.participation_mode,
+      organizer_name: selectedEvent.organizer_name ?? "",
+      external_registration_url: selectedEvent.external_registration_url ?? "",
+      max_participants: selectedEvent.max_participants,
     });
   }, [reset, selectedEvent]);
 
   const coverImageUrl = watch("cover_image_url");
   const galleryUrls = watch("gallery_urls") ?? [];
+  const participationMode = watch("participation_mode");
 
-  const saveEvent = async (values: EventInput) => {
+  const saveEvent = async (values: EventFormOutput) => {
     setSaving(true);
     setMessage(null);
 
@@ -160,6 +173,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
                 <th className="px-4 py-3">Evento</th>
                 <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3">Ubicacion</th>
+                <th className="px-4 py-3">Participacion</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
@@ -181,6 +195,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
                   </td>
                   <td className="px-4 py-4 text-zinc-300">{new Date(event.date).toLocaleString("es-ES")}</td>
                   <td className="px-4 py-4 text-zinc-300">{event.location}</td>
+                  <td className="px-4 py-4 text-zinc-300">{{ information: "Informativo", interest: "Interesados", managed: "Gestion Tramassso", external: "Externa" }[event.participation_mode]}</td>
                   <td className="px-4 py-4 text-right">
                     <div className="inline-flex gap-2">
                       <button type="button" onClick={() => setSelectedId(event.id)} className="rounded-full border border-zinc-800 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-zinc-300 transition hover:border-white hover:text-white">
@@ -195,7 +210,7 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
               ))}
               {!events.length ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">
+                  <td colSpan={5} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">
                     No hay eventos todavia
                   </td>
                 </tr>
@@ -236,6 +251,38 @@ export default function AdminEventsManager({ initialEvents }: AdminEventsManager
               <input {...register("location")} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
               {errors.location ? <span className="text-xs text-red-400">{errors.location.message}</span> : null}
             </label>
+          </div>
+
+          <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-black/25 p-4">
+            <label className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Participacion</span>
+              <select {...register("participation_mode")} className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400">
+                <option value="information">Solo informacion</option>
+                <option value="interest">Lista de interesados de Tramassso</option>
+                <option value="managed">Inscripcion gestionada por Tramassso</option>
+                <option value="external">Inscripcion externa</option>
+              </select>
+            </label>
+            <label className="grid gap-2">
+              <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Organizador indicado (opcional)</span>
+              <input {...register("organizer_name")} placeholder="Nombre mostrado como organizador" className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
+              {errors.organizer_name ? <span className="text-xs text-red-400">{errors.organizer_name.message}</span> : null}
+            </label>
+            {participationMode === "external" ? (
+              <label className="grid gap-2">
+                <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Enlace oficial de inscripcion</span>
+                <input {...register("external_registration_url")} type="url" placeholder="https://..." className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
+                {errors.external_registration_url ? <span className="text-xs text-red-400">{errors.external_registration_url.message}</span> : null}
+              </label>
+            ) : null}
+            {participationMode === "managed" ? (
+              <label className="grid max-w-64 gap-2">
+                <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Aforo (opcional)</span>
+                <input {...register("max_participants")} type="number" min={1} max={10000} placeholder="Sin limite" className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-zinc-50 outline-none transition focus:border-zinc-400" />
+                {errors.max_participants ? <span className="text-xs text-red-400">{errors.max_participants.message}</span> : null}
+              </label>
+            ) : null}
+            <p className="text-xs leading-6 text-zinc-500">Los organizadores externos no reciben una cuenta. Tramassso publica y gestiona cada evento desde este panel.</p>
           </div>
 
           <div className="grid gap-3">

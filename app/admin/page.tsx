@@ -3,15 +3,18 @@ import AdminEventsManager from "@/components/admin/AdminEventsManager";
 import AdminPartnersManager from "@/components/admin/AdminPartnersManager";
 import AdminRoutesManager from "@/components/admin/AdminRoutesManager";
 import AdminContactRequests from "@/components/admin/AdminContactRequests";
+import AdminEventRegistrations from "@/components/admin/AdminEventRegistrations";
+import { listEventRegistrations } from "@/app/lib/event-registrations";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [{ items: events, error: eventsError }, { items: routes, error: routesError }, { items: partners, error: partnersError }, { items: contacts, error: contactsError }] = await Promise.all([
+  const [{ items: events, error: eventsError }, { items: routes, error: routesError }, { items: partners, error: partnersError }, { items: contacts, error: contactsError }, { items: registrations, error: registrationsError }] = await Promise.all([
     listAdminContent("events"),
     listAdminContent("routes"),
     listAdminContent("partners"),
     listContactRequests(),
+    listEventRegistrations(),
   ]);
 
   return (
@@ -21,7 +24,7 @@ export default async function AdminPage() {
           <div className="max-w-3xl space-y-3">
             <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Panel</p>
             <h2 className="text-balance font-sans text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-5xl">Centro de control de contenido</h2>
-            <p className="text-sm leading-7 text-zinc-400">Gestiona eventos, rutas, colaboradores e imagenes desde una interfaz protegida conectada a Supabase y Cloudinary.</p>
+            <p className="text-sm leading-7 text-zinc-400">Gestiona eventos, inscripciones, rutas GPX, colaboradores e imagenes desde una interfaz protegida conectada a Supabase y Cloudinary.</p>
           </div>
           <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-xs uppercase tracking-[0.24em] text-emerald-200">
             Sesion protegida
@@ -36,9 +39,9 @@ export default async function AdminPage() {
           <p className="mt-2 text-xs text-zinc-500">Publicados en Supabase</p>
         </div>
         <div className="rounded-[1.5rem] border border-zinc-800 bg-zinc-900/60 p-5">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Solicitudes</p>
-          <p className="mt-3 font-sans text-4xl font-semibold text-white">{contacts.filter((item) => item.status === "nuevo").length}</p>
-          <p className="mt-2 text-xs text-zinc-500">Pendientes de revisar</p>
+          <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Inscripciones</p>
+          <p className="mt-3 font-sans text-4xl font-semibold text-white">{registrations.filter((item) => item.status === "new").length}</p>
+          <p className="mt-2 text-xs text-zinc-500">Inscripciones nuevas</p>
         </div>
         <div className="rounded-[1.5rem] border border-zinc-800 bg-zinc-900/60 p-5">
           <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Rutas</p>
@@ -56,10 +59,12 @@ export default async function AdminPage() {
       {routesError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{routesError}</p> : null}
       {partnersError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{partnersError}</p> : null}
       {contactsError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{contactsError}</p> : null}
+      {registrationsError ? <p className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">{registrationsError}</p> : null}
 
       <nav className="sticky top-3 z-10 flex gap-2 overflow-x-auto rounded-2xl border border-zinc-800 bg-black/75 p-2 backdrop-blur">
         <a href="#admin-events" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Eventos</a>
         <a href="#admin-routes" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Rutas</a>
+        <a href="#admin-registrations" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Inscripciones</a>
         <a href="#admin-partners" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Colaboradores</a>
         <a href="#admin-contacts" className="shrink-0 rounded-full border border-zinc-800 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white">Solicitudes</a>
       </nav>
@@ -69,6 +74,9 @@ export default async function AdminPage() {
       </div>
       <div id="admin-routes" className="scroll-mt-24">
         <AdminRoutesManager initialRoutes={routes} />
+      </div>
+      <div id="admin-registrations" className="scroll-mt-24">
+        <AdminEventRegistrations initialItems={registrations} />
       </div>
       <div id="admin-partners" className="scroll-mt-24">
         <AdminPartnersManager initialPartners={partners} />

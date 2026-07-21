@@ -12,6 +12,14 @@ const imageUrlSchema = httpsUrlSchema.refine(
 );
 const urlListSchema = z.array(imageUrlSchema).max(20, "No puedes añadir mas de 20 imagenes.").default([]);
 const optionalUrlSchema = httpsUrlSchema.or(z.literal("")).nullish();
+const optionalPositiveIntegerSchema = z.preprocess(
+  (value) => value === "" || value === null || value === undefined ? null : value,
+  z.coerce.number().int("El aforo debe ser un numero entero.").min(1, "El aforo debe ser mayor que 0.").max(10_000, "El aforo no puede superar 10.000 personas.").nullable(),
+);
+const gpxTextSchema = z.string().max(1_500_000, "El archivo GPX no puede superar 1,5 MB.").refine(
+  (value) => value === "" || (/<gpx(?:\s|>)/i.test(value) && !/<!DOCTYPE|<!ENTITY/i.test(value)),
+  "El archivo GPX no es valido.",
+);
 const isoDateSchema = z.string().refine(
   (value) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})?$/.test(value) && !Number.isNaN(Date.parse(value)),
   "La fecha debe tener un formato ISO valido.",
@@ -24,7 +32,7 @@ export const routeCoordinateSchema = z.object({
 
 export type RouteCoordinate = z.infer<typeof routeCoordinateSchema>;
 
-const routeCoordinateListSchema = z.array(routeCoordinateSchema).min(2, "Agrega al menos 2 puntos para mostrar el mapa.");
+const routeCoordinateListSchema = z.array(routeCoordinateSchema).min(2, "Agrega al menos 2 puntos para mostrar el mapa.").max(1000, "La ruta no puede superar 1.000 puntos.");
 
 export const routeCoordinatesSchema = z.unknown().transform((value, context): RouteCoordinate[] | null => {
   if (value === undefined || value === null || value === "") {
@@ -61,6 +69,9 @@ export const routeCoordinatesSchema = z.unknown().transform((value, context): Ro
   return parsed.data;
 });
 
+export const participationModeSchema = z.enum(["information", "interest", "managed", "external"]);
+export type ParticipationMode = z.infer<typeof participationModeSchema>;
+
 export const eventInputSchema = z.object({
   title: z.string().trim().min(3, "El titulo debe tener al menos 3 caracteres.").max(120, "El titulo no puede superar 120 caracteres."),
   description: z.string().trim().min(20, "La descripcion debe tener al menos 20 caracteres.").max(5000, "La descripcion no puede superar 5000 caracteres."),
@@ -68,6 +79,14 @@ export const eventInputSchema = z.object({
   location: z.string().trim().min(2, "Indica la ubicacion.").max(200, "La ubicacion no puede superar 200 caracteres."),
   cover_image_url: imageUrlSchema.or(z.literal("")).optional(),
   gallery_urls: urlListSchema.optional(),
+  participation_mode: participationModeSchema.default("information"),
+  organizer_name: z.string().trim().max(160, "El organizador no puede superar 160 caracteres.").or(z.literal("")).nullish(),
+  external_registration_url: optionalUrlSchema,
+  max_participants: optionalPositiveIntegerSchema,
+}).superRefine((value, context) => {
+  if (value.participation_mode === "external" && !value.external_registration_url) {
+    context.addIssue({ code: "custom", path: ["external_registration_url"], message: "Añade el enlace de inscripcion oficial." });
+  }
 });
 
 export const routeInputSchema = z.object({
@@ -83,6 +102,8 @@ export const routeInputSchema = z.object({
   difficulty: z.enum(["facil", "media", "exigente"]).default("media"),
   route_type: z.enum(["carretera", "costa", "montana", "nocturna", "exposicion"]).default("carretera"),
   recommended_time: z.string().trim().max(120, "La recomendacion no puede superar 120 caracteres.").or(z.literal("")).nullish(),
+  gpx_filename: z.string().trim().max(180, "El nombre del GPX no puede superar 180 caracteres.").or(z.literal("")).nullish(),
+  gpx_data: gpxTextSchema.or(z.literal("")).nullish(),
 });
 
 export const partnerInputSchema = z.object({
@@ -116,6 +137,10 @@ export interface EventRecord {
   location: string;
   cover_image_url: string | null;
   gallery_urls: string[];
+  participation_mode: ParticipationMode;
+  organizer_name: string | null;
+  external_registration_url: string | null;
+  max_participants: number | null;
   created_at: string;
 }
 
@@ -133,6 +158,7 @@ export interface RouteRecord {
   difficulty: "facil" | "media" | "exigente";
   route_type: "carretera" | "costa" | "montana" | "nocturna" | "exposicion";
   recommended_time: string | null;
+  gpx_filename: string | null;
   created_at: string;
 }
 
@@ -158,9 +184,7 @@ export interface ContactRequestRecord {
   created_at: string;
 }
 
-export interface EventDetailsRecord extends EventRecord {
-  organizer_name: string | null;
-}
+export type EventDetailsRecord = EventRecord;
 
 export type RouteDetailsRecord = RouteRecord;
 
@@ -174,6 +198,10 @@ interface EventRow {
   location: string;
   cover_image_url: string | null;
   gallery_urls: string[] | null;
+  participation_mode?: ParticipationMode | null;
+  organizer_name?: string | null;
+  external_registration_url?: string | null;
+  max_participants?: number | null;
   created_at: string;
 }
 
@@ -191,6 +219,7 @@ interface RouteRow {
   difficulty?: "facil" | "media" | "exigente" | null;
   route_type?: "carretera" | "costa" | "montana" | "nocturna" | "exposicion" | null;
   recommended_time?: string | null;
+  gpx_filename?: string | null;
   created_at: string;
 }
 
@@ -244,6 +273,10 @@ function mapEventRow(row: EventRow): EventRecord {
     location: row.location,
     cover_image_url: row.cover_image_url,
     gallery_urls: row.gallery_urls ?? [],
+    participation_mode: row.participation_mode ?? "information",
+    organizer_name: row.organizer_name ?? null,
+    external_registration_url: row.external_registration_url ?? null,
+    max_participants: row.max_participants === null || row.max_participants === undefined ? null : Number(row.max_participants),
     created_at: row.created_at,
   };
 }
@@ -263,6 +296,7 @@ function mapRouteRow(row: RouteRow): RouteRecord {
     difficulty: row.difficulty ?? "media",
     route_type: row.route_type ?? "carretera",
     recommended_time: row.recommended_time ?? null,
+    gpx_filename: row.gpx_filename ?? null,
     created_at: row.created_at,
   };
 }
@@ -300,6 +334,10 @@ function contentKindLabel(kind: ContentKind) {
 function formatSupabaseError(kind: ContentKind, error: { message?: string; code?: string }) {
   const message = error.message ?? "Error de Supabase";
 
+  if ((kind === "events" && isMissingParticipationColumnError(error)) || (kind === "routes" && isMissingGpxColumnError(error))) {
+    return "Faltan las funciones de inscripciones y GPX en Supabase. Ejecuta supabase/migrations/20260721_engagement_features.sql y vuelve a intentarlo.";
+  }
+
   if (kind === "routes" && isMissingEnhancedRouteColumnError(error)) {
     return "Faltan campos de rutas en Supabase. Ejecuta supabase/migrations/20260708_tramassso_content.sql y vuelve a intentarlo.";
   }
@@ -311,8 +349,10 @@ function formatSupabaseError(kind: ContentKind, error: { message?: string; code?
   return "No se pudo completar la operacion con el servicio de contenido.";
 }
 
-const eventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,created_at";
-const routeColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,difficulty,route_type,recommended_time,created_at";
+const eventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,participation_mode,organizer_name,external_registration_url,max_participants,created_at";
+const legacyEventColumns = "id,title,description,date,location,cover_image_url,gallery_urls,created_at";
+const routeColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,difficulty,route_type,recommended_time,gpx_filename,created_at";
+const routeColumnsWithoutGpx = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,coordinates,difficulty,route_type,recommended_time,created_at";
 const routeColumnsWithoutCoordinates = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,difficulty,route_type,recommended_time,created_at";
 const legacyRouteColumns = "id,title,description,start_point,end_point,distance_km,drive_time_minutes,cover_image_url,gallery_urls,created_at";
 const partnerColumns = "id,name,category,logo_url,website_url,instagram_url,description,is_featured,created_at";
@@ -330,6 +370,20 @@ function isMissingEnhancedRouteColumnError(error: { message?: string }) {
   );
 }
 
+function isMissingParticipationColumnError(error: { message?: string }) {
+  const message = error.message ?? "";
+  return ["participation_mode", "organizer_name", "external_registration_url", "max_participants"].some((column) =>
+    message.includes(`events.${column}`) || message.includes(`'${column}' column`),
+  );
+}
+
+function isMissingGpxColumnError(error: { message?: string }) {
+  const message = error.message ?? "";
+  return ["gpx_filename", "gpx_data"].some((column) =>
+    message.includes(`routes.${column}`) || message.includes(`'${column}' column`),
+  );
+}
+
 function isMissingInstagramColumnError(error: { message?: string }) {
   const message = error.message ?? "";
   return message.includes("partners.instagram_url") || message.includes("'instagram_url' column");
@@ -340,6 +394,10 @@ export async function listPublicEvents() {
   const { data, error } = await client.from("events").select(eventColumns).gte("date", new Date().toISOString()).order("date", { ascending: true });
 
   if (error) {
+    if (isMissingParticipationColumnError(error)) {
+      const fallback = await client.from("events").select(legacyEventColumns).gte("date", new Date().toISOString()).order("date", { ascending: true });
+      if (!fallback.error) return { events: (fallback.data ?? []).map((row) => mapEventRow(row as EventRow)) };
+    }
     return { events: [] as EventRecord[], error: formatSupabaseError("events", error) };
   }
 
@@ -351,6 +409,10 @@ export async function listPublicEvents() {
 export async function listPastEvents(limit = 12) {
   const client = createSupabasePublicClient();
   const { data, error } = await client.from("events").select(eventColumns).lt("date", new Date().toISOString()).order("date", { ascending: false }).limit(limit);
+  if (error && isMissingParticipationColumnError(error)) {
+    const fallback = await client.from("events").select(legacyEventColumns).lt("date", new Date().toISOString()).order("date", { ascending: false }).limit(limit);
+    if (!fallback.error) return { events: (fallback.data ?? []).map((row) => mapEventRow(row as EventRow)) };
+  }
   if (error) return { events: [] as EventRecord[], error: formatSupabaseError("events", error) };
   return { events: (data ?? []).map((row) => mapEventRow(row as EventRow)) };
 }
@@ -360,15 +422,14 @@ export async function getPublicEventById(id: string) {
   const { data, error } = await client.from("events").select(eventColumns).eq("id", id).maybeSingle();
 
   if (error || !data) {
+    if (error && isMissingParticipationColumnError(error)) {
+      const fallback = await client.from("events").select(legacyEventColumns).eq("id", id).maybeSingle();
+      if (!fallback.error && fallback.data) return { event: mapEventRow(fallback.data as EventRow) };
+    }
     return { event: null as EventDetailsRecord | null, error: error ? formatSupabaseError("events", error) : "Evento no encontrado" };
   }
 
-  return {
-    event: {
-      ...mapEventRow(data as EventRow),
-      organizer_name: null,
-    },
-  };
+  return { event: mapEventRow(data as EventRow) };
 }
 
 export async function listPublicRoutes() {
@@ -376,6 +437,10 @@ export async function listPublicRoutes() {
   const { data, error } = await client.from("routes").select(routeColumns).order("created_at", { ascending: false });
 
   if (error) {
+    if (isMissingGpxColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutGpx).order("created_at", { ascending: false });
+      if (!fallback.error) return { routes: (fallback.data ?? []).map((row) => mapRouteRow(row as RouteRow)) };
+    }
     if (isMissingEnhancedRouteColumnError(error)) {
       const fallback = await client.from("routes").select(legacyRouteColumns).order("created_at", { ascending: false });
 
@@ -399,6 +464,10 @@ export async function getPublicRouteById(id: string) {
   const { data, error } = await client.from("routes").select(routeColumns).eq("id", id).maybeSingle();
 
   if (error || !data) {
+    if (error && isMissingGpxColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutGpx).eq("id", id).maybeSingle();
+      if (!fallback.error && fallback.data) return { route: mapRouteRow(fallback.data as RouteRow) };
+    }
     if (error && isMissingEnhancedRouteColumnError(error)) {
       const fallback = await client.from("routes").select(legacyRouteColumns).eq("id", id).maybeSingle();
 
@@ -459,17 +528,32 @@ export async function listAdminContent(kind: "partners"): Promise<{ items: Partn
 export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[] | RouteRecord[] | PartnerRecord[]; error?: string }>;
 export async function listAdminContent(kind: ContentKind): Promise<{ items: EventRecord[] | RouteRecord[] | PartnerRecord[]; error?: string }> {
   const client = createSupabasePublicClient();
-  const selectColumns = kind === "events" ? eventColumns : kind === "routes" ? routeColumns : partnerColumns;
-  const orderColumn = kind === "events" ? "date" : "created_at";
-  let query = client.from(tableName(kind)).select(selectColumns);
+  let data: unknown[] | null = null;
+  let error: { message?: string; code?: string } | null = null;
 
-  if (kind === "partners") {
-    query = query.order("is_featured", { ascending: false });
+  if (kind === "events") {
+    const result = await client.from("events").select(eventColumns).order("date", { ascending: false });
+    data = result.data;
+    error = result.error;
+  } else if (kind === "routes") {
+    const result = await client.from("routes").select(routeColumns).order("created_at", { ascending: false });
+    data = result.data;
+    error = result.error;
+  } else {
+    const result = await client.from("partners").select(partnerColumns).order("is_featured", { ascending: false }).order("created_at", { ascending: false });
+    data = result.data;
+    error = result.error;
   }
 
-  const { data, error } = await query.order(orderColumn, { ascending: false });
-
   if (error) {
+    if (kind === "events" && isMissingParticipationColumnError(error)) {
+      const fallback = await client.from("events").select(legacyEventColumns).order("date", { ascending: false });
+      if (!fallback.error) return { items: (fallback.data ?? []).map((row) => mapEventRow(row as EventRow)) };
+    }
+    if (kind === "routes" && isMissingGpxColumnError(error)) {
+      const fallback = await client.from("routes").select(routeColumnsWithoutGpx).order("created_at", { ascending: false });
+      if (!fallback.error) return { items: (fallback.data ?? []).map((row) => mapRouteRow(row as RouteRow)) };
+    }
     if (kind === "routes" && isMissingEnhancedRouteColumnError(error)) {
       const fallback = await client.from("routes").select(legacyRouteColumns).order("created_at", { ascending: false });
 
@@ -516,6 +600,10 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
       location: parsed.location,
       cover_image_url: normalizeUrl(parsed.cover_image_url),
       gallery_urls: normalizeUrlArray(parsed.gallery_urls),
+      participation_mode: parsed.participation_mode,
+      organizer_name: normalizeNullableText(parsed.organizer_name),
+      external_registration_url: normalizeUrl(parsed.external_registration_url),
+      max_participants: parsed.max_participants,
     };
 
     const query = id
@@ -546,6 +634,8 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
       difficulty: parsed.difficulty,
       route_type: parsed.route_type,
       recommended_time: normalizeNullableText(parsed.recommended_time),
+      gpx_filename: normalizeNullableText(parsed.gpx_filename),
+      ...(parsed.gpx_data === undefined ? {} : { gpx_data: normalizeNullableText(parsed.gpx_data) }),
     };
 
     const query = id
@@ -555,6 +645,31 @@ export async function saveContent(kind: ContentKind, payload: unknown, id?: stri
     const { data, error } = await query;
 
     if (error || !data) {
+      if (error && isMissingGpxColumnError(error)) {
+        if (parsed.gpx_filename || parsed.gpx_data) {
+          return { error: formatSupabaseError("routes", error) };
+        }
+
+        const rowWithoutGpx = {
+          title: parsed.title,
+          description: parsed.description,
+          start_point: parsed.start_point,
+          end_point: parsed.end_point,
+          distance_km: parsed.distance_km,
+          drive_time_minutes: parsed.drive_time_minutes,
+          cover_image_url: normalizeUrl(parsed.cover_image_url),
+          gallery_urls: normalizeUrlArray(parsed.gallery_urls),
+          coordinates: parsed.coordinates ?? null,
+          difficulty: parsed.difficulty,
+          route_type: parsed.route_type,
+          recommended_time: normalizeNullableText(parsed.recommended_time),
+        };
+        const fallbackQuery = id
+          ? client.from("routes").update(rowWithoutGpx).eq("id", id).select(routeColumnsWithoutGpx).single()
+          : client.from("routes").insert(rowWithoutGpx).select(routeColumnsWithoutGpx).single();
+        const fallback = await fallbackQuery;
+        if (!fallback.error && fallback.data) return { item: mapRouteRow(fallback.data as RouteRow) };
+      }
       if (error && isMissingCoordinatesColumnError(error)) {
         if (parsed.coordinates) {
           return { error: formatSupabaseError("routes", error) };
