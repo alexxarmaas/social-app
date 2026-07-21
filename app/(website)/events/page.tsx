@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AdBanner from "@/components/ads/AdBanner";
+import { getAdsenseSlot, TRAMASSSO_ADSENSE_SLOTS } from "@/app/lib/adsense";
 import { listPastEvents, listPublicEvents } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = buildPremiumMetadata({
 
 export default async function EventsFeedPage() {
   const [{ events, error }, { events: pastEvents }] = await Promise.all([listPublicEvents(), listPastEvents()]);
+  const adSlot = getAdsenseSlot(process.env.NEXT_PUBLIC_ADSENSE_SLOT_EVENTS_1, TRAMASSSO_ADSENSE_SLOTS.events);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
@@ -58,7 +60,7 @@ export default async function EventsFeedPage() {
               </article>
 
               {(index + 1) % 3 === 0 ? (
-                <AdBanner key={`ad-${event.id}`} slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_EVENTS_1 ?? "0000000000"} label="Espacio patrocinado" className="md:col-span-2 xl:col-span-3" />
+                <AdBanner key={`ad-${event.id}`} slot={adSlot} label="Espacio patrocinado" className="md:col-span-2 xl:col-span-3" />
               ) : null}
             </Fragment>
           ))}

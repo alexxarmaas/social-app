@@ -76,7 +76,7 @@ Consulta [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Antes de publicar, ejecuta `n
 
 ## Google AdSense
 
-El dominio publica el identificador de editor en `/ads.txt` y en la metaetiqueta de verificacion. Antes de activar anuncios para trafico europeo, configura el mensaje de regulaciones europeas en AdSense mediante la CMP certificada de Google. Las unidades responsive de eventos y rutas se activan con `NEXT_PUBLIC_ADSENSE_SLOT_EVENTS_1` y `NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1`.
+El dominio publica el identificador de editor en `/ads.txt` y en la metaetiqueta de verificacion. Antes de activar anuncios para trafico europeo, configura el mensaje de regulaciones europeas en AdSense mediante la CMP certificada de Google. Las unidades responsive de eventos y rutas usan los identificadores del proyecto; `NEXT_PUBLIC_ADSENSE_SLOT_EVENTS_1` y `NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1` permiten sustituirlos por entorno.
 
 ## Seguridad
 
