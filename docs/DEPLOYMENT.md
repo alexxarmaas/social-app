@@ -9,4 +9,5 @@
 7. Despliega y verifica `/`, `/events`, `/routes`, `/partners`, el login y el panel `/admin`.
 8. Si activas las notificaciones de contacto, añade en Vercel las variables SMTP de `.env.example` y envía una solicitud real desde la portada para comprobar tanto el correo como su copia en `/admin`.
 
-No uses claves de servicio en variables `NEXT_PUBLIC_*`. AdSense es opcional y solo se carga tras el consentimiento del visitante.
+No uses claves de servicio en variables `NEXT_PUBLIC_*`. AdSense gestiona el consentimiento europeo mediante la CMP certificada configurada en la cuenta de Google.
+Para AdSense, comprueba que `/ads.txt` sea publico, activa el mensaje europeo de la CMP de Google y configura los identificadores de las unidades responsive antes de mostrar anuncios.
