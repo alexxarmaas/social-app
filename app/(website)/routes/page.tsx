@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getAdsenseSlot, TRAMASSSO_ADSENSE_SLOTS } from "@/app/lib/adsense";
 import { listPublicRoutes } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 import RoutesExplorer from "@/components/routes/RoutesExplorer";
@@ -14,6 +15,7 @@ export const metadata: Metadata = buildPremiumMetadata({
 
 export default async function RoutesGuidePage() {
   const { routes, error } = await listPublicRoutes();
+  const adSlot = getAdsenseSlot(process.env.NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1, TRAMASSSO_ADSENSE_SLOTS.routes);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
@@ -26,7 +28,7 @@ export default async function RoutesGuidePage() {
 
         {error ? <p className="mt-8 text-sm text-red-300">No hemos podido cargar las rutas.</p> : null}
 
-        <RoutesExplorer routes={routes} adSlot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1 ?? "0000000000"} />
+        <RoutesExplorer routes={routes} adSlot={adSlot} />
       </section>
     </main>
   );
