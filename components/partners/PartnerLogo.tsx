@@ -88,6 +88,7 @@ export default function PartnerLogo({
                 aria-hidden="true"
                 className="scale-110 object-cover opacity-25 blur-2xl"
                 sizes={config.sizes}
+                quality={90}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/45 to-black/80" />
             </>
