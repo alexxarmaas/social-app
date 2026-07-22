@@ -58,6 +58,8 @@ function buildForegroundUrl(src: string): string {
     return src;
   }
 
+  // Keep every original pixel, including any background supplied with the logo.
+  // Cloudinary is only used to cap the delivery size and improve compression.
   url.searchParams.delete("tramassso_logo");
   url.pathname = url.pathname.replace(
     "/image/upload/",
