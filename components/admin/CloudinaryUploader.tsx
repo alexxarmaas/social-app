@@ -7,6 +7,8 @@ interface CloudinaryUploaderProps {
   label: string;
   multiple?: boolean;
   className?: string;
+  minLongestSide?: number;
+  minShortestSide?: number;
 }
 
 interface CloudinarySignatureResponse {
@@ -48,7 +50,38 @@ async function getUploadSignature(): Promise<CloudinaryUploadSignature> {
   };
 }
 
-export default function CloudinaryUploader({ onUploadComplete, label, multiple = false, className = "" }: CloudinaryUploaderProps) {
+async function readImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  if (typeof createImageBitmap === "function") {
+    const bitmap = await createImageBitmap(file);
+    const dimensions = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return dimensions;
+  }
+
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      URL.revokeObjectURL(objectUrl);
+    };
+    image.onerror = () => {
+      reject(new Error("No se pudieron comprobar las dimensiones de la imagen."));
+      URL.revokeObjectURL(objectUrl);
+    };
+    image.src = objectUrl;
+  });
+}
+
+export default function CloudinaryUploader({
+  onUploadComplete,
+  label,
+  multiple = false,
+  className = "",
+  minLongestSide = 0,
+  minShortestSide = 0,
+}: CloudinaryUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +92,19 @@ export default function CloudinaryUploader({ onUploadComplete, label, multiple =
     if (file.size > MAX_FILE_SIZE) {
       throw new Error("La imagen no puede superar 10 MB.");
     }
+
+    if (minLongestSide > 0 || minShortestSide > 0) {
+      const { width, height } = await readImageDimensions(file);
+      const longestSide = Math.max(width, height);
+      const shortestSide = Math.min(width, height);
+
+      if (longestSide < minLongestSide || shortestSide < minShortestSide) {
+        throw new Error(
+          `La imagen es demasiado pequena (${width}×${height} px). El minimo es ${minLongestSide} px en el lado largo y ${minShortestSide} px en el corto.`,
+        );
+      }
+    }
+
     const signature = await getUploadSignature();
     const formData = new FormData();
 
