@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import TrackSponsorClick from "@/components/TrackSponsorClick";
+import PartnerLogo from "@/components/partners/PartnerLogo";
 import { listPublicPartners } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
@@ -27,28 +27,22 @@ export default async function PartnersPage() {
         </div>
 
         {partners.length ? (
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-10 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
             {partners.map((partner) => (
-              <article key={partner.id} className="racing-card flex min-h-[22rem] min-w-0 flex-col rounded-[1.5rem] border p-4 sm:rounded-[2rem] sm:p-5">
+              <article key={partner.id} className="racing-card flex min-h-[25rem] min-w-0 flex-col rounded-[1.5rem] border p-4 sm:rounded-[2rem] sm:p-5">
                 <div className="grid gap-3 sm:flex sm:items-start sm:justify-between sm:gap-4">
                   <div className="min-w-0">
                     <p className="truncate text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">{partner.category}</p>
                     <h2 className="mt-3 break-words font-sans text-lg font-semibold tracking-tight text-white sm:text-xl">{partner.name}</h2>
                   </div>
                   {partner.is_featured ? (
-                    <span className="w-fit rounded-full border border-red-500/35 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-red-100 sm:tracking-[0.25em]">
+                    <span className="w-fit shrink-0 rounded-full border border-red-500/35 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-red-100 sm:tracking-[0.25em]">
                       Destacado
                     </span>
                   ) : null}
                 </div>
 
-                <div className="mt-6 flex h-24 items-center justify-center rounded-[1.25rem] border border-zinc-800 bg-black/30 sm:h-28">
-                  {partner.logo_url ? (
-                    <Image src={partner.logo_url} alt={partner.name} width={220} height={96} className="max-h-16 w-auto max-w-[80%] object-contain sm:max-h-20" />
-                  ) : (
-                    <span className="font-aeroblade text-2xl tracking-[0.18em] text-zinc-700 sm:text-3xl">Tramassso</span>
-                  )}
-                </div>
+                <PartnerLogo src={partner.logo_url} alt={`Logo de ${partner.name}`} className="mt-6" />
 
                 <p className="mt-5 line-clamp-4 flex-1 text-sm leading-7 text-zinc-400">
                   {partner.description ?? "Colaborador seleccionado de la comunidad Tramassso."}

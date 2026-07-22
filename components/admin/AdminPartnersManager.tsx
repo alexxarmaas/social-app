@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { z } from "zod";
 import { partnerInputSchema, type PartnerRecord } from "@/app/lib/tramassso-content";
 import CloudinaryUploader from "@/components/admin/CloudinaryUploader";
+import PartnerLogo from "@/components/partners/PartnerLogo";
 
 interface AdminPartnersManagerProps {
   initialPartners: PartnerRecord[];
@@ -169,11 +169,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
                 <tr key={partner.id} className="align-top">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-                        {partner.logo_url ? (
-                          <Image src={partner.logo_url} alt={partner.name} fill className="object-contain p-2" sizes="56px" />
-                        ) : null}
-                      </div>
+                      <PartnerLogo src={partner.logo_url} alt={`Logo de ${partner.name}`} variant="thumbnail" />
                       <div>
                         <div className="font-medium text-zinc-50">{partner.name}</div>
                         <div className="max-w-[22rem] text-xs text-zinc-500 line-clamp-2">{partner.description ?? "Sin descripcion"}</div>
@@ -234,16 +230,22 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
           <div className="grid gap-3">
             <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Logo</span>
             <input {...register("logo_url")} placeholder="URL segura de Cloudinary" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
+            <p className="text-xs leading-5 text-zinc-500">
+              Usa preferiblemente PNG o WebP con fondo transparente. Minimo: 500 px en el lado largo y 160 px en el corto.
+            </p>
             <div className="flex flex-wrap gap-3">
-              <CloudinaryUploader label="Subir logo" onUploadComplete={(url) => setValue("logo_url", url, { shouldDirty: true, shouldValidate: true })} />
+              <CloudinaryUploader
+                label="Subir logo"
+                minLongestSide={500}
+                minShortestSide={160}
+                onUploadComplete={(url) => setValue("logo_url", url, { shouldDirty: true, shouldValidate: true })}
+              />
               <button type="button" onClick={() => setValue("logo_url", "", { shouldDirty: true, shouldValidate: true })} className="rounded-2xl border border-zinc-800 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-400 transition hover:border-zinc-500 hover:text-white">
                 Limpiar
               </button>
             </div>
             {logoUrl ? (
-              <div className="relative h-36 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900">
-                <Image src={logoUrl} alt="Vista previa del logo" fill className="object-contain p-5" sizes="(max-width: 768px) 100vw, 40vw" />
-              </div>
+              <PartnerLogo src={logoUrl} alt="Vista previa del logo" variant="preview" />
             ) : null}
             {errors.logo_url ? <span className="text-xs text-red-400">{errors.logo_url.message}</span> : null}
           </div>

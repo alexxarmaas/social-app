@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import TrackSponsorClick from "@/components/TrackSponsorClick";
+import PartnerLogo from "@/components/partners/PartnerLogo";
 import { notFound } from "next/navigation";
 import { getPublicPartner } from "@/app/lib/tramassso-content";
 import { serializeJsonLd } from "@/app/lib/json-ld";
@@ -61,22 +61,13 @@ export default async function PartnerDetailsPage({ params }: PartnerPageProps) {
     <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <section className="mx-auto flex w-full max-w-5xl flex-col gap-5 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="overflow-hidden rounded-[1.25rem] border border-zinc-800/80 bg-zinc-900/80 shadow-2xl shadow-black/20">
-          <div className="flex min-h-[14rem] items-center justify-center bg-black/35 px-6 py-8 sm:min-h-[18rem] sm:px-8 sm:py-10 lg:min-h-[20rem]">
-            {partner.logo_url ? (
-              <Image
-                src={partner.logo_url}
-                alt={partner.name}
-                width={420}
-                height={220}
-                className="h-auto w-auto max-h-32 max-w-[78%] object-contain sm:max-h-40 lg:max-h-48"
-                priority
-              />
-            ) : (
-              <span className="font-aeroblade text-3xl tracking-[0.18em] text-zinc-700 sm:text-4xl lg:text-5xl">Tramassso</span>
-            )}
-          </div>
-        </div>
+        <PartnerLogo
+          src={partner.logo_url}
+          alt={`Logo de ${partner.name}`}
+          variant="detail"
+          className="rounded-[1.25rem] shadow-2xl shadow-black/20"
+          priority
+        />
 
         <div className="space-y-4">
           <p className="racing-eyebrow text-[9px] uppercase tracking-[0.4em] text-zinc-500 sm:text-[10px] sm:tracking-[0.45em]">{partner.category}</p>
