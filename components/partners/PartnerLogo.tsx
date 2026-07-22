@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 
 type PartnerLogoVariant = "card" | "detail" | "preview" | "thumbnail";
 type PartnerLogoShape = "unknown" | "wide" | "landscape" | "square" | "portrait";
-export type PartnerLogoPresentation = "default" | "blend-dark";
+type PartnerLogoPresentation = "default" | "blend-dark";
 
 interface PartnerLogoProps {
   src?: string | null;
@@ -54,7 +54,7 @@ function parseLogoUrl(src: string): URL | null {
   }
 }
 
-export function canBlendPartnerLogo(src?: string | null): boolean {
+function canBlendPartnerLogo(src?: string | null): boolean {
   if (!src) {
     return false;
   }
@@ -63,29 +63,13 @@ export function canBlendPartnerLogo(src?: string | null): boolean {
   return url?.hostname === "res.cloudinary.com" && url.pathname.includes("/image/upload/");
 }
 
-export function getPartnerLogoPresentation(src?: string | null): PartnerLogoPresentation {
+function getRequestedPresentation(src?: string | null): PartnerLogoPresentation {
   if (!src) {
     return "default";
   }
 
   const url = parseLogoUrl(src);
   return url?.searchParams.get(PRESENTATION_PARAM) === "blend-dark" ? "blend-dark" : "default";
-}
-
-export function setPartnerLogoPresentation(src: string, presentation: PartnerLogoPresentation): string {
-  const url = parseLogoUrl(src);
-
-  if (!url) {
-    return src;
-  }
-
-  if (presentation === "blend-dark") {
-    url.searchParams.set(PRESENTATION_PARAM, "blend-dark");
-  } else {
-    url.searchParams.delete(PRESENTATION_PARAM);
-  }
-
-  return url.toString();
 }
 
 function stripPresentationMarker(src: string): string {
@@ -152,6 +136,65 @@ function classifyLogoShape(width: number, height: number): PartnerLogoShape {
   return "portrait";
 }
 
+function hasDarkOpaqueEdges(image: HTMLImageElement): boolean {
+  try {
+    const sampleSize = 64;
+    const edgeDepth = 5;
+    const canvas = document.createElement("canvas");
+    canvas.width = sampleSize;
+    canvas.height = sampleSize;
+
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) {
+      return false;
+    }
+
+    context.drawImage(image, 0, 0, sampleSize, sampleSize);
+    const pixels = context.getImageData(0, 0, sampleSize, sampleSize).data;
+    let edgePixels = 0;
+    let transparentPixels = 0;
+    let opaquePixels = 0;
+    let darkNeutralPixels = 0;
+
+    for (let y = 0; y < sampleSize; y += 1) {
+      for (let x = 0; x < sampleSize; x += 1) {
+        const isEdge = x < edgeDepth || y < edgeDepth || x >= sampleSize - edgeDepth || y >= sampleSize - edgeDepth;
+        if (!isEdge) {
+          continue;
+        }
+
+        const index = (y * sampleSize + x) * 4;
+        const red = pixels[index];
+        const green = pixels[index + 1];
+        const blue = pixels[index + 2];
+        const alpha = pixels[index + 3];
+        edgePixels += 1;
+
+        if (alpha < 48) {
+          transparentPixels += 1;
+          continue;
+        }
+
+        opaquePixels += 1;
+        const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+        const chroma = Math.max(red, green, blue) - Math.min(red, green, blue);
+
+        if (luminance < 82 && chroma < 72) {
+          darkNeutralPixels += 1;
+        }
+      }
+    }
+
+    if (edgePixels === 0 || transparentPixels / edgePixels > 0.2 || opaquePixels === 0) {
+      return false;
+    }
+
+    return opaquePixels / edgePixels > 0.82 && darkNeutralPixels / opaquePixels > 0.68;
+  } catch {
+    return false;
+  }
+}
+
 function getDetailFrame(shape: PartnerLogoShape): string {
   switch (shape) {
     case "wide":
@@ -198,8 +241,18 @@ export default function PartnerLogo({
   className = "",
 }: PartnerLogoProps) {
   const [shape, setShape] = useState<PartnerLogoShape>("unknown");
+  const [autoBlendDark, setAutoBlendDark] = useState(false);
+  const [autoBlendFailed, setAutoBlendFailed] = useState(false);
+
+  useEffect(() => {
+    setShape("unknown");
+    setAutoBlendDark(false);
+    setAutoBlendFailed(false);
+  }, [src]);
+
   const config = variantConfig[variant];
-  const presentation = getPartnerLogoPresentation(src);
+  const requestedPresentation = getRequestedPresentation(src);
+  const presentation = requestedPresentation === "blend-dark" || autoBlendDark ? "blend-dark" : "default";
   const foregroundSrc = src ? buildForegroundUrl(src, presentation) : null;
   const backdropSrc = src ? buildBackdropUrl(src) : null;
   const detailFrame = variant === "detail" ? getDetailFrame(shape) : "";
@@ -209,7 +262,26 @@ export default function PartnerLogo({
 
   const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     const image = event.currentTarget;
-    setShape(classifyLogoShape(image.naturalWidth, image.naturalHeight));
+    const nextShape = classifyLogoShape(image.naturalWidth, image.naturalHeight);
+    setShape(nextShape);
+
+    if (
+      requestedPresentation === "default"
+      && !autoBlendDark
+      && !autoBlendFailed
+      && canBlendPartnerLogo(src)
+      && (nextShape === "square" || nextShape === "portrait")
+      && hasDarkOpaqueEdges(image)
+    ) {
+      setAutoBlendDark(true);
+    }
+  };
+
+  const handleImageError = () => {
+    if (requestedPresentation === "default" && autoBlendDark) {
+      setAutoBlendFailed(true);
+      setAutoBlendDark(false);
+    }
   };
 
   return (
@@ -249,6 +321,7 @@ export default function PartnerLogo({
               quality={92}
               priority={priority}
               onLoad={handleImageLoad}
+              onError={handleImageError}
             />
           </div>
         </>
