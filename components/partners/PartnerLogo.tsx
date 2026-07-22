@@ -61,7 +61,7 @@ function buildForegroundUrl(src: string): string {
   url.searchParams.delete("tramassso_logo");
   url.pathname = url.pathname.replace(
     "/image/upload/",
-    "/image/upload/e_trim:10/c_limit,w_1600,h_1000,q_auto:best/",
+    "/image/upload/c_limit,w_1600,h_1000,q_auto:best/",
   );
 
   return url.toString();
