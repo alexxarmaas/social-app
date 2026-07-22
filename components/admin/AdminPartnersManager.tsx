@@ -15,6 +15,21 @@ interface AdminPartnersManagerProps {
 type PartnerFormInput = z.input<typeof partnerInputSchema>;
 type PartnerFormOutput = z.output<typeof partnerInputSchema>;
 
+type PartnerServiceDraft = {
+  key: string;
+  name: string;
+  description: string;
+};
+
+type PartnerServicesResponse = {
+  services?: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+  }>;
+  error?: string;
+};
+
 const emptyValues: PartnerFormInput = {
   name: "",
   category: "",
@@ -25,9 +40,19 @@ const emptyValues: PartnerFormInput = {
   is_featured: false,
 };
 
+function createServiceDraft(): PartnerServiceDraft {
+  return {
+    key: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+    name: "",
+    description: "",
+  };
+}
+
 export default function AdminPartnersManager({ initialPartners }: AdminPartnersManagerProps) {
   const [partners, setPartners] = useState<PartnerRecord[]>(initialPartners);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [services, setServices] = useState<PartnerServiceDraft[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -60,6 +85,53 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
 
   const logoUrl = watch("logo_url");
 
+  const startNewPartner = () => {
+    setSelectedId(null);
+    setServices([]);
+    setServicesLoading(false);
+    setMessage(null);
+  };
+
+  const selectPartner = async (partner: PartnerRecord) => {
+    setSelectedId(partner.id);
+    setServicesLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/partner-services?partnerId=${encodeURIComponent(partner.id)}`);
+      const data: PartnerServicesResponse = await response.json();
+
+      if (!response.ok || !data.services) {
+        throw new Error(data.error ?? "No se pudieron cargar los servicios.");
+      }
+
+      setServices(data.services.map((service) => ({
+        key: service.id,
+        name: service.name,
+        description: service.description ?? "",
+      })));
+    } catch (error) {
+      setServices([]);
+      setMessage(error instanceof Error ? error.message : "No se pudieron cargar los servicios.");
+    } finally {
+      setServicesLoading(false);
+    }
+  };
+
+  const updateService = (key: string, field: "name" | "description", value: string) => {
+    setServices((current) => current.map((service) => (
+      service.key === key ? { ...service, [field]: value } : service
+    )));
+  };
+
+  const removeService = (key: string) => {
+    setServices((current) => current.filter((service) => service.key !== key));
+  };
+
+  const addService = () => {
+    setServices((current) => current.length >= 12 ? current : [...current, createServiceDraft()]);
+  };
+
   const savePartner = async (values: PartnerFormOutput) => {
     setSaving(true);
     setMessage(null);
@@ -83,9 +155,10 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
         throw new Error(data.error ?? "No se pudo guardar el colaborador.");
       }
 
+      const savedPartner = data.item;
       setPartners((current) => {
-        const filtered = current.filter((partner) => partner.id !== data.item?.id);
-        return [data.item as PartnerRecord, ...filtered].sort((left, right) => {
+        const filtered = current.filter((partner) => partner.id !== savedPartner.id);
+        return [savedPartner, ...filtered].sort((left, right) => {
           if (left.is_featured !== right.is_featured) {
             return Number(right.is_featured) - Number(left.is_featured);
           }
@@ -93,9 +166,37 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
           return right.created_at.localeCompare(left.created_at);
         });
       });
+
+      const servicePayload = services
+        .filter((service) => service.name.trim().length > 0 || service.description.trim().length > 0)
+        .map((service) => ({
+          name: service.name,
+          description: service.description,
+        }));
+
+      if (selectedId || servicePayload.length > 0) {
+        const servicesResponse = await fetch("/api/admin/partner-services", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            partnerId: savedPartner.id,
+            services: servicePayload,
+          }),
+        });
+        const servicesData: PartnerServicesResponse = await servicesResponse.json();
+
+        if (!servicesResponse.ok || !servicesData.services) {
+          setSelectedId(savedPartner.id);
+          throw new Error(`El colaborador se guardo, pero sus servicios no: ${servicesData.error ?? "error desconocido"}`);
+        }
+      }
+
       setSelectedId(null);
+      setServices([]);
       reset(emptyValues);
-      setMessage("Colaborador guardado.");
+      setMessage("Colaborador y servicios guardados.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo guardar el colaborador.");
     } finally {
@@ -131,7 +232,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
 
       setPartners((current) => current.filter((partner) => partner.id !== id));
       if (selectedId === id) {
-        setSelectedId(null);
+        startNewPartner();
       }
       setMessage("Colaborador eliminado.");
     } catch (error) {
@@ -149,7 +250,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
             <p className="text-[10px] uppercase tracking-[0.45em] text-zinc-500">Colaboradores</p>
             <h2 className="mt-2 font-sans text-2xl font-semibold tracking-tight text-zinc-50">Directorio de partners</h2>
           </div>
-          <button type="button" onClick={() => setSelectedId(null)} className="rounded-full border border-zinc-800 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-300 transition hover:border-zinc-500 hover:text-white">
+          <button type="button" onClick={startNewPartner} className="rounded-full border border-zinc-800 px-4 py-2 text-xs uppercase tracking-[0.28em] text-zinc-300 transition hover:border-zinc-500 hover:text-white">
             Nuevo colaborador
           </button>
         </div>
@@ -180,7 +281,7 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
                   <td className="px-4 py-4 text-zinc-300">{partner.is_featured ? "Si" : "No"}</td>
                   <td className="px-4 py-4 text-right">
                     <div className="inline-flex gap-2">
-                      <button type="button" onClick={() => setSelectedId(partner.id)} className="rounded-full border border-zinc-800 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-zinc-300 transition hover:border-white hover:text-white">
+                      <button type="button" onClick={() => void selectPartner(partner)} className="rounded-full border border-zinc-800 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-zinc-300 transition hover:border-white hover:text-white">
                         Editar
                       </button>
                       <button type="button" onClick={() => void deletePartner(partner.id)} className="rounded-full border border-zinc-800 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-zinc-300 transition hover:border-red-500 hover:text-red-300">
@@ -227,11 +328,55 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
             {errors.description ? <span className="text-xs text-red-400">{errors.description.message}</span> : null}
           </label>
 
+          <div className="grid gap-3 rounded-[1.25rem] border border-zinc-800 bg-black/20 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Servicios</span>
+                <p className="mt-2 text-xs leading-5 text-zinc-600">Añade hasta 12 servicios, con una descripcion opcional para cada uno.</p>
+              </div>
+              <button type="button" onClick={addService} disabled={services.length >= 12 || servicesLoading} className="rounded-full border border-zinc-700 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-zinc-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-40">
+                Añadir servicio
+              </button>
+            </div>
+
+            {servicesLoading ? (
+              <p className="rounded-2xl border border-zinc-800 bg-zinc-950/70 px-4 py-5 text-center text-xs uppercase tracking-[0.25em] text-zinc-600">Cargando servicios</p>
+            ) : services.length ? (
+              <div className="grid gap-3">
+                {services.map((service, index) => (
+                  <div key={service.key} className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[10px] uppercase tracking-[0.28em] text-zinc-600">Servicio {String(index + 1).padStart(2, "0")}</span>
+                      <button type="button" onClick={() => removeService(service.key)} className="text-[10px] uppercase tracking-[0.22em] text-zinc-500 transition hover:text-red-300">Eliminar</button>
+                    </div>
+                    <input
+                      value={service.name}
+                      onChange={(event) => updateService(service.key, "name", event.target.value)}
+                      maxLength={100}
+                      placeholder="Nombre del servicio"
+                      className="rounded-xl border border-zinc-800 bg-black/40 px-3 py-2.5 text-sm text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400"
+                    />
+                    <textarea
+                      value={service.description}
+                      onChange={(event) => updateService(service.key, "description", event.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      placeholder="Descripcion opcional"
+                      className="rounded-xl border border-zinc-800 bg-black/40 px-3 py-2.5 text-sm text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-zinc-800 px-4 py-5 text-center text-xs leading-5 text-zinc-600">Todavia no se han añadido servicios.</p>
+            )}
+          </div>
+
           <div className="grid gap-3">
             <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">Logo</span>
             <input {...register("logo_url")} placeholder="URL segura de Cloudinary" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-zinc-50 outline-none transition placeholder:text-zinc-700 focus:border-zinc-400" />
             <p className="text-xs leading-5 text-zinc-500">
-              Usa preferiblemente PNG o WebP con fondo transparente. Minimo: 500 px en el lado largo y 160 px en el corto.
+              Usa preferiblemente PNG o WebP de buena calidad. El fondo original del archivo se conservara. Minimo: 500 px en el lado largo y 160 px en el corto.
             </p>
             <div className="flex flex-wrap gap-3">
               <CloudinaryUploader
@@ -268,10 +413,10 @@ export default function AdminPartnersManager({ initialPartners }: AdminPartnersM
           </label>
 
           <div className="grid gap-3 pt-2 sm:flex sm:items-center">
-            <button type="submit" disabled={saving} className="w-full rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:tracking-[0.32em]">
+            <button type="submit" disabled={saving || servicesLoading} className="w-full rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:tracking-[0.32em]">
               {saving ? "Guardando" : selectedId ? "Actualizar colaborador" : "Crear colaborador"}
             </button>
-            <span className="text-xs uppercase tracking-[0.28em] text-zinc-500">{message ?? "Listo"}</span>
+            <span className="text-xs leading-5 text-zinc-500">{message ?? "Listo"}</span>
           </div>
         </div>
       </form>
