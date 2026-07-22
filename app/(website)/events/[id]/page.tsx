@@ -76,33 +76,36 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div className="space-y-6">
-            <p className="racing-eyebrow text-[10px] uppercase tracking-[0.3em] text-zinc-500 sm:tracking-[0.45em]">Detalle del evento</p>
-            <h1 className="text-balance text-4xl font-black uppercase tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-7xl">{event.title}</h1>
-            <p className="max-w-3xl text-sm leading-7 text-zinc-400 md:text-base">{event.description}</p>
-            <div className="grid gap-3 text-[10px] uppercase tracking-[0.22em] text-zinc-500 sm:flex sm:flex-wrap sm:tracking-[0.35em]">
-              <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{new Date(event.date).toLocaleString("es-ES")}</span>
-              <span className="min-w-0 rounded-full border border-red-500/25 bg-red-500/10 px-4 py-2 text-zinc-100">{event.location}</span>
-            </div>
-            <EventCountdown date={event.date} />
-            <ContentActions title={event.title} location={event.location} date={event.date} kind="event" />
-            <EventCalendarActions event={event} />
-          </div>
-
-          <div className="racing-panel rounded-[1.5rem] sm:rounded-[2rem]">
-            <div className="relative aspect-[4/5]">
-              <Image src={event.cover_image_url || luxuryFallbackPath} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 45vw" priority />
-            </div>
-            <div className="border-t border-zinc-800 p-4 sm:p-5"><LightboxGallery images={event.gallery_urls} title={event.title} /></div>
+    <main className="min-h-screen bg-zinc-950 text-zinc-50">
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[1.5rem] border border-zinc-800/80 bg-zinc-900/80 shadow-2xl shadow-black/20">
+          <div className="relative aspect-[16/10] sm:aspect-[4/3] lg:aspect-[21/9]">
+            <Image
+              src={event.cover_image_url || luxuryFallbackPath}
+              alt={event.title}
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
           </div>
         </div>
 
-        <div className="mt-10 max-w-3xl">
-          <EventParticipation event={event} remaining={remaining} />
+        <div className="space-y-5">
+          <p className="text-[9px] uppercase tracking-[0.45em] text-zinc-500">Event detail</p>
+          <h1 className="max-w-4xl text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl lg:text-5xl">{event.title}</h1>
+          <p className="max-w-3xl text-xs leading-6 text-zinc-400 sm:text-sm">{event.description}</p>
+          <div className="flex flex-wrap gap-2 text-[9px] uppercase tracking-[0.3em] text-zinc-500 sm:gap-3 sm:text-[10px]">
+            <span className="rounded-full border border-zinc-800 bg-white/5 px-3 py-2 text-zinc-300 sm:px-4">{new Date(event.date).toLocaleString("en-GB")}</span>
+            <span className="rounded-full border border-zinc-800 bg-white/5 px-3 py-2 text-zinc-300 sm:px-4">{event.location}</span>
+          </div>
+        </div>
+
+        <div className="grid gap-3 border-t border-zinc-800/80 pt-5 text-sm text-zinc-400 sm:grid-cols-3">
+          {event.gallery_urls.length > 0 ? event.gallery_urls.slice(0, 3).map((imageUrl) => (
+            <div key={imageUrl} className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-800">
+              <Image src={imageUrl} alt={event.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 20vw" />
+            </div>
+          )) : <p>No gallery media yet.</p>}
         </div>
       </section>
     </main>
