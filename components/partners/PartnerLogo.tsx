@@ -5,7 +5,6 @@ import { useState, type SyntheticEvent } from "react";
 
 type PartnerLogoVariant = "card" | "detail" | "preview" | "thumbnail";
 type PartnerLogoShape = "unknown" | "wide" | "landscape" | "square" | "portrait";
-type PartnerLogoPresentation = "default" | "blend-dark";
 
 interface PartnerLogoProps {
   src?: string | null;
@@ -20,8 +19,6 @@ interface VariantConfig {
   sizes: string;
   showBackdrop: boolean;
 }
-
-const PRESENTATION_PARAM = "tramassso_logo";
 
 const variantConfig: Record<PartnerLogoVariant, VariantConfig> = {
   card: {
@@ -54,60 +51,31 @@ function parseLogoUrl(src: string): URL | null {
   }
 }
 
-function canBlendPartnerLogo(src?: string | null): boolean {
-  if (!src) {
-    return false;
-  }
-
-  const url = parseLogoUrl(src);
-  return url?.hostname === "res.cloudinary.com" && url.pathname.includes("/image/upload/");
-}
-
-function getRequestedPresentation(src?: string | null): PartnerLogoPresentation {
-  if (!src) {
-    return "default";
-  }
-
-  const url = parseLogoUrl(src);
-  return url?.searchParams.get(PRESENTATION_PARAM) === "blend-dark" ? "blend-dark" : "default";
-}
-
-function stripPresentationMarker(src: string): string {
+function buildForegroundUrl(src: string): string {
   const url = parseLogoUrl(src);
 
-  if (!url) {
+  if (!url || url.hostname !== "res.cloudinary.com" || !url.pathname.includes("/image/upload/")) {
     return src;
   }
 
-  url.searchParams.delete(PRESENTATION_PARAM);
-  return url.toString();
-}
-
-function buildForegroundUrl(src: string, presentation: PartnerLogoPresentation): string {
-  const cleanSrc = stripPresentationMarker(src);
-  const url = parseLogoUrl(cleanSrc);
-
-  if (!url || url.hostname !== "res.cloudinary.com" || !url.pathname.includes("/image/upload/")) {
-    return cleanSrc;
-  }
-
-  const backgroundTransform = presentation === "blend-dark" ? "e_make_transparent:22/f_png/" : "";
+  // Preserve every original pixel, including the supplied logo background.
+  url.searchParams.delete("tramassso_logo");
   url.pathname = url.pathname.replace(
     "/image/upload/",
-    `/image/upload/${backgroundTransform}e_trim:10/c_limit,w_1600,h_1000,q_auto:best/`,
+    "/image/upload/c_limit,w_1600,h_1000,q_auto:best/",
   );
 
   return url.toString();
 }
 
 function buildBackdropUrl(src: string): string {
-  const cleanSrc = stripPresentationMarker(src);
-  const url = parseLogoUrl(cleanSrc);
+  const url = parseLogoUrl(src);
 
   if (!url || url.hostname !== "res.cloudinary.com" || !url.pathname.includes("/image/upload/")) {
-    return cleanSrc;
+    return src;
   }
 
+  url.searchParams.delete("tramassso_logo");
   url.pathname = url.pathname.replace(
     "/image/upload/",
     "/image/upload/c_fill,w_1200,h_800,q_auto:eco,e_blur:250/",
@@ -134,65 +102,6 @@ function classifyLogoShape(width: number, height: number): PartnerLogoShape {
   }
 
   return "portrait";
-}
-
-function hasDarkOpaqueEdges(image: HTMLImageElement): boolean {
-  try {
-    const sampleSize = 64;
-    const edgeDepth = 5;
-    const canvas = document.createElement("canvas");
-    canvas.width = sampleSize;
-    canvas.height = sampleSize;
-
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context) {
-      return false;
-    }
-
-    context.drawImage(image, 0, 0, sampleSize, sampleSize);
-    const pixels = context.getImageData(0, 0, sampleSize, sampleSize).data;
-    let edgePixels = 0;
-    let transparentPixels = 0;
-    let opaquePixels = 0;
-    let darkNeutralPixels = 0;
-
-    for (let y = 0; y < sampleSize; y += 1) {
-      for (let x = 0; x < sampleSize; x += 1) {
-        const isEdge = x < edgeDepth || y < edgeDepth || x >= sampleSize - edgeDepth || y >= sampleSize - edgeDepth;
-        if (!isEdge) {
-          continue;
-        }
-
-        const index = (y * sampleSize + x) * 4;
-        const red = pixels[index];
-        const green = pixels[index + 1];
-        const blue = pixels[index + 2];
-        const alpha = pixels[index + 3];
-        edgePixels += 1;
-
-        if (alpha < 48) {
-          transparentPixels += 1;
-          continue;
-        }
-
-        opaquePixels += 1;
-        const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-        const chroma = Math.max(red, green, blue) - Math.min(red, green, blue);
-
-        if (luminance < 82 && chroma < 72) {
-          darkNeutralPixels += 1;
-        }
-      }
-    }
-
-    if (edgePixels === 0 || transparentPixels / edgePixels > 0.2 || opaquePixels === 0) {
-      return false;
-    }
-
-    return opaquePixels / edgePixels > 0.82 && darkNeutralPixels / opaquePixels > 0.68;
-  } catch {
-    return false;
-  }
 }
 
 function getDetailFrame(shape: PartnerLogoShape): string {
@@ -241,47 +150,21 @@ function PartnerLogoContent({
   className = "",
 }: PartnerLogoProps) {
   const [shape, setShape] = useState<PartnerLogoShape>("unknown");
-  const [autoBlendDark, setAutoBlendDark] = useState(false);
-  const [autoBlendFailed, setAutoBlendFailed] = useState(false);
   const config = variantConfig[variant];
-  const requestedPresentation = getRequestedPresentation(src);
-  const presentation = requestedPresentation === "blend-dark" || autoBlendDark ? "blend-dark" : "default";
-  const foregroundSrc = src ? buildForegroundUrl(src, presentation) : null;
+  const foregroundSrc = src ? buildForegroundUrl(src) : null;
   const backdropSrc = src ? buildBackdropUrl(src) : null;
   const detailFrame = variant === "detail" ? getDetailFrame(shape) : "";
   const foregroundFrame = getForegroundFrame(variant, shape);
-  const softenSquareEdges = presentation === "default" && variant !== "thumbnail" && (shape === "square" || shape === "portrait");
-  const edgeMask = "radial-gradient(ellipse 80% 80% at center, #000 68%, rgba(0,0,0,0.97) 78%, transparent 100%)";
 
   const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     const image = event.currentTarget;
-    const nextShape = classifyLogoShape(image.naturalWidth, image.naturalHeight);
-    setShape(nextShape);
-
-    if (
-      requestedPresentation === "default"
-      && !autoBlendDark
-      && !autoBlendFailed
-      && canBlendPartnerLogo(src)
-      && (nextShape === "square" || nextShape === "portrait")
-      && hasDarkOpaqueEdges(image)
-    ) {
-      setAutoBlendDark(true);
-    }
-  };
-
-  const handleImageError = () => {
-    if (requestedPresentation === "default" && autoBlendDark) {
-      setAutoBlendFailed(true);
-      setAutoBlendDark(false);
-    }
+    setShape(classifyLogoShape(image.naturalWidth, image.naturalHeight));
   };
 
   return (
     <div
       className={`relative isolate overflow-hidden border border-zinc-800 bg-black ${config.frame} ${detailFrame} ${className}`}
       data-logo-shape={shape}
-      data-logo-presentation={presentation}
     >
       {foregroundSrc ? (
         <>
@@ -301,10 +184,7 @@ function PartnerLogoContent({
             </>
           ) : null}
 
-          <div
-            className={`absolute ${foregroundFrame}`}
-            style={softenSquareEdges ? { WebkitMaskImage: edgeMask, maskImage: edgeMask } : undefined}
-          >
+          <div className={`absolute ${foregroundFrame}`}>
             <Image
               src={foregroundSrc}
               alt={alt}
@@ -314,7 +194,6 @@ function PartnerLogoContent({
               quality={92}
               priority={priority}
               onLoad={handleImageLoad}
-              onError={handleImageError}
             />
           </div>
         </>
