@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, type SyntheticEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 
 type PartnerLogoVariant = "card" | "detail" | "preview" | "thumbnail";
 type PartnerLogoShape = "unknown" | "wide" | "landscape" | "square" | "portrait";
@@ -233,7 +233,7 @@ function getForegroundFrame(variant: PartnerLogoVariant, shape: PartnerLogoShape
   return variant === "card" ? "inset-4 sm:inset-5" : "inset-5 sm:inset-7";
 }
 
-export default function PartnerLogo({
+function PartnerLogoContent({
   src,
   alt,
   variant = "card",
@@ -243,13 +243,6 @@ export default function PartnerLogo({
   const [shape, setShape] = useState<PartnerLogoShape>("unknown");
   const [autoBlendDark, setAutoBlendDark] = useState(false);
   const [autoBlendFailed, setAutoBlendFailed] = useState(false);
-
-  useEffect(() => {
-    setShape("unknown");
-    setAutoBlendDark(false);
-    setAutoBlendFailed(false);
-  }, [src]);
-
   const config = variantConfig[variant];
   const requestedPresentation = getRequestedPresentation(src);
   const presentation = requestedPresentation === "blend-dark" || autoBlendDark ? "blend-dark" : "default";
@@ -334,4 +327,8 @@ export default function PartnerLogo({
       )}
     </div>
   );
+}
+
+export default function PartnerLogo(props: PartnerLogoProps) {
+  return <PartnerLogoContent key={props.src ?? "empty-logo"} {...props} />;
 }
