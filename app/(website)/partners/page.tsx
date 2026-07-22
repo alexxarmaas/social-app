@@ -22,7 +22,7 @@ export default async function PartnersPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
           <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Marcas en pista</h1>
+          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.08em] md:text-5xl">Marcas en pista</h1>
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Colaboradores seleccionados para rutas, eventos y activaciones.</p>
         </div>
 
@@ -33,7 +33,7 @@ export default async function PartnersPage() {
                 <div className="grid gap-3 sm:flex sm:items-start sm:justify-between sm:gap-4">
                   <div className="min-w-0">
                     <p className="truncate text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">{partner.category}</p>
-                    <h2 className="mt-3 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">{partner.name}</h2>
+                    <h2 className="mt-3 break-words font-sans text-lg font-semibold tracking-tight text-white sm:text-xl">{partner.name}</h2>
                   </div>
                   {partner.is_featured ? (
                     <span className="w-fit rounded-full border border-red-500/35 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-red-100 sm:tracking-[0.25em]">
@@ -42,11 +42,11 @@ export default async function PartnersPage() {
                   ) : null}
                 </div>
 
-                <div className="mt-6 flex h-28 items-center justify-center rounded-[1.5rem] border border-zinc-800 bg-black/30">
+                <div className="mt-6 flex h-24 items-center justify-center rounded-[1.25rem] border border-zinc-800 bg-black/30 sm:h-28">
                   {partner.logo_url ? (
-                    <Image src={partner.logo_url} alt={partner.name} width={220} height={96} className="max-h-20 w-auto max-w-[80%] object-contain" />
+                    <Image src={partner.logo_url} alt={partner.name} width={220} height={96} className="max-h-16 w-auto max-w-[80%] object-contain sm:max-h-20" />
                   ) : (
-                    <span className="font-aeroblade text-3xl tracking-[0.18em] text-zinc-700">Tramassso</span>
+                    <span className="font-aeroblade text-2xl tracking-[0.18em] text-zinc-700 sm:text-3xl">Tramassso</span>
                   )}
                 </div>
 
