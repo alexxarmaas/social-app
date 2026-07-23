@@ -67,10 +67,13 @@ function migrationError(message?: string) {
 export async function getEventAvailability(eventId: string, maximum: number | null) {
   if (!maximum) return { remaining: null as number | null };
   const client = createSupabaseServiceClient();
-  const { data, error } = await client.from("event_registrations").select("companions").eq("event_id", eventId).neq("status", "cancelled");
+  const { count, error } = await client
+    .from("event_registrations")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", eventId)
+    .neq("status", "cancelled");
   if (error) return { remaining: null as number | null };
-  const occupied = (data ?? []).reduce((total, row) => total + 1 + Number(row.companions ?? 0), 0);
-  return { remaining: Math.max(0, maximum - occupied) };
+  return { remaining: Math.max(0, maximum - (count ?? 0)) };
 }
 
 export async function createEventRegistration(eventId: string, input: unknown) {
@@ -96,7 +99,7 @@ export async function createEventRegistration(eventId: string, input: unknown) {
 
   if (typedEvent.participation_mode === "managed" && typedEvent.max_participants) {
     const { remaining } = await getEventAvailability(eventId, typedEvent.max_participants);
-    if (remaining !== null && remaining < 1 + parsed.companions) return { error: "No quedan plazas suficientes para esta solicitud." };
+    if (remaining !== null && remaining < 1) return { error: "No quedan plazas disponibles para nuevas inscripciones." };
   }
 
   const { data: existingPlate, error: plateLookupError } = await client
