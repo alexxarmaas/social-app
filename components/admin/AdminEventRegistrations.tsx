@@ -38,8 +38,8 @@ export default function AdminEventRegistrations({ initialItems }: { initialItems
 
   function exportCsv() {
     const rows = [
-      ["Evento", "Fecha", "Tipo", "Nombre", "Email", "Telefono", "Vehiculo", "Acompañantes", "Estado", "Recibida"],
-      ...visible.map((item) => [item.event_title, item.event_date, item.participation_mode, item.name, item.email, item.phone, item.vehicle, item.companions, statusLabels[item.status], item.created_at]),
+      ["Evento", "Fecha", "Tipo", "Nombre", "Email", "Telefono", "Vehiculo", "Matricula", "Acompañantes", "Estado", "Recibida"],
+      ...visible.map((item) => [item.event_title, item.event_date, item.participation_mode, item.name, item.email, item.phone, item.vehicle, item.license_plate, item.companions, statusLabels[item.status], item.created_at]),
     ];
     const blob = new Blob([`\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -61,11 +61,11 @@ export default function AdminEventRegistrations({ initialItems }: { initialItems
       </div>
       {message ? <p className="mb-4 text-sm text-zinc-300">{message}</p> : null}
       <div className="overflow-x-auto rounded-2xl border border-zinc-800">
-        <table className="min-w-[72rem] divide-y divide-zinc-800 text-sm">
-          <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.28em] text-zinc-500"><tr><th className="px-4 py-3">Evento</th><th className="px-4 py-3">Persona</th><th className="px-4 py-3">Contacto</th><th className="px-4 py-3">Vehiculo</th><th className="px-4 py-3">Grupo</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3"></th></tr></thead>
+        <table className="min-w-[80rem] divide-y divide-zinc-800 text-sm">
+          <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.28em] text-zinc-500"><tr><th className="px-4 py-3">Evento</th><th className="px-4 py-3">Persona</th><th className="px-4 py-3">Contacto</th><th className="px-4 py-3">Vehiculo</th><th className="px-4 py-3">Matricula</th><th className="px-4 py-3">Grupo</th><th className="px-4 py-3">Estado</th><th className="px-4 py-3"></th></tr></thead>
           <tbody className="divide-y divide-zinc-900 bg-black/20">
-            {visible.map((item) => <tr key={item.id} className="align-top"><td className="px-4 py-4"><p className="font-medium text-white">{item.event_title}</p><p className="mt-1 text-xs text-zinc-500">{item.participation_mode === "managed" ? "Inscripcion" : "Interes"}</p></td><td className="px-4 py-4 text-zinc-200">{item.name}</td><td className="px-4 py-4"><a href={`mailto:${item.email}`} className="text-zinc-200 hover:text-white">{item.email}</a><p className="text-xs text-zinc-500">{item.phone || "Sin telefono"}</p></td><td className="px-4 py-4 text-zinc-400">{item.vehicle || "—"}</td><td className="px-4 py-4 text-zinc-300">{1 + item.companions}</td><td className="px-4 py-4"><select value={item.status} onChange={(event) => void update(item.id, event.target.value as RegistrationStatus)} className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></td><td className="px-4 py-4 text-right"><button onClick={() => void remove(item.id)} className="text-xs text-zinc-500 hover:text-red-300">Eliminar</button></td></tr>)}
-            {!visible.length ? <tr><td colSpan={7} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">No hay inscripciones</td></tr> : null}
+            {visible.map((item) => <tr key={item.id} className="align-top"><td className="px-4 py-4"><p className="font-medium text-white">{item.event_title}</p><p className="mt-1 text-xs text-zinc-500">{item.participation_mode === "managed" ? "Inscripcion" : "Interes"}</p></td><td className="px-4 py-4 text-zinc-200">{item.name}</td><td className="px-4 py-4"><a href={`mailto:${item.email}`} className="text-zinc-200 hover:text-white">{item.email}</a><p className="text-xs text-zinc-500">{item.phone || "Sin telefono"}</p></td><td className="px-4 py-4 text-zinc-300">{item.vehicle}</td><td className="px-4 py-4"><span className="inline-flex rounded-lg border border-zinc-700 bg-black px-3 py-1.5 font-mono text-sm font-semibold tracking-[0.12em] text-white">{item.license_plate}</span></td><td className="px-4 py-4 text-zinc-300">{1 + item.companions}</td><td className="px-4 py-4"><select value={item.status} onChange={(event) => void update(item.id, event.target.value as RegistrationStatus)} className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></td><td className="px-4 py-4 text-right"><button onClick={() => void remove(item.id)} className="text-xs text-zinc-500 hover:text-red-300">Eliminar</button></td></tr>)}
+            {!visible.length ? <tr><td colSpan={8} className="px-4 py-8 text-center text-xs uppercase tracking-[0.3em] text-zinc-600">No hay inscripciones</td></tr> : null}
           </tbody>
         </table>
       </div>

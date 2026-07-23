@@ -2,11 +2,25 @@ import { z } from "zod";
 import { createSupabaseServiceClient } from "@/app/lib/supabase";
 import { participationModeSchema, type ParticipationMode } from "@/app/lib/tramassso-content";
 
+export function normalizeLicensePlate(value: string) {
+  const compact = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (/^\d{4}[A-Z]{3}$/.test(compact)) {
+    return `${compact.slice(0, 4)} ${compact.slice(4)}`;
+  }
+  return compact;
+}
+
 export const registrationInputSchema = z.object({
   name: z.string().trim().min(2, "Indica tu nombre.").max(120),
   email: z.string().trim().email("Indica un correo valido.").max(160),
   phone: z.string().trim().max(40).or(z.literal("")).optional(),
-  vehicle: z.string().trim().max(160).or(z.literal("")).optional(),
+  vehicle: z.string().trim().min(2, "Indica la marca y el modelo del vehiculo.").max(160),
+  license_plate: z.string()
+    .trim()
+    .min(4, "Indica la matricula del vehiculo.")
+    .max(16, "La matricula no puede superar 16 caracteres.")
+    .transform(normalizeLicensePlate)
+    .refine((value) => value.length >= 4, "Indica una matricula valida."),
   companions: z.coerce.number().int().min(0).max(20).default(0),
   privacy: z.literal(true, { error: "Debes aceptar la politica de privacidad." }),
   website: z.string().max(200).optional(),
@@ -25,7 +39,8 @@ export interface EventRegistrationRecord {
   name: string;
   email: string;
   phone: string | null;
-  vehicle: string | null;
+  vehicle: string;
+  license_plate: string;
   companions: number;
   status: RegistrationStatus;
   created_at: string;
@@ -46,7 +61,7 @@ function nullable(value: string | undefined) {
 }
 
 function migrationError(message?: string) {
-  return message?.includes("event_registrations") || message?.includes("participation_mode") || message?.includes("schema cache");
+  return message?.includes("event_registrations") || message?.includes("participation_mode") || message?.includes("license_plate") || message?.includes("schema cache");
 }
 
 export async function getEventAvailability(eventId: string, maximum: number | null) {
@@ -84,20 +99,41 @@ export async function createEventRegistration(eventId: string, input: unknown) {
     if (remaining !== null && remaining < 1 + parsed.companions) return { error: "No quedan plazas suficientes para esta solicitud." };
   }
 
+  const { data: existingPlate, error: plateLookupError } = await client
+    .from("event_registrations")
+    .select("id")
+    .eq("event_id", eventId)
+    .eq("license_plate", parsed.license_plate)
+    .neq("status", "cancelled")
+    .maybeSingle();
+
+  if (plateLookupError) {
+    return { error: migrationError(plateLookupError.message) ? "Activa primero la migracion de matriculas en Supabase." : "No se pudo comprobar la matricula." };
+  }
+  if (existingPlate) {
+    return { error: "Esta matricula ya tiene una solicitud activa para este evento." };
+  }
+
   const { data, error } = await client.from("event_registrations").insert({
     event_id: eventId,
     participation_mode: typedEvent.participation_mode,
     name: parsed.name,
     email: parsed.email.toLowerCase(),
     phone: nullable(parsed.phone),
-    vehicle: nullable(parsed.vehicle),
+    vehicle: parsed.vehicle,
+    license_plate: parsed.license_plate,
     companions: parsed.companions,
     privacy_accepted_at: new Date().toISOString(),
   }).select("id").single();
 
   if (error) {
-    if (error.code === "23505") return { error: "Este correo ya figura en la lista del evento." };
-    return { error: migrationError(error.message) ? "Activa primero la migracion de inscripciones en Supabase." : "No se pudo guardar la solicitud." };
+    if (error.code === "23505") {
+      if (error.message.includes("license_plate") || error.message.includes("plate")) {
+        return { error: "Esta matricula ya tiene una solicitud activa para este evento." };
+      }
+      return { error: "Este correo ya figura en la lista del evento." };
+    }
+    return { error: migrationError(error.message) ? "Activa primero la migracion de matriculas en Supabase." : "No se pudo guardar la solicitud." };
   }
 
   return { success: true as const, registrationId: data.id as string, event: typedEvent, input: parsed };
@@ -107,11 +143,11 @@ export async function listEventRegistrations(): Promise<{ items: EventRegistrati
   const client = createSupabaseServiceClient();
   const { data, error } = await client
     .from("event_registrations")
-    .select("id,event_id,participation_mode,name,email,phone,vehicle,companions,status,created_at,events(title,date)")
+    .select("id,event_id,participation_mode,name,email,phone,vehicle,license_plate,companions,status,created_at,events(title,date)")
     .order("created_at", { ascending: false });
 
   if (error) {
-    return { items: [], error: migrationError(error.message) ? "Ejecuta la migracion de inscripciones para activar esta bandeja." : "No se pudieron cargar las inscripciones." };
+    return { items: [], error: migrationError(error.message) ? "Ejecuta la migracion de matriculas para activar esta bandeja." : "No se pudieron cargar las inscripciones." };
   }
 
   return {
@@ -126,7 +162,8 @@ export async function listEventRegistrations(): Promise<{ items: EventRegistrati
         name: String(row.name),
         email: String(row.email),
         phone: row.phone ? String(row.phone) : null,
-        vehicle: row.vehicle ? String(row.vehicle) : null,
+        vehicle: row.vehicle ? String(row.vehicle) : "Sin datos históricos",
+        license_plate: row.license_plate ? String(row.license_plate) : "Sin datos históricos",
         companions: Number(row.companions),
         status: registrationStatusSchema.parse(row.status),
         created_at: String(row.created_at),
