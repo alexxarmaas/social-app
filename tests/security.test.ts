@@ -3,7 +3,7 @@ import test from "node:test";
 import { serializeJsonLd } from "../app/lib/json-ld";
 import { safeInternalPath } from "../app/lib/safe-redirect";
 import { contactRequestInputSchema, eventInputSchema, partnerInputSchema, routeInputSchema } from "../app/lib/tramassso-content";
-import { registrationInputSchema } from "../app/lib/event-registrations";
+import { normalizeLicensePlate, registrationInputSchema } from "../app/lib/event-registrations";
 import { createEventIcs, googleCalendarUrl } from "../app/lib/event-calendar";
 
 test("JSON-LD escapes HTML-significant characters", () => {
@@ -55,11 +55,27 @@ test("event participation validates external URLs and capacity", () => {
   assert.equal(eventInputSchema.safeParse({ ...event, participation_mode: "managed", external_registration_url: "", max_participants: 0 }).success, false);
 });
 
-test("registrations require consent and constrain companions", () => {
-  const request = { name: "Alex", email: "alex@example.com", phone: "", vehicle: "Coche", companions: 2, privacy: false, website: "" };
-  assert.equal(registrationInputSchema.safeParse(request).success, false);
-  assert.equal(registrationInputSchema.safeParse({ ...request, privacy: true }).success, true);
-  assert.equal(registrationInputSchema.safeParse({ ...request, privacy: true, companions: 21 }).success, false);
+test("registrations require vehicle, license plate, consent and valid companions", () => {
+  const request = {
+    name: "Alex",
+    email: "alex@example.com",
+    phone: "",
+    vehicle: "Volkswagen Polo",
+    license_plate: "1234 abc",
+    companions: 2,
+    privacy: true,
+    website: "",
+  };
+
+  const parsed = registrationInputSchema.safeParse(request);
+  assert.equal(parsed.success, true);
+  if (parsed.success) assert.equal(parsed.data.license_plate, "1234 ABC");
+
+  assert.equal(registrationInputSchema.safeParse({ ...request, vehicle: "" }).success, false);
+  assert.equal(registrationInputSchema.safeParse({ ...request, license_plate: "" }).success, false);
+  assert.equal(registrationInputSchema.safeParse({ ...request, privacy: false }).success, false);
+  assert.equal(registrationInputSchema.safeParse({ ...request, companions: 21 }).success, false);
+  assert.equal(normalizeLicensePlate("gc-1234-ab"), "GC1234AB");
 });
 
 test("calendar exports escape event content and create Google links", () => {
