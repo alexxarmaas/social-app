@@ -186,7 +186,9 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
           </aside>
         </div>
 
-        <EventParticipation event={event} remaining={remaining} />
+        {event.participation_mode !== "external" ? (
+          <EventParticipation event={event} remaining={remaining} />
+        ) : null}
 
         {event.gallery_urls.length > 0 ? (
           <section className="border-t border-zinc-800/80 pt-6" aria-labelledby="event-gallery-title">
