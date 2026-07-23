@@ -154,7 +154,7 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
             </div>
 
             <EventCountdown date={event.date} compact />
-            <ContentActions title={event.title} location={event.location} date={event.date} kind="event" />
+            <ContentActions title={event.title} location={event.location} kind="event" contentId={event.id} />
           </div>
 
           <aside className="rounded-[1.5rem] border border-zinc-800 bg-black/30 p-4 sm:p-5 lg:sticky lg:top-24">
@@ -186,7 +186,9 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
           </aside>
         </div>
 
-        <EventParticipation event={event} remaining={remaining} />
+        {event.participation_mode !== "external" ? (
+          <EventParticipation event={event} remaining={remaining} />
+        ) : null}
 
         {event.gallery_urls.length > 0 ? (
           <section className="border-t border-zinc-800/80 pt-6" aria-labelledby="event-gallery-title">
