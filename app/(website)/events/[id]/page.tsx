@@ -154,7 +154,7 @@ export default async function EventDetailsPage({ params }: EventPageProps) {
             </div>
 
             <EventCountdown date={event.date} compact />
-            <ContentActions title={event.title} location={event.location} date={event.date} kind="event" />
+            <ContentActions title={event.title} location={event.location} kind="event" contentId={event.id} />
           </div>
 
           <aside className="rounded-[1.5rem] border border-zinc-800 bg-black/30 p-4 sm:p-5 lg:sticky lg:top-24">
