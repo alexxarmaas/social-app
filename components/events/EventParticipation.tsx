@@ -4,6 +4,14 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import type { EventRecord } from "@/app/lib/tramassso-content";
 
+function formatLicensePlateInput(value: string) {
+  const compact = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  if (/^\d{4}[A-Z]{0,3}$/.test(compact) && compact.length > 4) {
+    return `${compact.slice(0, 4)} ${compact.slice(4)}`;
+  }
+  return compact;
+}
+
 export default function EventParticipation({ event, remaining }: { event: EventRecord; remaining: number | null }) {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -48,6 +56,7 @@ export default function EventParticipation({ event, remaining }: { event: EventR
           email: values.get("email"),
           phone: values.get("phone"),
           vehicle: values.get("vehicle"),
+          license_plate: values.get("license_plate"),
           companions: isManaged ? values.get("companions") || 0 : 0,
           privacy: values.get("privacy") === "on",
           website: values.get("website"),
@@ -80,11 +89,13 @@ export default function EventParticipation({ event, remaining }: { event: EventR
       ) : (
         <form onSubmit={submit} className="mt-5 grid gap-4 sm:grid-cols-2">
           <input name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px]" aria-hidden="true" />
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Nombre</span><input name="name" required maxLength={120} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Correo</span><input name="email" type="email" required maxLength={160} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Telefono (opcional)</span><input name="phone" type="tel" maxLength={40} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Vehiculo (opcional)</span><input name="vehicle" maxLength={160} placeholder="Marca y modelo" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Nombre</span><input name="name" required maxLength={120} autoComplete="name" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Correo</span><input name="email" type="email" required maxLength={160} autoComplete="email" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Telefono (opcional)</span><input name="phone" type="tel" maxLength={40} autoComplete="tel" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Marca y modelo</span><input name="vehicle" required minLength={2} maxLength={160} placeholder="Volkswagen Polo GTI" autoComplete="off" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Matricula</span><input name="license_plate" required minLength={4} maxLength={16} placeholder="1234 ABC" autoCapitalize="characters" autoCorrect="off" spellCheck={false} onInput={(event) => { event.currentTarget.value = formatLicensePlateInput(event.currentTarget.value); }} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 uppercase text-white outline-none focus:border-zinc-400" /></label>
           {isManaged ? <label className="grid gap-2 sm:max-w-48"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Acompañantes</span><input name="companions" type="number" min={0} max={20} defaultValue={0} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label> : null}
+          <p className="text-xs leading-5 text-zinc-500 sm:col-span-2">La marca, el modelo y la matricula son obligatorios para identificar el vehiculo y controlar el acceso al evento.</p>
           <label className="flex items-start gap-3 text-xs leading-6 text-zinc-400 sm:col-span-2"><input name="privacy" type="checkbox" required className="mt-1" /><span>Acepto que Tramassso trate estos datos para gestionar esta solicitud según la <Link href="/privacidad" className="text-white underline">politica de privacidad</Link>.</span></label>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button disabled={sending} className="rounded-full bg-white px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-black transition hover:bg-zinc-200 disabled:opacity-50">{sending ? "Enviando" : isManaged ? "Solicitar plaza" : "Me interesa"}</button>
