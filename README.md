@@ -1,6 +1,6 @@
 # Tramassso
 
-Web de eventos, rutas y colaboradores de Tramassso, con panel privado de contenido. Está construida con Next.js 16, React 19, Prisma/PostgreSQL, Supabase y Cloudinary.
+Web de eventos, rutas y colaboradores de Tramassso, con panel privado de contenido y consola interna de RecceMind. Está construida con Next.js 16, React 19, Prisma/PostgreSQL, Supabase y Cloudinary.
 
 ## Requisitos
 
@@ -32,7 +32,30 @@ npm run create-superadmin
 npm run dev
 ```
 
-Abre `http://localhost:3000`. El panel está en `/admin` y el acceso interno en `/acceso-interno-tramassso`.
+Abre `http://localhost:3000`. El panel está en `/admin`, el acceso interno en `/acceso-interno-tramassso` y RecceMind en `/reccemind` para usuarios con rol `admin` o `superadmin`.
+
+## RecceMind
+
+`/reccemind` es una consola web protegida que consume el backend FastAPI de RecceMind a través de un proxy server-side de Next.js. El navegador nunca recibe `RECCEMIND_SERVICE_TOKEN` ni necesita conocer la URL real del backend.
+
+Configura en el servidor/Vercel:
+
+```env
+RECCEMIND_API_URL="https://tu-backend-reccemind.example.com"
+RECCEMIND_SERVICE_TOKEN="el-mismo-secreto-configurado-en-el-backend"
+RECCEMIND_API_TIMEOUT_MS="45000"
+```
+
+La consola permite actualmente:
+
+- analizar una ruta por origen y destino;
+- importar GPX;
+- importar telemetría CSV (`lat`, `lon` y opcionalmente `speed`, `brake`, `gear`);
+- visualizar el trazado en Leaflet;
+- revisar curvas, radios, distancias y pacenotes;
+- exportar las notas a CSV.
+
+Si `RECCEMIND_SERVICE_TOKEN` está configurado en el backend, usa exactamente el mismo valor en Tramassso. No lo declares como `NEXT_PUBLIC_*`.
 
 ## Configuración de Supabase
 
@@ -88,6 +111,7 @@ El dominio publica el identificador de editor en `/ads.txt` y en la metaetiqueta
 
 - No subas `.env`, bases de datos ni archivos de usuarios al repositorio.
 - Usa un `NEXTAUTH_SECRET` único de al menos 32 caracteres.
+- Mantén `RECCEMIND_SERVICE_TOKEN` exclusivamente en variables de servidor.
 - Rota de inmediato cualquier clave que haya sido expuesta.
 - Las imágenes del contenido deben usar HTTPS; las subidas admiten JPG, PNG, WebP, GIF o AVIF hasta 10 MB.
 - La rama principal valida lint, tipos, pruebas y build mediante GitHub Actions.
