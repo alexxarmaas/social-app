@@ -19,7 +19,10 @@ export type RecceMindStructuredPacenote =
       gear?: number;
     }
   | {
-      kind: "crest" | "jump";
+      kind: "crest";
+    }
+  | {
+      kind: "jump";
     }
   | {
       kind: "custom";
