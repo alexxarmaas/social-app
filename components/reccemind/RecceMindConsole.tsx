@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import RouteMap from "@/components/routes/RouteMap";
+import PacenoteEditor from "@/components/reccemind/PacenoteEditor";
 import {
   DEFAULT_RECCEMIND_THRESHOLDS,
   decodeGooglePolyline,
@@ -295,26 +296,25 @@ export default function RecceMindConsole() {
 
               <RouteMap coordinates={coordinates} />
 
-              <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.9fr)_minmax(24rem,1.1fr)]">
+              <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.85fr)]">
                 <section className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Pacenotes</p>
-                      <h2 className="mt-2 text-2xl font-semibold text-white">Borrador generado</h2>
+                      <h2 className="mt-2 text-2xl font-semibold text-white">Editor estructurado</h2>
+                      <p className="mt-2 max-w-xl text-xs leading-5 text-zinc-600">
+                        Ajusta dirección, grado, evolución y avisos. Los cambios se aplican al borrador de esta sesión y se incluyen al exportar el CSV.
+                      </p>
                     </div>
                     <button type="button" onClick={() => downloadPacenotesCsv(result)} className="shrink-0 rounded-full border border-zinc-700 px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-zinc-300 transition hover:border-white hover:text-white">
-                      CSV
+                      Exportar CSV
                     </button>
                   </div>
-                  <div className="mt-5 max-h-[36rem] space-y-2 overflow-y-auto pr-1">
-                    {result.pacenotes.map((note, index) => (
-                      <div key={`${note.distance}-${index}`} className={`flex items-center gap-3 rounded-2xl border px-3 py-3 ${note.type === "distance" ? "border-zinc-800 bg-black/20" : "border-white/10 bg-white/[0.04]"}`}>
-                        <span className="w-16 shrink-0 text-right font-mono text-xs text-zinc-600">{Math.round(note.distance)} m</span>
-                        <span className={note.type === "distance" ? "text-xs uppercase tracking-[0.22em] text-zinc-500" : "text-sm font-medium text-zinc-100"}>
-                          {note.type === "distance" ? `${note.text} m` : note.text}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="mt-5 max-h-[52rem] overflow-y-auto pr-1">
+                    <PacenoteEditor
+                      pacenotes={result.pacenotes}
+                      onChange={(pacenotes) => setResult((current) => current ? { ...current, pacenotes } : current)}
+                    />
                   </div>
                 </section>
 
@@ -325,7 +325,7 @@ export default function RecceMindConsole() {
                     {speedStats ? <p className="mt-2 text-xs text-amber-200/70">Perfil teorico experimental: {speedStats.min}–{speedStats.max} km/h. No usar como instruccion de conduccion.</p> : null}
                   </div>
                   <div className="mt-5 overflow-x-auto rounded-2xl border border-zinc-800">
-                    <table className="min-w-[42rem] divide-y divide-zinc-800 text-sm">
+                    <table className="min-w-[48rem] divide-y divide-zinc-800 text-sm">
                       <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.24em] text-zinc-500">
                         <tr>
                           <th className="px-4 py-3">Nota</th>
@@ -336,15 +336,28 @@ export default function RecceMindConsole() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-900 bg-black/20">
-                        {result.curves.map((curve, index) => (
-                          <tr key={`${curve.start_idx}-${curve.end_idx}-${index}`}>
-                            <td className="px-4 py-3 font-medium text-white">{curve.direction} {curve.classification}{curve.modifier ?? ""}</td>
-                            <td className="px-4 py-3 text-zinc-400">{Math.round(curve.radius)} m</td>
-                            <td className="px-4 py-3 text-zinc-400">{Math.round(curve.length)} m</td>
-                            <td className="px-4 py-3 text-zinc-400">{Math.round(Math.abs(curve.heading_change))}°</td>
-                            <td className="px-4 py-3 text-zinc-400">{Math.round(curve.start_distance)} m</td>
-                          </tr>
-                        ))}
+                        {result.curves.map((curve, index) => {
+                          const entryClass = curve.entry_classification ?? curve.classification;
+                          const exitClass = curve.exit_classification ?? curve.classification;
+                          const hasTransition = Boolean(curve.modifier) && entryClass !== exitClass;
+                          const profileRadius = curve.entry_radius && curve.exit_radius
+                            ? `${Math.round(curve.entry_radius)} → ${Math.round(curve.exit_radius)} m`
+                            : `${Math.round(curve.radius)} m`;
+
+                          return (
+                            <tr key={`${curve.start_idx}-${curve.end_idx}-${index}`}>
+                              <td className="px-4 py-3 font-medium text-white">
+                                {curve.direction} {hasTransition ? entryClass : curve.classification}
+                                {curve.modifier ?? ""}
+                                {hasTransition ? ` a ${exitClass}` : ""}
+                              </td>
+                              <td className="px-4 py-3 text-zinc-400">{profileRadius}</td>
+                              <td className="px-4 py-3 text-zinc-400">{Math.round(curve.length)} m</td>
+                              <td className="px-4 py-3 text-zinc-400">{Math.round(Math.abs(curve.heading_change))}°</td>
+                              <td className="px-4 py-3 text-zinc-400">{Math.round(curve.start_distance)} m</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
