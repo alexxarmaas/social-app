@@ -1,4 +1,33 @@
 export type RecceMindThresholds = Record<"6" | "5" | "4" | "3" | "2", number>;
+export type RecceMindSeverity = 1 | 2 | 3 | 4 | 5 | 6;
+export type RecceMindModifier = "tightens" | "opens";
+export type RecceMindWarning = "caution" | "brake";
+
+export type RecceMindStructuredPacenote =
+  | {
+      kind: "distance";
+      meters: number;
+    }
+  | {
+      kind: "curve";
+      direction: "left" | "right";
+      severity: RecceMindSeverity;
+      target_severity?: RecceMindSeverity;
+      length: "standard" | "long";
+      modifiers: RecceMindModifier[];
+      warnings: RecceMindWarning[];
+      gear?: number;
+    }
+  | {
+      kind: "crest";
+    }
+  | {
+      kind: "jump";
+    }
+  | {
+      kind: "custom";
+      label: string;
+    };
 
 export interface RecceMindCurve {
   start_idx: number;
@@ -7,10 +36,14 @@ export interface RecceMindCurve {
   end_distance: number;
   length: number;
   radius: number;
+  entry_radius?: number;
+  exit_radius?: number;
   heading_change: number;
   direction: "Derecha" | "Izquierda" | string;
   modifier?: string;
   classification: number;
+  entry_classification?: number;
+  exit_classification?: number;
   max_speed?: number;
   min_gear?: number;
   max_braking?: number;
@@ -21,6 +54,7 @@ export interface RecceMindPacenote {
   text: string;
   curve_index: number | null;
   distance: number;
+  structured?: RecceMindStructuredPacenote;
 }
 
 export interface RecceMindAnalysis {
@@ -44,6 +78,36 @@ export const DEFAULT_RECCEMIND_THRESHOLDS: RecceMindThresholds = {
   "3": 35,
   "2": 20,
 };
+
+export function renderRecceMindPacenote(structured: RecceMindStructuredPacenote) {
+  if (structured.kind === "distance") return String(Math.round(structured.meters));
+  if (structured.kind === "crest") return "Rasante";
+  if (structured.kind === "jump") return "Salto";
+  if (structured.kind === "custom") return structured.label;
+
+  const prefixes: string[] = [];
+  if (structured.warnings.includes("caution")) prefixes.push("Ojo");
+  if (structured.warnings.includes("brake")) prefixes.push("Frena");
+
+  const direction = structured.direction === "right" ? "Derecha" : "Izquierda";
+  let body = structured.severity === 1
+    ? `Horquilla ${direction.toLowerCase()}`
+    : `${direction} ${structured.severity}`;
+
+  if (structured.length === "long") body += " larga";
+
+  if (structured.modifiers.includes("tightens")) {
+    body += " se cierra";
+    if (structured.target_severity) body += ` a ${structured.target_severity}`;
+  }
+  if (structured.modifiers.includes("opens")) {
+    body += " se abre";
+    if (structured.target_severity) body += ` a ${structured.target_severity}`;
+  }
+  if (structured.gear) body += ` en ${structured.gear}ª`;
+
+  return [...prefixes, body].join(" ");
+}
 
 export function decodeGooglePolyline(encoded: string): RecceMindCoordinate[] {
   const points: RecceMindCoordinate[] = [];
