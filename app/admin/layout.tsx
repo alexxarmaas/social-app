@@ -31,7 +31,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
         <nav className="mt-6 grid gap-2 text-[11px] uppercase tracking-[0.18em] text-zinc-400 sm:mt-9 sm:text-xs sm:tracking-[0.24em]">
           <Link href="/admin" className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-white/30 hover:text-white">Resumen</Link>
-          <Link href="/reccemind" className="rounded-2xl border border-rose-400/20 bg-rose-400/[0.06] px-4 py-3 text-rose-100 transition hover:border-rose-300/50 hover:bg-rose-400/10">RecceMind</Link>
           <Link href="/events" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Eventos publicos</Link>
           <Link href="/routes" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Rutas publicas</Link>
           <Link href="/" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Inicio publico</Link>
