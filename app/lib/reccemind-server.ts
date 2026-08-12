@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentAdminSession } from "@/app/lib/admin-auth";
+import { getCurrentRecceMindSession } from "@/app/lib/reccemind-auth";
 import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
 
 const DEFAULT_TIMEOUT_MS = 45_000;
@@ -16,7 +16,7 @@ function timeoutMs() {
 }
 
 export async function proxyRecceMind(request: NextRequest, endpoint: string) {
-  const session = await getCurrentAdminSession();
+  const session = await getCurrentRecceMindSession();
   if (!session) {
     return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
   }
