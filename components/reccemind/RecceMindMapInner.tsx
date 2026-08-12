@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
 import { latLngBounds, type LatLngExpression } from "leaflet";
 import type { RecceMindCoordinate, RecceMindCurve } from "@/app/lib/reccemind";
@@ -58,7 +58,7 @@ export default function RecceMindMapInner({ coordinates, curves, selectedCurveIn
           const midIndex = Math.floor((curve.start_idx + curve.end_idx) / 2);
           const midpoint = coordinates[midIndex];
           return (
-            <span key={`${curve.start_idx}-${curve.end_idx}-${index}`}>
+            <Fragment key={`${curve.start_idx}-${curve.end_idx}-${index}`}>
               <Polyline
                 positions={section}
                 pathOptions={{ color: selected ? "#facc15" : curve.direction.toLowerCase().includes("derecha") ? "#ef4444" : "#3b82f6", weight: selected ? 8 : 6, opacity: 0.95 }}
@@ -77,7 +77,7 @@ export default function RecceMindMapInner({ coordinates, curves, selectedCurveIn
                   </Popup>
                 </CircleMarker>
               ) : null}
-            </span>
+            </Fragment>
           );
         })}
         {livePositions.length > 1 ? <Polyline positions={livePositions} pathOptions={{ color: "#22c55e", weight: 5, opacity: 0.95 }} /> : null}
