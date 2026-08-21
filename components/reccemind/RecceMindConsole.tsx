@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import PacenoteEditor from "@/components/reccemind/PacenoteEditor";
 import RecceMindMap from "@/components/reccemind/RecceMindMap";
+import RoutePointPicker from "@/components/reccemind/RoutePointPicker";
 import SpeedProfileChart from "@/components/reccemind/SpeedProfileChart";
 import {
   DEFAULT_RECCEMIND_THRESHOLDS,
@@ -14,7 +15,8 @@ import {
 } from "@/app/lib/reccemind";
 
 type BackendStatus = "checking" | "online" | "offline";
-type InputMode = "route" | "gpx" | "telemetry";
+type InputMode = "route" | "gpx" | "kmz" | "telemetry";
+type RouteEntryMode = "search" | "map";
 
 interface ApiErrorPayload {
   error?: string;
@@ -69,14 +71,37 @@ function printPacenotes(result: RecceMindAnalysis, driverId: string) {
   return true;
 }
 
+function rallyDistance(raw: string) {
+  const meters = Number.parseFloat(raw);
+  if (!Number.isFinite(meters)) return raw;
+  const step = meters < 100 ? 10 : meters <= 300 ? 25 : 50;
+  return String(Math.max(step, Math.round(meters / step) * step));
+}
+
+function copilotingPhrases(result: RecceMindAnalysis) {
+  const phrases: string[] = [];
+  for (let index = 0; index < result.pacenotes.length; index += 1) {
+    const note = result.pacenotes[index];
+    if (note.type === "distance") continue;
+    const next = result.pacenotes[index + 1];
+    const distanceAfter = next?.type === "distance" ? rallyDistance(next.text) : null;
+    phrases.push(distanceAfter ? `${note.text}, ${distanceAfter}` : note.text);
+  }
+  return phrases;
+}
+
 export default function RecceMindConsole() {
   const [backendStatus, setBackendStatus] = useState<BackendStatus>("checking");
   const [mode, setMode] = useState<InputMode>("route");
+  const [routeEntryMode, setRouteEntryMode] = useState<RouteEntryMode>("search");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
+  const [originPoint, setOriginPoint] = useState<RecceMindCoordinate | null>(null);
+  const [destinationPoint, setDestinationPoint] = useState<RecceMindCoordinate | null>(null);
   const [driverId, setDriverId] = useState("tramassso-admin");
   const [thresholds, setThresholds] = useState<RecceMindThresholds>(DEFAULT_RECCEMIND_THRESHOLDS);
   const [gpxFile, setGpxFile] = useState<File | null>(null);
+  const [kmzFile, setKmzFile] = useState<File | null>(null);
   const [telemetryFile, setTelemetryFile] = useState<File | null>(null);
   const [result, setResult] = useState<RecceMindAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
@@ -114,10 +139,23 @@ export default function RecceMindConsole() {
   };
 
   const analyzeRoute = async () => {
-    if (!origin.trim() || !destination.trim()) throw new Error("Indica un origen y un destino.");
+    const payload = routeEntryMode === "map"
+      ? (() => {
+          if (!originPoint || !destinationPoint) throw new Error("Marca la salida y la meta en el mapa.");
+          return {
+            origin_coords: [originPoint.lat, originPoint.lng],
+            destination_coords: [destinationPoint.lat, destinationPoint.lng],
+          };
+        })()
+      : (() => {
+          if (!origin.trim() || !destination.trim()) throw new Error("Indica un origen y un destino.");
+          return { origin: origin.trim(), destination: destination.trim() };
+        })();
+
     return parseAnalysisResponse(await fetch("/api/reccemind/analyze-route", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ origin: origin.trim(), destination: destination.trim(), driver_id: driverId.trim() || "tramassso-admin", thresholds }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, driver_id: driverId.trim() || "tramassso-admin", thresholds }),
     }));
   };
 
@@ -128,6 +166,16 @@ export default function RecceMindConsole() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ gpx_content: await gpxFile.text(), driver_id: driverId.trim() || "tramassso-admin", thresholds }),
     }));
+  };
+
+  const analyzeKmz = async () => {
+    if (!kmzFile) throw new Error("Selecciona un archivo KMZ.");
+    if (kmzFile.size > 10 * 1024 * 1024) throw new Error("El KMZ no puede superar 10 MB.");
+    const formData = new FormData();
+    formData.append("file", kmzFile);
+    formData.append("driver_id", driverId.trim() || "tramassso-admin");
+    formData.append("thresholds", JSON.stringify(thresholds));
+    return parseAnalysisResponse(await fetch("/api/reccemind/process-kmz", { method: "POST", body: formData }));
   };
 
   const analyzeTelemetry = async () => {
@@ -144,7 +192,13 @@ export default function RecceMindConsole() {
     event.preventDefault();
     setLoading(true); setError(null); setFeedbackMessage(null); setSelectedCurveIndex(null);
     try {
-      const nextResult = mode === "route" ? await analyzeRoute() : mode === "gpx" ? await analyzeGpx() : await analyzeTelemetry();
+      const nextResult = mode === "route"
+        ? await analyzeRoute()
+        : mode === "gpx"
+          ? await analyzeGpx()
+          : mode === "kmz"
+            ? await analyzeKmz()
+            : await analyzeTelemetry();
       setResult(nextResult); setBackendStatus("online");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "No se pudo analizar el tramo.");
@@ -156,14 +210,14 @@ export default function RecceMindConsole() {
     if (isSimulating) {
       window.speechSynthesis.cancel(); setIsSimulating(false); return;
     }
-    const queue = [...result.pacenotes];
+    const queue = copilotingPhrases(result);
     setIsSimulating(true);
     const speakNext = () => {
-      const note = queue.shift();
-      if (!note) { setIsSimulating(false); return; }
-      const utterance = new SpeechSynthesisUtterance(note.type === "distance" ? `${note.text} metros` : note.text);
+      const phrase = queue.shift();
+      if (!phrase) { setIsSimulating(false); return; }
+      const utterance = new SpeechSynthesisUtterance(phrase);
       utterance.lang = "es-ES";
-      utterance.rate = note.type === "distance" ? 1.25 : 1.4;
+      utterance.rate = 1.4;
       utterance.onend = speakNext;
       utterance.onerror = () => setIsSimulating(false);
       window.speechSynthesis.speak(utterance);
@@ -227,7 +281,7 @@ export default function RecceMindConsole() {
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(244,63,94,0.15),transparent_35%),rgba(9,9,11,0.92)] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.35)] sm:p-7">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-          <div className="max-w-3xl"><p className="text-[10px] uppercase tracking-[0.45em] text-rose-300/70">RecceMind Cloud Console</p><h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">Prepara, revisa y entrena tus tramos</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Ruta, GPX, telemetría, reconocimiento GPS, editor estructurado, simulación y aprendizaje del piloto desde la misma consola.</p></div>
+          <div className="max-w-3xl"><p className="text-[10px] uppercase tracking-[0.45em] text-rose-300/70">RecceMind</p><h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">Prepara, revisa y entrena tus tramos</h1><p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Ruta por búsqueda o mapa, GPX, KMZ, telemetría, reconocimiento GPS, editor estructurado y simulación de copiloto.</p></div>
           <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[10px] uppercase tracking-[0.24em] ${backendStatus === "online" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : backendStatus === "offline" ? "border-red-400/30 bg-red-400/10 text-red-200" : "border-zinc-700 bg-zinc-900 text-zinc-400"}`}><span className={`h-2 w-2 rounded-full ${backendStatus === "online" ? "bg-emerald-300" : backendStatus === "offline" ? "bg-red-300" : "bg-zinc-500"}`} />{statusLabel}</div>
         </div>
       </section>
@@ -235,38 +289,51 @@ export default function RecceMindConsole() {
       <section className="grid gap-6 xl:grid-cols-[minmax(22rem,0.72fr)_minmax(0,1.28fr)]">
         <form onSubmit={submit} className="space-y-5 rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5 sm:p-6">
           <div><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Entrada</p><h2 className="mt-2 text-2xl font-semibold text-white">Origen del tramo</h2></div>
-          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-zinc-800 bg-black/30 p-1.5 text-[10px] uppercase tracking-[0.18em]">{(["route", "gpx", "telemetry"] as const).map((item) => <button key={item} type="button" onClick={() => setMode(item)} className={`rounded-xl px-2 py-2.5 transition ${mode === item ? "bg-white text-black" : "text-zinc-500 hover:text-white"}`}>{item === "route" ? "Ruta" : item === "gpx" ? "GPX" : "CSV"}</button>)}</div>
-          {mode === "route" ? <div className="grid gap-4"><label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Origen</span><input value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="Artenara, Gran Canaria" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" /></label><label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Destino</span><input value={destination} onChange={(event) => setDestination(event.target.value)} placeholder="Tejeda, Gran Canaria" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" /></label></div> : null}
-          {mode === "gpx" ? <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Archivo GPX</span><input type="file" accept=".gpx,application/gpx+xml,application/xml,text/xml" onChange={(event) => setGpxFile(event.target.files?.[0] ?? null)} className="rounded-2xl border border-dashed border-zinc-700 bg-black/40 px-4 py-6 text-sm text-zinc-400" />{gpxFile ? <span className="text-xs text-zinc-500">{gpxFile.name}</span> : null}</label> : null}
-          {mode === "telemetry" ? <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Telemetría CSV</span><input type="file" accept=".csv,text/csv" onChange={(event) => setTelemetryFile(event.target.files?.[0] ?? null)} className="rounded-2xl border border-dashed border-zinc-700 bg-black/40 px-4 py-6 text-sm text-zinc-400" /><span className="text-xs leading-5 text-zinc-600">lat, lon · opcionales speed, brake, gear.</span></label> : null}
+          <div className="grid grid-cols-4 gap-1.5 rounded-2xl border border-zinc-800 bg-black/30 p-1.5 text-[9px] uppercase tracking-[0.14em] sm:text-[10px]">{(["route", "gpx", "kmz", "telemetry"] as const).map((item) => <button key={item} type="button" onClick={() => setMode(item)} className={`rounded-xl px-1 py-2.5 transition ${mode === item ? "bg-white text-black" : "text-zinc-500 hover:text-white"}`}>{item === "route" ? "Ruta" : item === "gpx" ? "GPX" : item === "kmz" ? "KMZ" : "CSV"}</button>)}</div>
+
+          {mode === "route" ? <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2 rounded-xl border border-zinc-800 bg-black/20 p-1"><button type="button" onClick={() => setRouteEntryMode("search")} className={`rounded-lg px-3 py-2 text-[10px] uppercase tracking-[0.16em] ${routeEntryMode === "search" ? "bg-zinc-100 text-black" : "text-zinc-500"}`}>Buscar lugares</button><button type="button" onClick={() => setRouteEntryMode("map")} className={`rounded-lg px-3 py-2 text-[10px] uppercase tracking-[0.16em] ${routeEntryMode === "map" ? "bg-zinc-100 text-black" : "text-zinc-500"}`}>Marcar en mapa</button></div>
+            {routeEntryMode === "search" ? <div className="grid gap-4"><label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Origen</span><input value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="Artenara, Gran Canaria" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" /></label><label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Destino</span><input value={destination} onChange={(event) => setDestination(event.target.value)} placeholder="Tejeda, Gran Canaria" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" /></label></div> : <RoutePointPicker origin={originPoint} destination={destinationPoint} onChange={(nextOrigin, nextDestination) => { setOriginPoint(nextOrigin); setDestinationPoint(nextDestination); }} />}
+          </div> : null}
+
+          {mode === "gpx" ? <FileInput label="Archivo GPX" accept=".gpx,application/gpx+xml,application/xml,text/xml" file={gpxFile} onChange={setGpxFile} hint="Importa un track GPX completo." /> : null}
+          {mode === "kmz" ? <FileInput label="Archivo KMZ (VMRM / Google Earth)" accept=".kmz,application/vnd.google-earth.kmz" file={kmzFile} onChange={setKmzFile} hint="RecceMind detecta los LineString y analiza el trazado principal." /> : null}
+          {mode === "telemetry" ? <FileInput label="Telemetría CSV" accept=".csv,text/csv" file={telemetryFile} onChange={setTelemetryFile} hint="lat, lon · opcionales speed, brake, gear." /> : null}
+
           <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Perfil / piloto</span><input value={driverId} onChange={(event) => setDriverId(event.target.value)} maxLength={100} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" /></label>
           <div className="rounded-2xl border border-zinc-800 bg-black/25 p-4"><p className="mb-3 text-xs uppercase tracking-[0.24em] text-zinc-500">Umbrales de radio</p><div className="grid grid-cols-5 gap-2">{(["6", "5", "4", "3", "2"] as const).map((level) => <label key={level} className="grid gap-1"><span className="text-center text-[9px] text-zinc-600">G{level}</span><input type="number" min={1} value={thresholds[level]} onChange={(event) => updateThreshold(level, event.target.value)} className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-950 px-2 py-2 text-center text-sm text-white" /></label>)}</div></div>
           <button disabled={loading} type="submit" className="w-full rounded-2xl bg-white px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.28em] text-black disabled:opacity-50">{loading ? "Analizando..." : "Analizar tramo"}</button>
-          <button type="button" disabled={loading} onClick={recceActive ? stopRecce : startRecce} className={`w-full rounded-2xl border px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.22em] transition ${recceActive ? "border-red-400/40 bg-red-400/15 text-red-100" : "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"}`}>{recceActive ? `Finalizar Recce GPS · ${recceCoordinates.length} puntos` : "Iniciar Recce GPS"}</button>
+          <button type="button" disabled={loading} onClick={recceActive ? stopRecce : startRecce} className={`w-full rounded-2xl border px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.22em] transition ${recceActive ? "border-red-400/40 bg-red-400/15 text-red-100" : "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"}`}>{recceActive ? `Finalizar reconocimiento · ${recceCoordinates.length} puntos` : "Grabar reconocimiento GPS"}</button>
           {error ? <p className="rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm leading-6 text-red-200">{error}</p> : null}
         </form>
 
         <div className="min-w-0 space-y-5">
           {result ? <>
+            {result.sourceName ? <div className="rounded-2xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3 text-sm text-sky-100"><span className="font-semibold">KMZ: {result.sourceName}</span>{result.kmzTrackCount && result.kmzTrackCount > 1 ? <span className="ml-2 text-sky-200/60">· {result.kmzTrackCount} trazados detectados, usando el principal.</span> : null}</div> : null}
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Distancia" value={estimatedDistanceMeters ? `${(estimatedDistanceMeters / 1000).toFixed(2)} km` : "—"} /><Metric label="Curvas" value={String(result.curves.length)} /><Metric label="Notas" value={String(notes.length)} /><Metric label="Duración" value={formatDuration(result.duration)} /></div>
             <RecceMindMap coordinates={coordinates} curves={result.curves} selectedCurveIndex={selectedCurveIndex} onSelectCurve={setSelectedCurveIndex} liveCoordinates={recceCoordinates} />
             <div className="flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3">
-              <ActionButton label={isSimulating ? "Detener simulación" : "Simular notas"} onClick={toggleSimulation} />
+              <ActionButton label={isSimulating ? "Detener copiloto" : "Reproducir como copiloto"} onClick={toggleSimulation} />
               <ActionButton label="PDF / Imprimir" onClick={() => printPacenotes(result, driverId)} />
               <ActionButton label="Exportar CSV" onClick={() => downloadPacenotesCsv(result)} />
               <ActionButton label="Enseñar correcciones" onClick={teachCorrections} />
               {feedbackMessage ? <span className="self-center text-xs text-emerald-300">{feedbackMessage}</span> : null}
             </div>
+            <p className="-mt-2 px-2 text-[11px] text-zinc-600">El modo copiloto agrupa curva + distancia siguiente y redondea la distancia para una lectura más natural.</p>
             <SpeedProfileChart speeds={result.speed_profile} />
             <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.85fr)]">
-              <section className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5"><div><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Pacenotes</p><h2 className="mt-2 text-2xl font-semibold text-white">Editor estructurado</h2><p className="mt-2 text-xs leading-5 text-zinc-600">Edita el borrador. “Enseñar correcciones” envía únicamente cambios de grado al perfil del piloto.</p></div><div className="mt-5 max-h-[52rem] overflow-y-auto pr-1"><PacenoteEditor pacenotes={result.pacenotes} onChange={(pacenotes) => setResult((current) => current ? { ...current, pacenotes } : current)} /></div></section>
+              <section className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5"><div><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Pacenotes</p><h2 className="mt-2 text-2xl font-semibold text-white">Editor estructurado</h2><p className="mt-2 text-xs leading-5 text-zinc-600">Dirección, grado, abre/cierra, longitud, cortar/no cortar, referencias de entorno y carretera. “Enseñar correcciones” sigue enviando únicamente cambios de grado al aprendizaje.</p></div><div className="mt-5 max-h-[52rem] overflow-y-auto pr-1"><PacenoteEditor pacenotes={result.pacenotes} onChange={(pacenotes) => setResult((current) => current ? { ...current, pacenotes } : current)} /></div></section>
               <section className="rounded-[2rem] border border-zinc-800 bg-zinc-950/80 p-5"><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Geometría</p><h2 className="mt-2 text-2xl font-semibold text-white">Curvas detectadas</h2><div className="mt-5 overflow-x-auto rounded-2xl border border-zinc-800"><table className="min-w-[48rem] divide-y divide-zinc-800 text-sm"><thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.24em] text-zinc-500"><tr><th className="px-4 py-3">Nota</th><th className="px-4 py-3">Radio</th><th className="px-4 py-3">Longitud</th><th className="px-4 py-3">Giro</th><th className="px-4 py-3">Posición</th></tr></thead><tbody className="divide-y divide-zinc-900 bg-black/20">{result.curves.map((curve, index) => { const entryClass = curve.entry_classification ?? curve.classification; const exitClass = curve.exit_classification ?? curve.classification; const hasTransition = Boolean(curve.modifier) && entryClass !== exitClass; const profileRadius = curve.entry_radius && curve.exit_radius ? `${Math.round(curve.entry_radius)} → ${Math.round(curve.exit_radius)} m` : `${Math.round(curve.radius)} m`; return <tr key={`${curve.start_idx}-${curve.end_idx}-${index}`} onClick={() => setSelectedCurveIndex(index)} className={`cursor-pointer transition hover:bg-white/5 ${selectedCurveIndex === index ? "bg-amber-400/10" : ""}`}><td className="px-4 py-3 font-medium text-white">{curve.direction} {hasTransition ? entryClass : curve.classification}{curve.modifier ?? ""}{hasTransition ? ` a ${exitClass}` : ""}</td><td className="px-4 py-3 text-zinc-400">{profileRadius}</td><td className="px-4 py-3 text-zinc-400">{Math.round(curve.length)} m</td><td className="px-4 py-3 text-zinc-400">{Math.round(Math.abs(curve.heading_change))}°</td><td className="px-4 py-3 text-zinc-400">{Math.round(curve.start_distance)} m</td></tr>; })}</tbody></table></div></section>
             </div>
-          </> : <div className="flex min-h-[38rem] items-center justify-center rounded-[2rem] border border-dashed border-zinc-800 bg-white/[0.02] p-8 text-center"><div className="max-w-md"><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-600">Sin análisis</p><h2 className="mt-3 text-2xl font-semibold text-zinc-300">Carga o graba un tramo para empezar</h2><p className="mt-3 text-sm leading-7 text-zinc-600">Ruta de Google, GPX, telemetría CSV o reconocimiento GPS desde el navegador.</p></div></div>}
+          </> : <div className="flex min-h-[38rem] items-center justify-center rounded-[2rem] border border-dashed border-zinc-800 bg-white/[0.02] p-8 text-center"><div className="max-w-md"><p className="text-[10px] uppercase tracking-[0.4em] text-zinc-600">Sin análisis</p><h2 className="mt-3 text-2xl font-semibold text-zinc-300">Carga o graba un tramo para empezar</h2><p className="mt-3 text-sm leading-7 text-zinc-600">Busca lugares, marca salida/meta en mapa, importa GPX o KMZ, carga telemetría o graba un reconocimiento GPS.</p></div></div>}
         </div>
       </section>
     </div>
   );
+}
+
+function FileInput({ label, accept, file, onChange, hint }: { label: string; accept: string; file: File | null; onChange: (file: File | null) => void; hint: string }) {
+  return <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.24em] text-zinc-500">{label}</span><input type="file" accept={accept} onChange={(event) => onChange(event.target.files?.[0] ?? null)} className="rounded-2xl border border-dashed border-zinc-700 bg-black/40 px-4 py-6 text-sm text-zinc-400" /><span className="text-xs leading-5 text-zinc-600">{file ? file.name : hint}</span></label>;
 }
 
 function Metric({ label, value }: { label: string; value: string }) { return <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4"><p className="text-[10px] uppercase tracking-[0.28em] text-zinc-600">{label}</p><p className="mt-2 text-2xl font-semibold text-white">{value}</p></div>; }
