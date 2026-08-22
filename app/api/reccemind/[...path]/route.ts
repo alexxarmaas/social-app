@@ -6,6 +6,7 @@ const ALLOWED_ENDPOINTS = new Set([
   "analyze-route",
   "process-polyline",
   "process-gpx",
+  "process-kmz",
   "process-telemetry",
   "process-coords",
   "feedback",

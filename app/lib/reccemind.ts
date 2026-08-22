@@ -2,6 +2,10 @@ export type RecceMindThresholds = Record<"6" | "5" | "4" | "3" | "2", number>;
 export type RecceMindSeverity = 1 | 2 | 3 | 4 | 5 | 6;
 export type RecceMindModifier = "tightens" | "opens";
 export type RecceMindWarning = "caution" | "brake";
+export type RecceMindCurveLength = "standard" | "long" | "very_long";
+export type RecceMindLine = "cut" | "dont_cut";
+export type RecceMindContext = "crest" | "junction" | "barrier";
+export type RecceMindRoadModifier = "narrows";
 
 export type RecceMindStructuredPacenote =
   | {
@@ -13,9 +17,12 @@ export type RecceMindStructuredPacenote =
       direction: "left" | "right";
       severity: RecceMindSeverity;
       target_severity?: RecceMindSeverity;
-      length: "standard" | "long";
+      length: RecceMindCurveLength;
       modifiers: RecceMindModifier[];
       warnings: RecceMindWarning[];
+      line?: RecceMindLine;
+      contexts?: RecceMindContext[];
+      road_modifiers?: RecceMindRoadModifier[];
       gear?: number;
     }
   | {
@@ -64,6 +71,8 @@ export interface RecceMindAnalysis {
   speed_profile: number[];
   distanceMeters?: number;
   duration?: string;
+  sourceName?: string;
+  kmzTrackCount?: number;
 }
 
 export interface RecceMindCoordinate {
@@ -95,6 +104,7 @@ export function renderRecceMindPacenote(structured: RecceMindStructuredPacenote)
     : `${direction} ${structured.severity}`;
 
   if (structured.length === "long") body += " larga";
+  if (structured.length === "very_long") body += " muy larga";
 
   if (structured.modifiers.includes("tightens")) {
     body += " se cierra";
@@ -104,6 +114,16 @@ export function renderRecceMindPacenote(structured: RecceMindStructuredPacenote)
     body += " se abre";
     if (structured.target_severity) body += ` a ${structured.target_severity}`;
   }
+
+  if (structured.line === "cut") body += " cortar";
+  if (structured.line === "dont_cut") body += " no cortar";
+
+  const contexts = structured.contexts ?? [];
+  if (contexts.includes("crest")) body += " en rasante";
+  if (contexts.includes("junction")) body += " en cruce";
+  if (contexts.includes("barrier")) body += " en valla";
+
+  if ((structured.road_modifiers ?? []).includes("narrows")) body += " se estrecha";
   if (structured.gear) body += ` en ${structured.gear}ª`;
 
   return [...prefixes, body].join(" ");
