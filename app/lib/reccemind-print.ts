@@ -83,6 +83,9 @@ export function buildRecceMindPrintDocument(result: RecceMindAnalysis, options: 
     * { box-sizing: border-box; }
     html { background: #fff; }
     body { margin: 0; color: #111; background: #fff; font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .screen-actions { display: flex; justify-content: flex-end; gap: 8px; max-width: 210mm; margin: 0 auto 12px; }
+    .screen-actions button { border: 0; border-radius: 999px; padding: 10px 16px; background: #111; color: #fff; cursor: pointer; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .screen-actions button.secondary { background: #fff; color: #111; border: 1px solid #bbb; }
     .sheet { width: 100%; }
     header { display: grid; grid-template-columns: 1.45fr .8fr; gap: 8mm; align-items: end; padding-bottom: 5mm; border-bottom: 3px solid #111; }
     .brand { font-size: 10px; font-weight: 800; letter-spacing: .28em; text-transform: uppercase; }
@@ -115,11 +118,16 @@ export function buildRecceMindPrintDocument(result: RecceMindAnalysis, options: 
       .sheet { max-width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm; background: white; box-shadow: 0 10px 40px rgba(0,0,0,.18); }
     }
     @media print {
+      .screen-actions { display: none; }
       .sheet { padding: 0; }
     }
   </style>
 </head>
 <body>
+  <div class="screen-actions">
+    <button type="button" class="secondary" onclick="window.close()">Cerrar</button>
+    <button type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
+  </div>
   <main class="sheet">
     <header>
       <div>
