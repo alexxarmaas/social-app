@@ -54,6 +54,13 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
     );
   };
 
+  const updateDistance = (index: number, value: string) => {
+    if (value.trim() === "") return;
+    const meters = Number(value);
+    if (!Number.isFinite(meters) || meters < 0) return;
+    replaceStructured(index, { kind: "distance", meters: Math.round(meters) });
+  };
+
   const updateCurve = (index: number, structured: StructuredCurve, patch: Partial<StructuredCurve>) => {
     replaceStructured(index, { ...structured, ...patch });
   };
@@ -121,10 +128,23 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
     <div className="space-y-3">
       {pacenotes.map((note, index) => {
         if (note.type === "distance") {
+          const structuredMeters = note.structured?.kind === "distance" ? note.structured.meters : Number(note.text);
           return (
             <div key={`${note.distance}-${index}`} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-black/20 px-3 py-2.5">
               <span className="w-16 shrink-0 text-right font-mono text-xs text-zinc-600">{Math.round(note.distance)} m</span>
-              <span className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">{note.text} m</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600">Enlace</span>
+              <div className="ml-auto flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step={5}
+                  value={Number.isFinite(structuredMeters) ? Math.round(structuredMeters) : ""}
+                  onChange={(event) => updateDistance(index, event.target.value)}
+                  className="w-24 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-right font-mono text-sm font-semibold text-white outline-none transition focus:border-zinc-500"
+                  aria-label="Distancia de enlace en metros"
+                />
+                <span className="text-xs text-zinc-500">m</span>
+              </div>
             </div>
           );
         }
