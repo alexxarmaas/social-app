@@ -15,7 +15,9 @@ export function useRecceMindDraft(result: RecceMindAnalysis | null, stageName: s
 
   useEffect(() => {
     const stored = parseRecceMindDraft(window.localStorage.getItem(RECCEMIND_DRAFT_STORAGE_KEY));
-    if (stored) setRecoverableDraft(stored);
+    if (!stored) return;
+    const timeout = window.setTimeout(() => setRecoverableDraft(stored), 0);
+    return () => window.clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
