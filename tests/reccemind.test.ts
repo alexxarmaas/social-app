@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { renderRecceMindPacenote } from "../app/lib/reccemind";
+import { buildRecceMindPrintDocument, buildRecceMindPrintRows, rallyDistance } from "../app/lib/reccemind-print";
+import { renderRecceMindPacenote, type RecceMindAnalysis } from "../app/lib/reccemind";
 
 test("RecceMind renders compound tightening curves", () => {
   assert.equal(
@@ -38,4 +39,48 @@ test("RecceMind renders non-curve structured events", () => {
   assert.equal(renderRecceMindPacenote({ kind: "crest" }), "Rasante");
   assert.equal(renderRecceMindPacenote({ kind: "jump" }), "Salto");
   assert.equal(renderRecceMindPacenote({ kind: "custom", label: "Puente" }), "Puente");
+});
+
+test("RecceMind print rows pair calls with rounded following distances", () => {
+  const result: RecceMindAnalysis = {
+    polyline: "",
+    curves: [],
+    speed_profile: [],
+    pacenotes: [
+      { type: "note", text: "Derecha 6 larga", curve_index: 0, distance: 120 },
+      { type: "distance", text: "105", curve_index: null, distance: 225 },
+      { type: "note", text: "Izquierda 4 no cortar", curve_index: 1, distance: 225 },
+    ],
+  };
+
+  assert.equal(rallyDistance("105"), "100");
+  assert.deepEqual(buildRecceMindPrintRows(result), [
+    { positionMeters: 120, note: "Derecha 6 larga", nextDistance: "100" },
+    { positionMeters: 225, note: "Izquierda 4 no cortar", nextDistance: null },
+  ]);
+});
+
+test("RecceMind print document contains rally sheet structure", () => {
+  const result: RecceMindAnalysis = {
+    polyline: "",
+    curves: [],
+    speed_profile: [],
+    distanceMeters: 1234,
+    pacenotes: [
+      { type: "note", text: "Derecha 5 en rasante", curve_index: 0, distance: 100 },
+    ],
+  };
+
+  const html = buildRecceMindPrintDocument(result, {
+    driverId: "Piloto Demo",
+    stageName: "TC Demo",
+    generatedAt: new Date("2026-08-22T12:00:00Z"),
+  });
+
+  assert.match(html, /TC Demo/);
+  assert.match(html, /Piloto Demo/);
+  assert.match(html, /Salida/);
+  assert.match(html, /Meta/);
+  assert.match(html, /Derecha 5 en rasante/);
+  assert.match(html, /Imprimir \/ Guardar PDF/);
 });

@@ -5,6 +5,7 @@ import PacenoteEditor from "@/components/reccemind/PacenoteEditor";
 import RecceMindMap from "@/components/reccemind/RecceMindMap";
 import RoutePointPicker from "@/components/reccemind/RoutePointPicker";
 import SpeedProfileChart from "@/components/reccemind/SpeedProfileChart";
+import { buildRecceMindPrintDocument, rallyDistance } from "@/app/lib/reccemind-print";
 import {
   DEFAULT_RECCEMIND_THRESHOLDS,
   decodeGooglePolyline,
@@ -56,26 +57,14 @@ function downloadPacenotesCsv(result: RecceMindAnalysis) {
   URL.revokeObjectURL(url);
 }
 
-function escapeHtml(value: string) {
-  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
-}
-
-function printPacenotes(result: RecceMindAnalysis, driverId: string) {
-  const popup = window.open("", "_blank", "noopener,noreferrer");
+function printPacenotes(result: RecceMindAnalysis, driverId: string, stageName: string) {
+  const popup = window.open("", "_blank");
   if (!popup) return false;
-  const rows = result.pacenotes.map((note) => note.type === "distance"
-    ? `<tr class="distance"><td colspan="2">${escapeHtml(note.text)} m</td></tr>`
-    : `<tr><td>${Math.round(note.distance)} m</td><td>${escapeHtml(note.text)}</td></tr>`).join("");
-  popup.document.write(`<!doctype html><html><head><title>RecceMind - Pacenotes</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{margin-bottom:4px}p{color:#666}table{width:100%;border-collapse:collapse;margin-top:24px;font-size:18px}td{padding:12px;border-bottom:1px solid #ddd}.distance td{text-align:center;background:#f3f4f6;color:#666;font-weight:700}tr:not(.distance) td:last-child{font-weight:700;text-transform:uppercase}@media print{body{padding:0}}</style></head><body><h1>RecceMind · Notas de rally</h1><p>Piloto: ${escapeHtml(driverId)}</p><table>${rows}</table><script>window.onload=()=>window.print()</script></body></html>`);
+  popup.document.open();
+  popup.document.write(buildRecceMindPrintDocument(result, { driverId, stageName }));
   popup.document.close();
+  popup.focus();
   return true;
-}
-
-function rallyDistance(raw: string) {
-  const meters = Number.parseFloat(raw);
-  if (!Number.isFinite(meters)) return raw;
-  const step = meters < 100 ? 10 : meters <= 300 ? 25 : 50;
-  return String(Math.max(step, Math.round(meters / step) * step));
 }
 
 function copilotingPhrases(result: RecceMindAnalysis) {
@@ -132,6 +121,17 @@ export default function RecceMindConsole() {
     if (result.distanceMeters && result.distanceMeters > 0) return result.distanceMeters;
     return Math.max(result.curves.at(-1)?.end_distance ?? 0, result.pacenotes.at(-1)?.distance ?? 0);
   }, [result]);
+  const stageLabel = useMemo(() => {
+    if (result?.sourceName) return result.sourceName;
+    if (mode === "route" && routeEntryMode === "search" && origin.trim() && destination.trim()) {
+      return `${origin.trim()} → ${destination.trim()}`;
+    }
+    if (mode === "route" && routeEntryMode === "map" && originPoint && destinationPoint) return "Tramo marcado en mapa";
+    if (mode === "gpx" && gpxFile) return gpxFile.name.replace(/\.[^.]+$/, "");
+    if (mode === "kmz" && kmzFile) return kmzFile.name.replace(/\.[^.]+$/, "");
+    if (mode === "telemetry" && telemetryFile) return telemetryFile.name.replace(/\.[^.]+$/, "");
+    return "Tramo RecceMind";
+  }, [destination, destinationPoint, gpxFile, kmzFile, mode, origin, originPoint, result?.sourceName, routeEntryMode, telemetryFile]);
 
   const updateThreshold = (level: keyof RecceMindThresholds, value: string) => {
     const numeric = Number(value);
@@ -314,7 +314,7 @@ export default function RecceMindConsole() {
             <RecceMindMap coordinates={coordinates} curves={result.curves} selectedCurveIndex={selectedCurveIndex} onSelectCurve={setSelectedCurveIndex} liveCoordinates={recceCoordinates} />
             <div className="flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3">
               <ActionButton label={isSimulating ? "Detener copiloto" : "Reproducir como copiloto"} onClick={toggleSimulation} />
-              <ActionButton label="PDF / Imprimir" onClick={() => printPacenotes(result, driverId)} />
+              <ActionButton label="Vista PDF" onClick={() => printPacenotes(result, driverId, stageLabel)} />
               <ActionButton label="Exportar CSV" onClick={() => downloadPacenotesCsv(result)} />
               <ActionButton label="Enseñar correcciones" onClick={teachCorrections} />
               {feedbackMessage ? <span className="self-center text-xs text-emerald-300">{feedbackMessage}</span> : null}
