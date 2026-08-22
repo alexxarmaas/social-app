@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { parseRecceMindDraft, serializeRecceMindDraft } from "../app/lib/reccemind-draft";
 import { buildRecceMindPrintDocument, buildRecceMindPrintRows, rallyDistance } from "../app/lib/reccemind-print";
 import { renderRecceMindPacenote, type RecceMindAnalysis } from "../app/lib/reccemind";
 
@@ -83,4 +84,30 @@ test("RecceMind print document contains rally sheet structure", () => {
   assert.match(html, /Meta/);
   assert.match(html, /Derecha 5 en rasante/);
   assert.match(html, /Imprimir \/ Guardar PDF/);
+});
+
+test("RecceMind local drafts preserve the edited analysis and stage name", () => {
+  const result: RecceMindAnalysis = {
+    polyline: "abc",
+    curves: [],
+    speed_profile: [80, 70],
+    sourceName: "TC VMRM",
+    pacenotes: [
+      { type: "note", text: "Derecha 4 no cortar", curve_index: 0, distance: 150 },
+      { type: "distance", text: "100", curve_index: null, distance: 250 },
+    ],
+  };
+
+  const serialized = serializeRecceMindDraft({
+    result,
+    stageName: "TC 3 · Artenara",
+    driverId: "Piloto Demo",
+  });
+  const restored = parseRecceMindDraft(serialized);
+
+  assert.ok(restored);
+  assert.equal(restored.stageName, "TC 3 · Artenara");
+  assert.equal(restored.driverId, "Piloto Demo");
+  assert.deepEqual(restored.result, result);
+  assert.equal(parseRecceMindDraft("not-json"), null);
 });
