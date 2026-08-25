@@ -34,8 +34,11 @@ function buildCalls(result: RecceMindAnalysis) {
     if (note.type === "distance") return [];
     const following = result.pacenotes[index + 1];
     const link = following?.type === "distance" ? rallyDistance(following.text) : null;
+    const stableId = note.curve_index !== null
+      ? `curve-${note.curve_index}-${Math.round(note.distance)}`
+      : `manual-${Math.round(note.distance)}-${note.text}`;
     return [{
-      id: `${index}-${note.distance}-${note.text}`,
+      id: stableId,
       note,
       phrase: link ? `${note.text}, ${link}` : note.text,
       link,
@@ -68,6 +71,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
   const [lastSpokenPhrase, setLastSpokenPhrase] = useState<string | null>(null);
   const [wakeLockActive, setWakeLockActive] = useState(false);
   const watchRef = useRef<number | null>(null);
+  const callsRef = useRef(calls);
   const spokenRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
   const previousSampleRef = useRef<LiveSample | null>(null);
@@ -84,6 +88,10 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
   const after = upcomingIndex >= 0 ? calls[upcomingIndex + 1] ?? null : null;
   const distanceToCall = upcoming ? Math.max(0, upcoming.note.distance - progress) : 0;
   const selectedCurveIndex = upcoming?.note.curve_index ?? null;
+
+  useEffect(() => {
+    callsRef.current = calls;
+  }, [calls]);
 
   const speak = useCallback((phrase: string) => {
     if (!("speechSynthesis" in window)) return;
@@ -208,8 +216,9 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
         const currentSpeed = browserSpeed ?? derivedSpeed;
         setSpeedMps(currentSpeed);
 
+        const latestCalls = callsRef.current;
         if (!initializedRef.current) {
-          const initialSpoken = new Set(calls.filter((call) => call.note.distance < matched.routeDistance - 30).map((call) => call.id));
+          const initialSpoken = new Set(latestCalls.filter((call) => call.note.distance < matched.routeDistance - 30).map((call) => call.id));
           spokenRef.current = initialSpoken;
           setSpokenIds(initialSpoken);
           initializedRef.current = true;
@@ -223,7 +232,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
 
         if (nextStatus !== "ready") return;
         const dynamicAhead = clampCallAheadMeters(currentSpeed, leadSecondsRef.current);
-        const call = calls.find((candidate) => !spokenRef.current.has(candidate.id) && candidate.note.distance >= matched.routeDistance - 20);
+        const call = latestCalls.find((candidate) => !spokenRef.current.has(candidate.id) && candidate.note.distance >= matched.routeDistance - 20);
         if (!call) return;
         const distanceToNext = Math.max(0, call.note.distance - matched.routeDistance);
         if (distanceToNext > dynamicAhead) return;
