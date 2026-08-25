@@ -68,10 +68,13 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
   const [lastSpokenPhrase, setLastSpokenPhrase] = useState<string | null>(null);
   const [wakeLockActive, setWakeLockActive] = useState(false);
   const watchRef = useRef<number | null>(null);
+  const spokenRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
   const previousSampleRef = useRef<LiveSample | null>(null);
   const reverseSamplesRef = useRef(0);
   const wakeLockRef = useRef<WakeLockSentinelLike | null>(null);
+  const leadSecondsRef = useRef(4.5);
+  const voiceEnabledRef = useRef(true);
 
   const progress = projection?.routeDistance ?? 0;
   const callAhead = clampCallAheadMeters(speedMps, leadSeconds);
@@ -141,18 +144,6 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
     void releaseWakeLock();
   }, [releaseWakeLock]);
 
-  useEffect(() => {
-    if (!active || status !== "ready" || !voiceEnabled || !upcoming || !("speechSynthesis" in window)) return;
-    if (distanceToCall > callAhead) return;
-    setSpokenIds((current) => {
-      if (current.has(upcoming.id)) return current;
-      const next = new Set(current);
-      next.add(upcoming.id);
-      return next;
-    });
-    speak(upcoming.phrase);
-  }, [active, callAhead, distanceToCall, speak, status, upcoming, voiceEnabled]);
-
   const start = () => {
     if (active) {
       stop();
@@ -168,7 +159,9 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
       return;
     }
 
-    setSpokenIds(new Set());
+    const emptySpoken = new Set<string>();
+    spokenRef.current = emptySpoken;
+    setSpokenIds(emptySpoken);
     setLastSpokenPhrase(null);
     initializedRef.current = false;
     previousSampleRef.current = null;
@@ -204,17 +197,34 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
         const browserSpeed = typeof position.coords.speed === "number" && Number.isFinite(position.coords.speed) && position.coords.speed >= 0
           ? position.coords.speed
           : null;
-        setSpeedMps(browserSpeed ?? derivedSpeed);
+        const currentSpeed = browserSpeed ?? derivedSpeed;
+        setSpeedMps(currentSpeed);
 
         if (!initializedRef.current) {
-          setSpokenIds(new Set(calls.filter((call) => call.note.distance < matched.routeDistance - 30).map((call) => call.id)));
+          const initialSpoken = new Set(calls.filter((call) => call.note.distance < matched.routeDistance - 30).map((call) => call.id));
+          spokenRef.current = initialSpoken;
+          setSpokenIds(initialSpoken);
           initializedRef.current = true;
         }
 
-        if (position.coords.accuracy > MAX_GPS_ACCURACY_M) setStatus("low_accuracy");
-        else if (matched.offRouteMeters > MAX_OFF_ROUTE_M) setStatus("off_route");
-        else if (reverseSamplesRef.current >= 2) setStatus("reverse");
-        else setStatus("ready");
+        let nextStatus: LiveStatus = "ready";
+        if (position.coords.accuracy > MAX_GPS_ACCURACY_M) nextStatus = "low_accuracy";
+        else if (matched.offRouteMeters > MAX_OFF_ROUTE_M) nextStatus = "off_route";
+        else if (reverseSamplesRef.current >= 2) nextStatus = "reverse";
+        setStatus(nextStatus);
+
+        if (nextStatus !== "ready") return;
+        const dynamicAhead = clampCallAheadMeters(currentSpeed, leadSecondsRef.current);
+        const call = calls.find((candidate) => !spokenRef.current.has(candidate.id) && candidate.note.distance >= matched.routeDistance - 20);
+        if (!call) return;
+        const distanceToNext = Math.max(0, call.note.distance - matched.routeDistance);
+        if (distanceToNext > dynamicAhead) return;
+
+        const nextSpoken = new Set(spokenRef.current);
+        nextSpoken.add(call.id);
+        spokenRef.current = nextSpoken;
+        setSpokenIds(nextSpoken);
+        if (voiceEnabledRef.current) speak(call.phrase);
       },
       (geoError) => {
         setStatus("error");
@@ -225,22 +235,37 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
   };
 
   const rearmFromHere = () => {
-    setSpokenIds(new Set(calls.filter((call) => call.note.distance < progress - 20).map((call) => call.id)));
+    const next = new Set(calls.filter((call) => call.note.distance < progress - 20).map((call) => call.id));
+    spokenRef.current = next;
+    setSpokenIds(next);
     window.speechSynthesis?.cancel();
   };
 
   const skipUpcoming = () => {
     if (!upcoming) return;
-    setSpokenIds((current) => {
-      const next = new Set(current);
-      next.add(upcoming.id);
-      return next;
-    });
+    const next = new Set(spokenRef.current);
+    next.add(upcoming.id);
+    spokenRef.current = next;
+    setSpokenIds(next);
     window.speechSynthesis?.cancel();
   };
 
   const repeatLast = () => {
     if (lastSpokenPhrase) speak(lastSpokenPhrase);
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled((current) => {
+      const next = !current;
+      voiceEnabledRef.current = next;
+      if (!next) window.speechSynthesis?.cancel();
+      return next;
+    });
+  };
+
+  const changeLeadSeconds = (value: number) => {
+    leadSecondsRef.current = value;
+    setLeadSeconds(value);
   };
 
   const requestFullscreen = async () => {
@@ -266,7 +291,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={start} className={`rounded-xl px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${active ? "bg-red-400 text-black" : "bg-orange-300 text-black"}`}>{active ? "Detener GPS" : "Iniciar copiloto"}</button>
-          <button type="button" onClick={() => setVoiceEnabled((current) => !current)} className={`rounded-xl border px-3 py-2.5 text-[10px] uppercase tracking-[0.14em] ${voiceEnabled ? "border-orange-300/30 bg-orange-300/10 text-orange-100" : "border-zinc-700 text-zinc-500"}`}>Voz {voiceEnabled ? "ON" : "OFF"}</button>
+          <button type="button" onClick={toggleVoice} className={`rounded-xl border px-3 py-2.5 text-[10px] uppercase tracking-[0.14em] ${voiceEnabled ? "border-orange-300/30 bg-orange-300/10 text-orange-100" : "border-zinc-700 text-zinc-500"}`}>Voz {voiceEnabled ? "ON" : "OFF"}</button>
           <button type="button" onClick={() => void requestFullscreen()} className="rounded-xl border border-zinc-700 px-3 py-2.5 text-[10px] uppercase tracking-[0.14em] text-zinc-400">Pantalla completa</button>
         </div>
       </div>
@@ -306,7 +331,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
                 <p className="text-[8px] uppercase tracking-[0.18em] text-zinc-600">Anticipación</p>
                 <p className="mt-1 text-xs text-zinc-400">{leadSeconds.toFixed(1)} s · ahora ≈ {callAhead} m</p>
               </div>
-              <select value={leadSeconds} onChange={(event) => setLeadSeconds(Number(event.target.value))} className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white">
+              <select value={leadSeconds} onChange={(event) => changeLeadSeconds(Number(event.target.value))} className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white">
                 <option value={3.5}>3.5 s</option>
                 <option value={4.5}>4.5 s</option>
                 <option value={5.5}>5.5 s</option>
