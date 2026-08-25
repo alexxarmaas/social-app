@@ -1,13 +1,17 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import KmzTrackPicker from "@/components/reccemind/KmzTrackPicker";
 import PacenoteEditor from "@/components/reccemind/PacenoteEditor";
+import RecceMindDemo from "@/components/reccemind/RecceMindDemo";
 import RecceMindMap from "@/components/reccemind/RecceMindMap";
+import RecceMindReviewPanel from "@/components/reccemind/RecceMindReviewPanel";
 import RoutePointPicker from "@/components/reccemind/RoutePointPicker";
 import SpeedProfileChart from "@/components/reccemind/SpeedProfileChart";
 import { useRecceMindDraft } from "@/components/reccemind/useRecceMindDraft";
 import { buildRecceMindPrintDocument, rallyDistance } from "@/app/lib/reccemind-print";
+import type { RecceMindSavedStage } from "@/app/lib/reccemind-stage";
 import {
   DEFAULT_RECCEMIND_THRESHOLDS,
   decodeGooglePolyline,
@@ -19,11 +23,17 @@ import {
 
 type BackendStatus = "checking" | "online" | "offline";
 type InputMode = "route" | "gpx" | "kmz" | "telemetry";
+type AnalysisSourceType = InputMode | "gps";
 type RouteEntryMode = "search" | "map";
+type SaveState = "idle" | "saving" | "saved";
 
 interface ApiErrorPayload {
   error?: string;
   detail?: string | { msg?: string }[];
+}
+
+interface RecceMindConsoleProps {
+  initialStageId?: string | null;
 }
 
 function apiErrorMessage(payload: ApiErrorPayload, fallback: string) {
@@ -106,9 +116,19 @@ function formatSavedAt(value: string) {
   }).format(date);
 }
 
-export default function RecceMindConsole() {
+function isInputMode(value: string | null | undefined): value is InputMode {
+  return value === "route" || value === "gpx" || value === "kmz" || value === "telemetry";
+}
+
+function isSourceType(value: string | null | undefined): value is AnalysisSourceType {
+  return isInputMode(value) || value === "gps";
+}
+
+export default function RecceMindConsole({ initialStageId = null }: RecceMindConsoleProps) {
+  const router = useRouter();
   const [backendStatus, setBackendStatus] = useState<BackendStatus>("checking");
   const [mode, setMode] = useState<InputMode>("route");
+  const [sourceType, setSourceType] = useState<AnalysisSourceType>("route");
   const [routeEntryMode, setRouteEntryMode] = useState<RouteEntryMode>("search");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
@@ -117,6 +137,10 @@ export default function RecceMindConsole() {
   const [driverId, setDriverId] = useState("tramassso-admin");
   const [stageName, setStageName] = useState("");
   const [stageNameEdited, setStageNameEdited] = useState(false);
+  const [stageId, setStageId] = useState<string | null>(initialStageId);
+  const [stageLoading, setStageLoading] = useState(Boolean(initialStageId));
+  const [stageDirty, setStageDirty] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
   const [thresholds, setThresholds] = useState<RecceMindThresholds>(DEFAULT_RECCEMIND_THRESHOLDS);
   const [gpxFile, setGpxFile] = useState<File | null>(null);
   const [kmzFile, setKmzFile] = useState<File | null>(null);
@@ -127,6 +151,7 @@ export default function RecceMindConsole() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCurveIndex, setSelectedCurveIndex] = useState<number | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [recceActive, setRecceActive] = useState(false);
   const [recceCoordinates, setRecceCoordinates] = useState<RecceMindCoordinate[]>([]);
@@ -144,6 +169,35 @@ export default function RecceMindConsole() {
       if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     };
   }, []);
+
+  useEffect(() => {
+    if (!initialStageId) return;
+    let cancelled = false;
+    setStageLoading(true);
+    fetch(`/api/reccemind/stages/${encodeURIComponent(initialStageId)}`, { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json() as { stage?: RecceMindSavedStage; error?: string };
+        if (!response.ok || !payload.stage) throw new Error(payload.error || "No se pudo cargar el tramo guardado.");
+        if (cancelled) return;
+        const stage = payload.stage;
+        setStageId(stage.id);
+        setStageName(stage.name);
+        setStageNameEdited(true);
+        setDriverId(stage.driverId);
+        setThresholds(stage.thresholds);
+        setResult(stage.analysis);
+        setSourceType(isSourceType(stage.sourceType) ? stage.sourceType : "route");
+        if (isInputMode(stage.sourceType)) setMode(stage.sourceType);
+        setSelectedCurveIndex(null);
+        setStageDirty(false);
+        setSaveState("saved");
+      })
+      .catch((loadError) => {
+        if (!cancelled) setError(loadError instanceof Error ? loadError.message : "No se pudo cargar el tramo guardado.");
+      })
+      .finally(() => { if (!cancelled) setStageLoading(false); });
+    return () => { cancelled = true; };
+  }, [initialStageId]);
 
   const coordinates = result?.polyline ? decodeGooglePolyline(result.polyline) : [];
   const notes = result?.pacenotes.filter((note) => note.type === "note") ?? [];
@@ -169,6 +223,7 @@ export default function RecceMindConsole() {
   const updateThreshold = (level: keyof RecceMindThresholds, value: string) => {
     const numeric = Number(value);
     setThresholds((current) => ({ ...current, [level]: Number.isFinite(numeric) && numeric > 0 ? numeric : current[level] }));
+    setStageDirty(true);
   };
 
   const analyzeRoute = async () => {
@@ -229,6 +284,7 @@ export default function RecceMindConsole() {
     setError(null);
     setFeedbackMessage(null);
     setSelectedCurveIndex(null);
+    setShowDemo(false);
     try {
       const nextResult = mode === "route"
         ? await analyzeRoute()
@@ -238,7 +294,10 @@ export default function RecceMindConsole() {
             ? await analyzeKmz()
             : await analyzeTelemetry();
       setResult(nextResult);
+      setSourceType(mode);
       setBackendStatus("online");
+      setStageDirty(true);
+      setSaveState("idle");
       if (!stageNameEdited) setStageName(nextResult.sourceName || inferredInputStageName());
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "No se pudo analizar el tramo.");
@@ -255,6 +314,8 @@ export default function RecceMindConsole() {
     setDriverId(recoverableDraft.driverId);
     setSelectedCurveIndex(null);
     setError(null);
+    setStageDirty(true);
+    setSaveState("idle");
     setFeedbackMessage("Borrador local recuperado.");
   };
 
@@ -281,6 +342,38 @@ export default function RecceMindConsole() {
       window.speechSynthesis.speak(utterance);
     };
     speakNext();
+  };
+
+  const saveStage = async () => {
+    if (!result || saveState === "saving") return;
+    setSaveState("saving");
+    setError(null);
+    try {
+      const endpoint = stageId ? `/api/reccemind/stages/${encodeURIComponent(stageId)}` : "/api/reccemind/stages";
+      const response = await fetch(endpoint, {
+        method: stageId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: effectiveStageName,
+          driverId: driverId.trim() || "default",
+          sourceType,
+          sourceName: result.sourceName ?? null,
+          analysis: result,
+          thresholds,
+        }),
+      });
+      const payload = await response.json() as { stage?: { id: string }; error?: string };
+      if (!response.ok || !payload.stage) throw new Error(payload.error || "No se pudo guardar el tramo.");
+      const nextId = payload.stage.id;
+      setStageId(nextId);
+      setStageDirty(false);
+      setSaveState("saved");
+      setFeedbackMessage(stageId ? "Cambios guardados en Mis tramos." : "Tramo guardado en Mis tramos.");
+      if (!stageId) router.replace(`/reccemind?stage=${encodeURIComponent(nextId)}`, { scroll: false });
+    } catch (saveError) {
+      setSaveState("idle");
+      setError(saveError instanceof Error ? saveError.message : "No se pudo guardar el tramo.");
+    }
   };
 
   const teachCorrections = async () => {
@@ -360,7 +453,10 @@ export default function RecceMindConsole() {
         }),
       }));
       setResult(nextResult);
+      setSourceType("gps");
       setSelectedCurveIndex(null);
+      setStageDirty(true);
+      setSaveState("idle");
       if (!stageNameEdited) setStageName("Reconocimiento GPS");
     } catch (recceError) {
       setError(recceError instanceof Error ? recceError.message : "No se pudo procesar el reconocimiento GPS.");
@@ -370,6 +466,13 @@ export default function RecceMindConsole() {
   };
 
   const statusLabel = backendStatus === "online" ? "Motor online" : backendStatus === "offline" ? "Motor no disponible" : "Comprobando motor";
+  const cloudStatus = stageId
+    ? stageDirty
+      ? "Cambios pendientes"
+      : "Guardado en Mis tramos"
+    : lastSavedAt
+      ? `Borrador local · ${formatSavedAt(lastSavedAt)}`
+      : "Autoguardado local activo";
 
   return (
     <div className="space-y-6">
@@ -378,7 +481,7 @@ export default function RecceMindConsole() {
           <div className="max-w-3xl">
             <p className="text-[10px] uppercase tracking-[0.45em] text-rose-300/70">RecceMind</p>
             <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-white sm:text-5xl">Prepara, revisa y entrena tus tramos</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Ruta por búsqueda o mapa, GPX, KMZ, telemetría, reconocimiento GPS, editor estructurado y simulación de copiloto.</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">Ruta por búsqueda o mapa, GPX, KMZ, telemetría, reconocimiento GPS, revisión inteligente, editor estructurado y simulación de copiloto.</p>
           </div>
           <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[10px] uppercase tracking-[0.24em] ${backendStatus === "online" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : backendStatus === "offline" ? "border-red-400/30 bg-red-400/10 text-red-200" : "border-zinc-700 bg-zinc-900 text-zinc-400"}`}>
             <span className={`h-2 w-2 rounded-full ${backendStatus === "online" ? "bg-emerald-300" : backendStatus === "offline" ? "bg-red-300" : "bg-zinc-500"}`} />
@@ -387,7 +490,7 @@ export default function RecceMindConsole() {
         </div>
       </section>
 
-      {!result && recoverableDraft ? (
+      {!result && recoverableDraft && !stageLoading ? (
         <section className="flex flex-col gap-4 rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-[0.24em] text-amber-300/70">Borrador local disponible</p>
@@ -488,17 +591,18 @@ export default function RecceMindConsole() {
               onChange={(event) => {
                 setStageName(event.target.value);
                 setStageNameEdited(true);
+                setStageDirty(true);
               }}
               placeholder={result?.sourceName || inferredInputStageName()}
               maxLength={120}
               className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500"
             />
-            <span className="text-[10px] leading-4 text-zinc-600">Se usa en la cabecera, el PDF y el nombre del CSV.</span>
+            <span className="text-[10px] leading-4 text-zinc-600">Se usa en la biblioteca, la cabecera, el PDF y el nombre del CSV.</span>
           </label>
 
           <label className="grid gap-2">
             <span className="text-xs uppercase tracking-[0.24em] text-zinc-500">Perfil / piloto</span>
-            <input value={driverId} onChange={(event) => setDriverId(event.target.value)} maxLength={100} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" />
+            <input value={driverId} onChange={(event) => { setDriverId(event.target.value); setStageDirty(true); }} maxLength={100} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-500" />
           </label>
 
           <div className="rounded-2xl border border-zinc-800 bg-black/25 p-4">
@@ -523,21 +627,21 @@ export default function RecceMindConsole() {
         </form>
 
         <div className="min-w-0 space-y-5">
-          {result ? (
+          {stageLoading && !result ? (
+            <div className="flex min-h-[38rem] items-center justify-center rounded-[2rem] border border-zinc-800 bg-zinc-950/70 text-xs uppercase tracking-[0.28em] text-zinc-600">Cargando tramo guardado</div>
+          ) : result ? (
             <>
               <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-[9px] uppercase tracking-[0.22em] text-zinc-600">Tramo actual</p>
                   <p className="mt-1 truncate text-sm font-semibold text-white">{effectiveStageName}</p>
                 </div>
-                <span className="shrink-0 text-[10px] text-emerald-300/70">
-                  {lastSavedAt ? `Borrador guardado · ${formatSavedAt(lastSavedAt)}` : "Autoguardado local activo"}
-                </span>
+                <span className={`shrink-0 text-[10px] ${stageId && !stageDirty ? "text-emerald-300/70" : stageId ? "text-amber-300/70" : "text-zinc-500"}`}>{cloudStatus}</span>
               </div>
 
               {result.sourceName ? (
                 <div className="rounded-2xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3 text-sm text-sky-100">
-                  <span className="font-semibold">KMZ: {result.sourceName}</span>
+                  <span className="font-semibold">Fuente: {result.sourceName}</span>
                   {result.kmzTrackCount && result.kmzTrackCount > 1 ? <span className="ml-2 text-sky-200/60">· {result.kmzTrackCount} trazados detectados.</span> : null}
                 </div>
               ) : null}
@@ -552,13 +656,19 @@ export default function RecceMindConsole() {
               <RecceMindMap coordinates={coordinates} curves={result.curves} selectedCurveIndex={selectedCurveIndex} onSelectCurve={setSelectedCurveIndex} liveCoordinates={recceCoordinates} />
 
               <div className="flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3">
-                <ActionButton label={isSimulating ? "Detener copiloto" : "Reproducir como copiloto"} onClick={toggleSimulation} />
+                <ActionButton label={showDemo ? "Cerrar modo demo" : "Modo demo"} onClick={() => setShowDemo((current) => !current)} />
+                <ActionButton label={isSimulating ? "Detener audio" : "Reproducir audio"} onClick={toggleSimulation} />
+                <ActionButton label={saveState === "saving" ? "Guardando..." : stageId ? stageDirty ? "Guardar cambios" : "Guardado" : "Guardar tramo"} onClick={() => void saveStage()} disabled={saveState === "saving" || Boolean(stageId && !stageDirty)} />
                 <ActionButton label="Vista PDF" onClick={() => printPacenotes(result, driverId, effectiveStageName)} />
                 <ActionButton label="Exportar CSV" onClick={() => downloadPacenotesCsv(result, effectiveStageName)} />
                 <ActionButton label="Enseñar correcciones" onClick={teachCorrections} />
                 {feedbackMessage ? <span className="self-center text-xs text-emerald-300">{feedbackMessage}</span> : null}
               </div>
-              <p className="-mt-2 px-2 text-[11px] text-zinc-600">El modo copiloto agrupa curva + distancia siguiente y redondea la distancia para una lectura más natural.</p>
+              <p className="-mt-2 px-2 text-[11px] text-zinc-600">El modo demo anima el recorrido completo. La reproducción rápida conserva el modo de audio secuencial anterior.</p>
+
+              {showDemo ? <RecceMindDemo key={`${result.polyline}-${effectiveStageName}`} result={result} coordinates={coordinates} /> : null}
+
+              <RecceMindReviewPanel result={result} thresholds={thresholds} onSelectCurve={setSelectedCurveIndex} />
 
               <SpeedProfileChart speeds={result.speed_profile} />
 
@@ -570,7 +680,13 @@ export default function RecceMindConsole() {
                     <p className="mt-2 text-xs leading-5 text-zinc-600">Dirección, grado, abre/cierra, longitud, cortar/no cortar, referencias de entorno y carretera. “Enseñar correcciones” sigue enviando únicamente cambios de grado al aprendizaje.</p>
                   </div>
                   <div className="mt-5 max-h-[52rem] overflow-y-auto pr-1">
-                    <PacenoteEditor pacenotes={result.pacenotes} onChange={(pacenotes) => setResult((current) => current ? { ...current, pacenotes } : current)} />
+                    <PacenoteEditor
+                      pacenotes={result.pacenotes}
+                      onChange={(pacenotes) => {
+                        setResult((current) => current ? { ...current, pacenotes } : current);
+                        setStageDirty(true);
+                      }}
+                    />
                   </div>
                 </section>
 
@@ -578,9 +694,9 @@ export default function RecceMindConsole() {
                   <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Geometría</p>
                   <h2 className="mt-2 text-2xl font-semibold text-white">Curvas detectadas</h2>
                   <div className="mt-5 overflow-x-auto rounded-2xl border border-zinc-800">
-                    <table className="min-w-[48rem] divide-y divide-zinc-800 text-sm">
+                    <table className="min-w-[54rem] divide-y divide-zinc-800 text-sm">
                       <thead className="bg-zinc-900/70 text-left text-[10px] uppercase tracking-[0.24em] text-zinc-500">
-                        <tr><th className="px-4 py-3">Nota</th><th className="px-4 py-3">Radio</th><th className="px-4 py-3">Longitud</th><th className="px-4 py-3">Giro</th><th className="px-4 py-3">Posición</th></tr>
+                        <tr><th className="px-4 py-3">Nota</th><th className="px-4 py-3">Radio</th><th className="px-4 py-3">Longitud</th><th className="px-4 py-3">Giro</th><th className="px-4 py-3">Conf.</th><th className="px-4 py-3">Posición</th></tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-900 bg-black/20">
                         {result.curves.map((curve, index) => {
@@ -594,6 +710,7 @@ export default function RecceMindConsole() {
                               <td className="px-4 py-3 text-zinc-400">{profileRadius}</td>
                               <td className="px-4 py-3 text-zinc-400">{Math.round(curve.length)} m</td>
                               <td className="px-4 py-3 text-zinc-400">{Math.round(Math.abs(curve.heading_change))}°</td>
+                              <td className="px-4 py-3 text-zinc-400">{typeof curve.classification_confidence === "number" ? `${Math.round(curve.classification_confidence * 100)} %` : "—"}</td>
                               <td className="px-4 py-3 text-zinc-400">{Math.round(curve.start_distance)} m</td>
                             </tr>
                           );
@@ -633,6 +750,6 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4"><p className="text-[10px] uppercase tracking-[0.28em] text-zinc-600">{label}</p><p className="mt-2 text-2xl font-semibold text-white">{value}</p></div>;
 }
 
-function ActionButton({ label, onClick }: { label: string; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className="rounded-full border border-zinc-700 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white hover:text-white">{label}</button>;
+function ActionButton({ label, onClick, disabled = false }: { label: string; onClick: () => void; disabled?: boolean }) {
+  return <button type="button" disabled={disabled} onClick={onClick} className="rounded-full border border-zinc-700 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-35">{label}</button>;
 }
