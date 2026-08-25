@@ -6,7 +6,9 @@ import { rallyDistance } from "@/app/lib/reccemind-print";
 import type { RecceMindAnalysis, RecceMindCoordinate } from "@/app/lib/reccemind";
 
 const EARTH_RADIUS_M = 6_371_000;
-const BASE_DEMO_SPEED_MPS = 25;
+const FALLBACK_SPEED_MPS = 25;
+const MIN_DEMO_SPEED_MPS = 8;
+const CALL_AHEAD_METERS = 160;
 
 function segmentDistance(a: RecceMindCoordinate, b: RecceMindCoordinate) {
   const lat1 = a.lat * Math.PI / 180;
@@ -27,11 +29,9 @@ function routeDistances(coordinates: RecceMindCoordinate[]) {
   return cumulative;
 }
 
-function coordinateAtDistance(coordinates: RecceMindCoordinate[], cumulative: number[], distance: number) {
-  if (!coordinates.length) return null;
-  if (distance <= 0) return coordinates[0];
-  const total = cumulative.at(-1) ?? 0;
-  if (distance >= total) return coordinates.at(-1) ?? null;
+function indexAtDistance(cumulative: number[], distance: number) {
+  if (cumulative.length <= 1 || distance <= 0) return 0;
+  if (distance >= (cumulative.at(-1) ?? 0)) return cumulative.length - 1;
 
   let low = 1;
   let high = cumulative.length - 1;
@@ -40,8 +40,16 @@ function coordinateAtDistance(coordinates: RecceMindCoordinate[], cumulative: nu
     if (cumulative[mid] < distance) low = mid + 1;
     else high = mid;
   }
+  return low;
+}
 
-  const endIndex = low;
+function coordinateAtDistance(coordinates: RecceMindCoordinate[], cumulative: number[], distance: number) {
+  if (!coordinates.length) return null;
+  if (distance <= 0) return coordinates[0];
+  const total = cumulative.at(-1) ?? 0;
+  if (distance >= total) return coordinates.at(-1) ?? null;
+
+  const endIndex = indexAtDistance(cumulative, distance);
   const startIndex = Math.max(0, endIndex - 1);
   const startDistance = cumulative[startIndex];
   const endDistance = cumulative[endIndex];
@@ -53,6 +61,16 @@ function coordinateAtDistance(coordinates: RecceMindCoordinate[], cumulative: nu
     lat: start.lat + (end.lat - start.lat) * ratio,
     lng: start.lng + (end.lng - start.lng) * ratio,
   };
+}
+
+function speedAtDistance(speedProfile: number[], cumulative: number[], distance: number) {
+  if (!speedProfile.length) return FALLBACK_SPEED_MPS;
+  const coordinateIndex = indexAtDistance(cumulative, distance);
+  const profileIndex = cumulative.length <= 1
+    ? 0
+    : Math.round(coordinateIndex * (speedProfile.length - 1) / (cumulative.length - 1));
+  const speed = speedProfile[Math.max(0, Math.min(speedProfile.length - 1, profileIndex))];
+  return Number.isFinite(speed) && speed > 0 ? Math.max(MIN_DEMO_SPEED_MPS, speed) : FALLBACK_SPEED_MPS;
 }
 
 function buildCalls(result: RecceMindAnalysis) {
@@ -85,6 +103,7 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
   const upcoming = calls[normalizedUpcomingIndex] ?? null;
   const after = calls[normalizedUpcomingIndex + 1] ?? null;
   const distanceToCall = upcoming ? Math.max(0, upcoming.note.distance - progress) : 0;
+  const currentSpeedMps = speedAtDistance(result.speed_profile, cumulative, progress);
   const playhead = useMemo(() => coordinateAtDistance(coordinates, cumulative, progress), [coordinates, cumulative, progress]);
   const selectedCurveIndex = upcoming?.note.curve_index ?? null;
 
@@ -96,7 +115,8 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
     const tick = (now: number) => {
       const elapsed = Math.min(0.1, Math.max(0, (now - previous) / 1000));
       previous = now;
-      const next = Math.min(totalDistance, progressRef.current + elapsed * BASE_DEMO_SPEED_MPS * multiplier);
+      const estimatedSpeed = speedAtDistance(result.speed_profile, cumulative, progressRef.current);
+      const next = Math.min(totalDistance, progressRef.current + elapsed * estimatedSpeed * multiplier);
       progressRef.current = next;
       setProgress(next);
       if (next >= totalDistance) {
@@ -108,10 +128,11 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
 
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
-  }, [multiplier, playing, totalDistance]);
+  }, [cumulative, multiplier, playing, result.speed_profile, totalDistance]);
 
   useEffect(() => {
     if (!playing || !voiceEnabled || !upcoming || !("speechSynthesis" in window)) return;
+    if (distanceToCall > CALL_AHEAD_METERS) return;
     if (lastSpokenRef.current === upcoming.id) return;
     lastSpokenRef.current = upcoming.id;
     window.speechSynthesis.cancel();
@@ -119,7 +140,7 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
     utterance.lang = "es-ES";
     utterance.rate = 1.35;
     window.speechSynthesis.speak(utterance);
-  }, [playing, upcoming, voiceEnabled]);
+  }, [distanceToCall, playing, upcoming, voiceEnabled]);
 
   const setDemoProgress = (next: number) => {
     const clamped = Math.max(0, Math.min(totalDistance, next));
@@ -144,7 +165,7 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
         <div>
           <p className="text-[10px] uppercase tracking-[0.4em] text-emerald-300/60">Modo demo</p>
           <h2 className="mt-2 text-2xl font-semibold text-white">Simulación visual de copiloto</h2>
-          <p className="mt-2 text-xs leading-5 text-zinc-500">Recorre el trazado con un ritmo virtual, muestra la siguiente llamada y reproduce la nota como la oiría el equipo.</p>
+          <p className="mt-2 text-xs leading-5 text-zinc-500">El coche sigue el perfil de velocidad estimado del trazado, muestra la siguiente llamada y la canta al entrar en la ventana de anticipación.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setPlaying((current) => !current)} className="rounded-xl bg-emerald-300 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-black">{playing ? "Pausar" : "Reproducir"}</button>
@@ -181,7 +202,7 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
             <div>
               <div className="mb-2 flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-zinc-600">
                 <span>{(progress / 1000).toFixed(2)} km</span>
-                <span>{Math.round(BASE_DEMO_SPEED_MPS * 3.6 * multiplier)} km/h virtual</span>
+                <span>{Math.round(currentSpeedMps * 3.6)} km/h estimados</span>
               </div>
               <input
                 type="range"
@@ -193,10 +214,13 @@ export default function RecceMindDemo({ result, coordinates }: { result: RecceMi
                 className="w-full accent-emerald-300"
               />
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[0.5, 1, 2, 4].map((value) => (
-                <button key={value} type="button" onClick={() => setMultiplier(value)} className={`rounded-lg border px-2 py-2 text-[10px] font-semibold ${multiplier === value ? "border-emerald-300/40 bg-emerald-300/10 text-emerald-100" : "border-zinc-800 text-zinc-500"}`}>×{value}</button>
-              ))}
+            <div>
+              <p className="mb-2 text-[8px] uppercase tracking-[0.18em] text-zinc-600">Velocidad de reproducción</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[0.5, 1, 2, 4].map((value) => (
+                  <button key={value} type="button" onClick={() => setMultiplier(value)} className={`rounded-lg border px-2 py-2 text-[10px] font-semibold ${multiplier === value ? "border-emerald-300/40 bg-emerald-300/10 text-emerald-100" : "border-zinc-800 text-zinc-500"}`}>×{value}</button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
