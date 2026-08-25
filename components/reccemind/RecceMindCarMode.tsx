@@ -22,6 +22,12 @@ function distanceNote(meters: number, atDistance: number): RecceMindPacenote {
   };
 }
 
+function previousCallEnd(analysis: RecceMindAnalysis, note: RecceMindPacenote | null) {
+  if (!note) return 0;
+  if (note.curve_index !== null) return analysis.curves[note.curve_index]?.end_distance ?? note.distance;
+  return note.distance;
+}
+
 function insertManualCall(analysis: RecceMindAnalysis, text: string, distance: number): RecceMindAnalysis {
   const calls = analysis.pacenotes.filter((note) => note.type === "note");
   const insertionDistance = Math.max(0, Math.round(distance));
@@ -38,10 +44,7 @@ function insertManualCall(analysis: RecceMindAnalysis, text: string, distance: n
 
   if (!nextCall) {
     const nextPacenotes = [...analysis.pacenotes];
-    const previousEnd = previousCall?.curve_index !== null && previousCall?.curve_index !== undefined
-      ? analysis.curves[previousCall.curve_index]?.end_distance ?? previousCall.distance
-      : previousCall?.distance ?? 0;
-    const gap = Math.max(0, insertionDistance - previousEnd);
+    const gap = Math.max(0, insertionDistance - previousCallEnd(analysis, previousCall));
     if (gap > 10) nextPacenotes.push(distanceNote(gap, insertionDistance));
     nextPacenotes.push(manual);
     return { ...analysis, pacenotes: nextPacenotes };
@@ -51,10 +54,7 @@ function insertManualCall(analysis: RecceMindAnalysis, text: string, distance: n
   let replaceFrom = nextIndex;
   if (nextIndex > 0 && analysis.pacenotes[nextIndex - 1]?.type === "distance") replaceFrom = nextIndex - 1;
 
-  const previousEnd = previousCall?.curve_index !== null && previousCall?.curve_index !== undefined
-    ? analysis.curves[previousCall.curve_index]?.end_distance ?? previousCall.distance
-    : previousCall?.distance ?? 0;
-  const firstGap = Math.max(0, insertionDistance - previousEnd);
+  const firstGap = Math.max(0, insertionDistance - previousCallEnd(analysis, previousCall));
   const secondGap = Math.max(0, nextCall.distance - insertionDistance);
   const replacement: RecceMindPacenote[] = [];
   if (firstGap > 10) replacement.push(distanceNote(firstGap, insertionDistance));
@@ -62,12 +62,14 @@ function insertManualCall(analysis: RecceMindAnalysis, text: string, distance: n
   if (secondGap > 10) replacement.push(distanceNote(secondGap, nextCall.distance));
   replacement.push(nextCall);
 
-  const nextPacenotes = [
-    ...analysis.pacenotes.slice(0, replaceFrom),
-    ...replacement,
-    ...analysis.pacenotes.slice(nextIndex + 1),
-  ];
-  return { ...analysis, pacenotes: nextPacenotes };
+  return {
+    ...analysis,
+    pacenotes: [
+      ...analysis.pacenotes.slice(0, replaceFrom),
+      ...replacement,
+      ...analysis.pacenotes.slice(nextIndex + 1),
+    ],
+  };
 }
 
 export default function RecceMindCarMode({ stageId }: RecceMindCarModeProps) {
@@ -99,7 +101,8 @@ export default function RecceMindCarMode({ stageId }: RecceMindCarModeProps) {
   const coordinates = useMemo(() => analysis?.polyline ? decodeGooglePolyline(analysis.polyline) : [], [analysis]);
 
   const persistAnalysis = async (nextAnalysis: RecceMindAnalysis, successMessage: string) => {
-    if (!stage || saving) return;
+    if (!stage) throw new Error("El tramo todavía no está disponible.");
+    if (saving) throw new Error("Ya hay un cambio guardándose. Espera un momento.");
     setSaving(true);
     setError(null);
     setMessage(null);
@@ -121,16 +124,18 @@ export default function RecceMindCarMode({ stageId }: RecceMindCarModeProps) {
       setAnalysis(nextAnalysis);
       setMessage(successMessage);
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "No se pudo guardar el tramo.");
+      const nextError = saveError instanceof Error ? saveError : new Error("No se pudo guardar el tramo.");
+      setError(nextError.message);
+      throw nextError;
     } finally {
       setSaving(false);
     }
   };
 
-  const insertVoiceNote = (text: string, distance: number) => {
-    if (!analysis) return;
+  const insertVoiceNote = async (text: string, distance: number) => {
+    if (!analysis) throw new Error("El tramo todavía no está cargado.");
     const nextAnalysis = insertManualCall(analysis, text, distance);
-    void persistAnalysis(nextAnalysis, `Dictado guardado en ${(distance / 1000).toFixed(3)} km.`);
+    await persistAnalysis(nextAnalysis, `Dictado guardado en ${(distance / 1000).toFixed(3)} km.`);
   };
 
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center rounded-[2rem] border border-zinc-800 bg-zinc-950/70 text-xs uppercase tracking-[0.24em] text-zinc-600">Preparando modo coche</div>;
