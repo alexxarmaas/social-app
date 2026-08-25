@@ -10,6 +10,12 @@ export interface RecceMindRouteProjection {
   segmentIndex: number;
 }
 
+export interface RecceMindProjectionOptions {
+  preferredSegmentIndex?: number | null;
+  searchRadiusSegments?: number;
+  reacquireAboveMeters?: number;
+}
+
 export function segmentDistance(a: RecceMindCoordinate, b: RecceMindCoordinate) {
   const lat1 = a.lat * Math.PI / 180;
   const lat2 = b.lat * Math.PI / 180;
@@ -44,11 +50,7 @@ export function indexAtDistance(cumulative: number[], distance: number) {
   return low;
 }
 
-export function coordinateAtDistance(
-  coordinates: RecceMindCoordinate[],
-  cumulative: number[],
-  distance: number,
-) {
+export function coordinateAtDistance(coordinates: RecceMindCoordinate[], cumulative: number[], distance: number) {
   if (!coordinates.length) return null;
   if (distance <= 0) return coordinates[0];
   const total = cumulative.at(-1) ?? 0;
@@ -68,17 +70,17 @@ export function coordinateAtDistance(
   };
 }
 
-export function projectCoordinateOntoRoute(
+function projectRange(
   point: RecceMindCoordinate,
   coordinates: RecceMindCoordinate[],
-  cumulative = routeDistances(coordinates),
+  cumulative: number[],
+  startSegment: number,
+  endSegmentExclusive: number,
 ): RecceMindRouteProjection | null {
-  if (coordinates.length < 2 || cumulative.length !== coordinates.length) return null;
-
   const metersPerDegreeLon = METERS_PER_DEGREE_LAT * Math.max(0.1, Math.cos(point.lat * Math.PI / 180));
   let best: RecceMindRouteProjection | null = null;
 
-  for (let index = 0; index < coordinates.length - 1; index += 1) {
+  for (let index = startSegment; index < endSegmentExclusive; index += 1) {
     const start = coordinates[index];
     const end = coordinates[index + 1];
     const ax = (start.lng - point.lng) * metersPerDegreeLon;
@@ -88,13 +90,10 @@ export function projectCoordinateOntoRoute(
     const dx = bx - ax;
     const dy = by - ay;
     const lengthSquared = dx * dx + dy * dy;
-    const ratio = lengthSquared <= 0
-      ? 0
-      : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / lengthSquared));
+    const ratio = lengthSquared <= 0 ? 0 : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / lengthSquared));
     const projectedX = ax + ratio * dx;
     const projectedY = ay + ratio * dy;
     const offRouteMeters = Math.hypot(projectedX, projectedY);
-
     if (best && offRouteMeters >= best.offRouteMeters) continue;
 
     const segmentMeters = Math.max(0, cumulative[index + 1] - cumulative[index]);
@@ -110,6 +109,27 @@ export function projectCoordinateOntoRoute(
   }
 
   return best;
+}
+
+export function projectCoordinateOntoRoute(
+  point: RecceMindCoordinate,
+  coordinates: RecceMindCoordinate[],
+  cumulative = routeDistances(coordinates),
+  options: RecceMindProjectionOptions = {},
+): RecceMindRouteProjection | null {
+  if (coordinates.length < 2 || cumulative.length !== coordinates.length) return null;
+
+  const preferred = options.preferredSegmentIndex;
+  if (typeof preferred === "number" && Number.isInteger(preferred)) {
+    const radius = Math.max(20, Math.min(1_000, options.searchRadiusSegments ?? 180));
+    const start = Math.max(0, preferred - radius);
+    const end = Math.min(coordinates.length - 1, preferred + radius + 1);
+    const local = projectRange(point, coordinates, cumulative, start, end);
+    const reacquireAbove = Math.max(30, options.reacquireAboveMeters ?? 100);
+    if (local && local.offRouteMeters <= reacquireAbove) return local;
+  }
+
+  return projectRange(point, coordinates, cumulative, 0, coordinates.length - 1);
 }
 
 export function clampCallAheadMeters(speedMps: number | null | undefined, leadSeconds = 4.5) {
