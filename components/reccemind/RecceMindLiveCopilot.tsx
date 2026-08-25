@@ -72,6 +72,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
   const initializedRef = useRef(false);
   const previousSampleRef = useRef<LiveSample | null>(null);
   const reverseSamplesRef = useRef(0);
+  const matchedSegmentRef = useRef<number | null>(null);
   const wakeLockRef = useRef<WakeLockSentinelLike | null>(null);
   const leadSecondsRef = useRef(4.5);
   const voiceEnabledRef = useRef(true);
@@ -127,6 +128,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
     setStatus("waiting");
     previousSampleRef.current = null;
     reverseSamplesRef.current = 0;
+    matchedSegmentRef.current = null;
     initializedRef.current = false;
   };
 
@@ -166,6 +168,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
     initializedRef.current = false;
     previousSampleRef.current = null;
     reverseSamplesRef.current = 0;
+    matchedSegmentRef.current = null;
     setActive(true);
     setStatus("waiting");
     void requestWakeLock();
@@ -173,7 +176,11 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
     watchRef.current = navigator.geolocation.watchPosition(
       (position) => {
         const raw = { lat: position.coords.latitude, lng: position.coords.longitude };
-        const matched = projectCoordinateOntoRoute(raw, coordinates, cumulative);
+        const matched = projectCoordinateOntoRoute(raw, coordinates, cumulative, {
+          preferredSegmentIndex: matchedSegmentRef.current,
+          searchRadiusSegments: 180,
+          reacquireAboveMeters: 100,
+        });
         setRawPosition(raw);
         setAccuracy(position.coords.accuracy);
         setProjection(matched);
@@ -181,6 +188,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
           setStatus("off_route");
           return;
         }
+        if (matched.offRouteMeters <= 100) matchedSegmentRef.current = matched.segmentIndex;
 
         const now = position.timestamp || Date.now();
         const previous = previousSampleRef.current;
@@ -287,7 +295,7 @@ export default function RecceMindLiveCopilot({ result, coordinates }: { result: 
             {wakeLockActive ? <span className="text-[8px] uppercase tracking-[0.14em] text-emerald-300/60">pantalla activa</span> : null}
           </div>
           <h2 className="mt-2 text-2xl font-semibold text-white">Llamadas sobre posición real</h2>
-          <p className="mt-2 max-w-3xl text-xs leading-5 text-zinc-500">Map-matching contra el tramo, control de precisión, sentido de marcha y anticipación dinámica según velocidad. Úsalo primero en reconocimiento o entorno controlado.</p>
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-zinc-500">Map-matching con continuidad sobre el trazado, control de precisión, sentido de marcha y anticipación dinámica según velocidad. Úsalo primero en reconocimiento o entorno controlado.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={start} className={`rounded-xl px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] ${active ? "bg-red-400 text-black" : "bg-orange-300 text-black"}`}>{active ? "Detener GPS" : "Iniciar copiloto"}</button>
