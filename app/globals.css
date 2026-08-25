@@ -163,6 +163,14 @@ a {
   /* Firefox */
 }
 
+/* RecceMind owns its note-list scrolling internally. Avoid a second scrollable
+   viewport around the complete editor, which made controls look clipped. */
+.max-h-\[52rem\].overflow-y-auto.pr-1 {
+  max-height: none !important;
+  overflow-y: visible !important;
+  padding-right: 0 !important;
+}
+
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
