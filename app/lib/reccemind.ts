@@ -51,6 +51,10 @@ export interface RecceMindCurve {
   classification: number;
   entry_classification?: number;
   exit_classification?: number;
+  classification_confidence?: number;
+  classification_source?: "ml" | "rule" | string;
+  entry_confidence?: number;
+  exit_confidence?: number;
   max_speed?: number;
   min_gear?: number;
   max_braking?: number;
@@ -73,6 +77,7 @@ export interface RecceMindAnalysis {
   duration?: string;
   sourceName?: string;
   kmzTrackCount?: number;
+  selectedTrackIndex?: number;
 }
 
 export interface RecceMindCoordinate {

@@ -372,3 +372,24 @@ model EventPhoto {
   uploaderId String
   uploader   User   @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
 }
+
+// Persistent RecceMind workspace owned by an authenticated account.
+model RecceMindStage {
+  id             String   @id @default(uuid())
+  ownerId        String
+  name           String
+  driverId       String   @default("default")
+  sourceType     String?
+  sourceName     String?
+  status         String   @default("draft")
+  analysis       Json
+  thresholds     Json?
+  distanceMeters Float?
+  curveCount     Int      @default(0)
+  noteCount      Int      @default(0)
+  reviewCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  @@index([ownerId, updatedAt(sort: Desc)], map: "RecceMindStage_ownerId_updatedAt_idx")
+}
