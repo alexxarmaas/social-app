@@ -21,24 +21,23 @@ export default function RecceMindStageLibrary() {
   const [error, setError] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(true);
 
-  const loadStages = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/reccemind/stages", { cache: "no-store" });
-      const payload = await response.json() as { stages?: RecceMindSavedStageSummary[]; storageReady?: boolean; error?: string };
-      if (!response.ok) throw new Error(payload.error || "No se pudieron cargar los tramos.");
-      setStages(payload.stages ?? []);
-      setStorageReady(payload.storageReady !== false);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "No se pudieron cargar los tramos.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    void loadStages();
+    let cancelled = false;
+    fetch("/api/reccemind/stages", { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json() as { stages?: RecceMindSavedStageSummary[]; storageReady?: boolean; error?: string };
+        if (!response.ok) throw new Error(payload.error || "No se pudieron cargar los tramos.");
+        if (cancelled) return;
+        setStages(payload.stages ?? []);
+        setStorageReady(payload.storageReady !== false);
+      })
+      .catch((loadError) => {
+        if (!cancelled) setError(loadError instanceof Error ? loadError.message : "No se pudieron cargar los tramos.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   const removeStage = async (stage: RecceMindSavedStageSummary) => {
