@@ -18,6 +18,8 @@ interface RecceMindMapProps {
   selectedCurveIndex: number | null;
   onSelectCurve: (index: number | null) => void;
   liveCoordinates?: RecceMindCoordinate[];
+  playhead?: RecceMindCoordinate | null;
+  followPlayhead?: boolean;
 }
 
 export default function RecceMindMap(props: RecceMindMapProps) {
