@@ -11,6 +11,8 @@ interface Props {
   selectedCurveIndex: number | null;
   onSelectCurve: (index: number | null) => void;
   liveCoordinates?: RecceMindCoordinate[];
+  playhead?: RecceMindCoordinate | null;
+  followPlayhead?: boolean;
 }
 
 function FitBounds({ positions }: { positions: LatLngExpression[] }) {
@@ -22,20 +24,38 @@ function FitBounds({ positions }: { positions: LatLngExpression[] }) {
   return null;
 }
 
-function FocusCurve({ coordinate }: { coordinate: LatLngExpression | null }) {
+function FocusCurve({ coordinate, disabled = false }: { coordinate: LatLngExpression | null; disabled?: boolean }) {
   const map = useMap();
   useEffect(() => {
-    if (!coordinate) return;
+    if (!coordinate || disabled) return;
     map.flyTo(coordinate, Math.max(map.getZoom(), 16), { duration: 0.7 });
-  }, [coordinate, map]);
+  }, [coordinate, disabled, map]);
   return null;
 }
 
-export default function RecceMindMapInner({ coordinates, curves, selectedCurveIndex, onSelectCurve, liveCoordinates = [] }: Props) {
+function FollowPlayhead({ coordinate, enabled }: { coordinate: LatLngExpression | null; enabled: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!coordinate || !enabled) return;
+    map.panTo(coordinate, { animate: false });
+  }, [coordinate, enabled, map]);
+  return null;
+}
+
+export default function RecceMindMapInner({
+  coordinates,
+  curves,
+  selectedCurveIndex,
+  onSelectCurve,
+  liveCoordinates = [],
+  playhead = null,
+  followPlayhead = false,
+}: Props) {
   const positions = useMemo<LatLngExpression[]>(() => coordinates.map((point) => [point.lat, point.lng]), [coordinates]);
   const livePositions = useMemo<LatLngExpression[]>(() => liveCoordinates.map((point) => [point.lat, point.lng]), [liveCoordinates]);
   const fallbackCenter: LatLngExpression = [28.1234, -15.4321];
   const center = positions[0] ?? livePositions[0] ?? fallbackCenter;
+  const playheadPosition: LatLngExpression | null = playhead ? [playhead.lat, playhead.lng] : null;
 
   const selectedMidpoint = useMemo<LatLngExpression | null>(() => {
     if (selectedCurveIndex === null) return null;
@@ -72,6 +92,7 @@ export default function RecceMindMapInner({ coordinates, curves, selectedCurveIn
                       <div>Radio: {Math.round(curve.radius)} m</div>
                       <div>Longitud: {Math.round(curve.length)} m</div>
                       <div>Giro: {Math.round(Math.abs(curve.heading_change))}°</div>
+                      {typeof curve.classification_confidence === "number" ? <div>Confianza: {Math.round(curve.classification_confidence * 100)} %</div> : null}
                       <a className="mt-2 inline-block font-semibold underline" href={`https://www.google.com/maps/search/?api=1&query=${midpoint.lat},${midpoint.lng}`} target="_blank" rel="noreferrer">Abrir en Google Maps</a>
                     </div>
                   </Popup>
@@ -81,8 +102,16 @@ export default function RecceMindMapInner({ coordinates, curves, selectedCurveIn
           );
         })}
         {livePositions.length > 1 ? <Polyline positions={livePositions} pathOptions={{ color: "#22c55e", weight: 5, opacity: 0.95 }} /> : null}
+        {playheadPosition ? (
+          <CircleMarker
+            center={playheadPosition}
+            radius={10}
+            pathOptions={{ color: "#a7f3d0", fillColor: "#10b981", fillOpacity: 1, weight: 4 }}
+          />
+        ) : null}
         <FitBounds positions={positions.length > 1 ? positions : livePositions} />
-        <FocusCurve coordinate={selectedMidpoint} />
+        <FocusCurve coordinate={selectedMidpoint} disabled={followPlayhead} />
+        <FollowPlayhead coordinate={playheadPosition} enabled={followPlayhead} />
       </MapContainer>
     </div>
   );
