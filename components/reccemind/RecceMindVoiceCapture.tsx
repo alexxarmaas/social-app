@@ -6,7 +6,7 @@ import type { RecceMindCoordinate } from "@/app/lib/reccemind";
 
 interface RecceMindVoiceCaptureProps {
   coordinates: RecceMindCoordinate[];
-  onInsert: (text: string, distance: number) => void;
+  onInsert: (text: string, distance: number) => void | Promise<void>;
 }
 
 type VoiceState = "idle" | "recording" | "processing";
@@ -78,8 +78,9 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
       const text = payload.text?.trim();
       if (!text) throw new Error(payload.error || "No se entendió el audio. Repite la nota.");
 
-      onInsert(text, Math.round(projection.routeDistance));
-      setMessage(`Nota añadida en ${(projection.routeDistance / 1000).toFixed(3)} km · ${Math.round(projection.offRouteMeters)} m del eje.`);
+      setMessage("Transcripción lista. Guardando el cambio en el tramo…");
+      await onInsert(text, Math.round(projection.routeDistance));
+      setMessage(`Nota guardada en ${(projection.routeDistance / 1000).toFixed(3)} km · ${Math.round(projection.offRouteMeters)} m del eje.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo añadir la nota de voz.");
     } finally {
@@ -117,7 +118,7 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
       };
       recorder.start();
       setState("recording");
-      setMessage("Grabando. Di una nota corta y clara; se guardará en tu posición GPS al detener.");
+      setMessage("Grabando. Di una nota corta y clara; se asociará a tu posición GPS al detener.");
     } catch (error) {
       cleanupStream();
       setMessage(error instanceof Error ? error.message : "No se pudo acceder al micrófono.");
@@ -134,7 +135,7 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
         <div>
           <p className="text-[9px] uppercase tracking-[0.24em] text-sky-300/60">Recce real</p>
           <h3 className="mt-1 text-lg font-semibold text-white">Dictado GPS</h3>
-          <p className="mt-1 max-w-2xl text-xs leading-5 text-zinc-500">Graba una observación durante el reconocimiento. RecceMind la transcribe y la inserta en el metro del tramo más cercano.</p>
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-zinc-500">Graba una observación durante el reconocimiento. RecceMind la transcribe, la sitúa sobre el tramo y confirma el guardado antes de darla por registrada.</p>
         </div>
         <button
           type="button"
