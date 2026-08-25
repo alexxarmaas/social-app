@@ -24,7 +24,8 @@ export default async function RecceMindLayout({ children }: { children: ReactNod
             <p className="text-[9px] uppercase tracking-[0.32em] text-zinc-600">Tramassso Labs · {displayUser}</p>
           </div>
           <nav className="flex shrink-0 flex-wrap items-center justify-end gap-2 text-[10px] uppercase tracking-[0.2em]">
-            <Link href="/reccemind" className="rounded-full border border-zinc-800 px-3 py-2 text-zinc-400 transition hover:border-white/30 hover:text-white">Tramos</Link>
+            <Link href="/reccemind" className="rounded-full border border-zinc-800 px-3 py-2 text-zinc-400 transition hover:border-white/30 hover:text-white">Preparar</Link>
+            <Link href="/reccemind/tramos" className="rounded-full border border-zinc-800 px-3 py-2 text-zinc-400 transition hover:border-white/30 hover:text-white">Mis tramos</Link>
             {canManageUsers ? (
               <Link href="/reccemind/usuarios" className="rounded-full border border-rose-400/20 bg-rose-400/[0.06] px-3 py-2 text-rose-100 transition hover:border-rose-300/50">Testers</Link>
             ) : null}
