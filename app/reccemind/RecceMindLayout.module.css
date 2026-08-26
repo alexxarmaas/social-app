@@ -1,0 +1,23 @@
+.shell :global(section.grid:has(> form)) {
+  align-items: start;
+}
+
+.shell :global(.min-w-0.space-y-5) > :global(.grid.gap-5) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.shell :global(.min-w-0.space-y-5) > :global(.grid.gap-5) > section {
+  min-width: 0;
+}
+
+@media (min-width: 1280px) {
+  .shell :global(section.grid:has(> form)) {
+    grid-template-columns: minmax(20rem, 22rem) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 1279px) {
+  .shell :global(section.grid:has(> form)) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
