@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentRecceMindSession } from "@/app/lib/reccemind-auth";
 import { isAdminRole } from "@/app/lib/admin-auth";
 import RecceMindSignOutButton from "@/components/reccemind/RecceMindSignOutButton";
+import styles from "./RecceMindLayout.module.css";
 
 export default async function RecceMindLayout({ children }: { children: ReactNode }) {
   const session = await getCurrentRecceMindSession();
@@ -36,7 +37,7 @@ export default async function RecceMindLayout({ children }: { children: ReactNod
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-[110rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
+      <main className={`${styles.shell} mx-auto max-w-[110rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-8`}>{children}</main>
     </div>
   );
 }
