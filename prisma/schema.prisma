@@ -38,8 +38,6 @@ model User {
   notifications          Notification[] @relation("UserNotifications")
   triggeredNotifications Notification[] @relation("TriggeredNotifications")
 
-
-
   followers          Follow[] @relation("UserFollowing")
   following          Follow[] @relation("UserFollowers")
 
@@ -49,6 +47,20 @@ model User {
   eventPhotos        EventPhoto[]
   ownedClubs         Club[]        @relation("ClubOwner")
   pushSubscriptions  PushSubscription[]
+  bonoaSsoCodes      BonoaSsoCode[]
+}
+
+model BonoaSsoCode {
+  id        String   @id
+  codeHash  String   @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([userId])
 }
 
 model PushSubscription {
@@ -115,7 +127,7 @@ model Comment {
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-// Like model for post engagement
+// Like model
 model Like {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
@@ -144,10 +156,10 @@ model Notification {
   actor   User   @relation("TriggeredNotifications", fields: [actorId], references: [id], onDelete: Cascade)
 
   postId String?
-  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: SetNull)
 }
 
-// Club model for car clubs/groups
+// Club model
 model Club {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -305,8 +317,6 @@ model Store {
 
   listings MarketplaceListing[]
 }
-
-
 
 // Follow model
 model Follow {
