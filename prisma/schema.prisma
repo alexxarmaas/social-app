@@ -38,6 +38,7 @@ model User {
   notifications          Notification[] @relation("UserNotifications")
   triggeredNotifications Notification[] @relation("TriggeredNotifications")
 
+
   followers          Follow[] @relation("UserFollowing")
   following          Follow[] @relation("UserFollowers")
 
@@ -127,7 +128,7 @@ model Comment {
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-// Like model
+// Like model for post engagement
 model Like {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
@@ -156,10 +157,10 @@ model Notification {
   actor   User   @relation("TriggeredNotifications", fields: [actorId], references: [id], onDelete: Cascade)
 
   postId String?
-  post   Post?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-// Club model
+// Club model for car clubs/groups
 model Club {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -317,6 +318,7 @@ model Store {
 
   listings MarketplaceListing[]
 }
+
 
 // Follow model
 model Follow {
