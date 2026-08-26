@@ -4,6 +4,9 @@ import { useMemo, useRef, useState } from "react";
 import { projectCoordinateOntoRoute, routeDistances } from "@/app/lib/reccemind-geo";
 import type { RecceMindCoordinate } from "@/app/lib/reccemind";
 
+const MAX_RECORDING_MS = 15_000;
+const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
+
 interface RecceMindVoiceCaptureProps {
   coordinates: RecceMindCoordinate[];
   onInsert: (text: string, distance: number) => void | Promise<void>;
@@ -43,9 +46,12 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
+  const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cumulative = useMemo(() => routeDistances(coordinates), [coordinates]);
 
   const cleanupStream = () => {
+    if (autoStopRef.current) clearTimeout(autoStopRef.current);
+    autoStopRef.current = null;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     recorderRef.current = null;
@@ -55,6 +61,9 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
     setState("processing");
     setMessage("Localizando y transcribiendo la nota…");
     try {
+      if (!blob.size) throw new Error("La grabación está vacía. Repite la nota.");
+      if (blob.size > MAX_AUDIO_BYTES) throw new Error("La grabación es demasiado grande. Usa una nota más corta.");
+
       const position = await currentPosition();
       if (position.coords.accuracy > 60) {
         throw new Error(`Precisión GPS insuficiente (${Math.round(position.coords.accuracy)} m). Espera a tener mejor señal.`);
@@ -117,8 +126,11 @@ export default function RecceMindVoiceCapture({ coordinates, onInsert }: RecceMi
         void processRecording(blob);
       };
       recorder.start();
+      autoStopRef.current = setTimeout(() => {
+        if (recorder.state === "recording") recorder.stop();
+      }, MAX_RECORDING_MS);
       setState("recording");
-      setMessage("Grabando. Di una nota corta y clara; se asociará a tu posición GPS al detener.");
+      setMessage("Grabando · máximo 15 s. Di una nota corta y clara; se asociará a tu posición GPS al detener.");
     } catch (error) {
       cleanupStream();
       setMessage(error instanceof Error ? error.message : "No se pudo acceder al micrófono.");
