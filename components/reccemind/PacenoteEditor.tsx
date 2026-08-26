@@ -14,6 +14,7 @@ import {
 
 const SEVERITIES = [1, 2, 3, 4, 5, 6] as const;
 const QUICK_CUSTOM_NOTES = ["Bache", "Puente", "Agua", "Público", "Árbol", "Cambio de asfalto"] as const;
+const POSITION_STEPS = [-25, -10, -5, 5, 10, 25] as const;
 
 type StructuredCurve = Extract<RecceMindStructuredPacenote, { kind: "curve" }>;
 
@@ -27,11 +28,7 @@ function nextTarget(severity: RecceMindSeverity, modifier: RecceMindModifier) {
   return Math.min(6, severity + 1) as RecceMindSeverity;
 }
 
-function isValidTarget(
-  severity: RecceMindSeverity,
-  target: RecceMindSeverity | undefined,
-  modifier: RecceMindModifier,
-) {
+function isValidTarget(severity: RecceMindSeverity, target: RecceMindSeverity | undefined, modifier: RecceMindModifier) {
   if (!target) return false;
   return modifier === "tightens" ? target < severity : target > severity;
 }
@@ -46,10 +43,29 @@ function noteKindLabel(note: RecceMindPacenote) {
 
 function noteAccent(note: RecceMindPacenote) {
   if (note.type === "distance") return "border-l-zinc-700";
-  if (note.structured?.kind === "curve") {
-    return note.structured.direction === "right" ? "border-l-red-500" : "border-l-blue-500";
-  }
+  if (note.structured?.kind === "curve") return note.structured.direction === "right" ? "border-l-red-500" : "border-l-blue-500";
   return "border-l-amber-400";
+}
+
+function callPositionBounds(pacenotes: RecceMindPacenote[], index: number) {
+  let previousCall: RecceMindPacenote | null = null;
+  let nextCall: RecceMindPacenote | null = null;
+  for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
+    if (pacenotes[cursor].type === "note") {
+      previousCall = pacenotes[cursor];
+      break;
+    }
+  }
+  for (let cursor = index + 1; cursor < pacenotes.length; cursor += 1) {
+    if (pacenotes[cursor].type === "note") {
+      nextCall = pacenotes[cursor];
+      break;
+    }
+  }
+  return {
+    min: previousCall ? Math.ceil(previousCall.distance + 1) : 0,
+    max: nextCall ? Math.max(0, Math.floor(nextCall.distance - 1)) : Number.POSITIVE_INFINITY,
+  };
 }
 
 export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorProps) {
@@ -71,13 +87,7 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
   }, [pacenotes, query, showDistances]);
 
   const replaceStructured = (index: number, structured: RecceMindStructuredPacenote) => {
-    onChange(
-      pacenotes.map((note, noteIndex) =>
-        noteIndex === index
-          ? { ...note, structured, text: renderRecceMindPacenote(structured) }
-          : note,
-      ),
-    );
+    onChange(pacenotes.map((note, noteIndex) => noteIndex === index ? { ...note, structured, text: renderRecceMindPacenote(structured) } : note));
   };
 
   const replaceText = (index: number, text: string) => {
@@ -86,11 +96,7 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
       replaceStructured(index, { kind: "custom", label: text });
       return;
     }
-    onChange(
-      pacenotes.map((note, noteIndex) =>
-        noteIndex === index ? { ...note, text, structured: undefined } : note,
-      ),
-    );
+    onChange(pacenotes.map((note, noteIndex) => noteIndex === index ? { ...note, text, structured: undefined } : note));
   };
 
   const updateDistance = (index: number, value: string) => {
@@ -98,6 +104,14 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
     const meters = Number(value);
     if (!Number.isFinite(meters) || meters < 0) return;
     replaceStructured(index, { kind: "distance", meters: Math.round(meters) });
+  };
+
+  const updateCallPosition = (index: number, requested: number) => {
+    const current = pacenotes[index];
+    if (!current || current.type !== "note" || !Number.isFinite(requested)) return;
+    const { min, max } = callPositionBounds(pacenotes, index);
+    const distance = Math.max(min, Math.min(max, Math.round(requested)));
+    onChange(pacenotes.map((note, noteIndex) => noteIndex === index ? { ...note, distance } : note));
   };
 
   const updateCurve = (index: number, structured: StructuredCurve, patch: Partial<StructuredCurve>) => {
@@ -110,41 +124,31 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
       updateCurve(index, structured, { severity });
       return;
     }
-
     const modifierStillPossible = modifier === "tightens" ? severity > 1 : severity < 6;
     if (!modifierStillPossible) {
       updateCurve(index, structured, { severity, modifiers: [], target_severity: undefined });
       return;
     }
-
     updateCurve(index, structured, {
       severity,
-      target_severity: isValidTarget(severity, structured.target_severity, modifier)
-        ? structured.target_severity
-        : nextTarget(severity, modifier),
+      target_severity: isValidTarget(severity, structured.target_severity, modifier) ? structured.target_severity : nextTarget(severity, modifier),
     });
   };
 
   const toggleWarning = (index: number, structured: StructuredCurve, warning: RecceMindWarning) => {
-    const warnings = structured.warnings.includes(warning)
-      ? structured.warnings.filter((item) => item !== warning)
-      : [...structured.warnings, warning];
+    const warnings = structured.warnings.includes(warning) ? structured.warnings.filter((item) => item !== warning) : [...structured.warnings, warning];
     updateCurve(index, structured, { warnings });
   };
 
   const toggleContext = (index: number, structured: StructuredCurve, context: RecceMindContext) => {
     const current = structured.contexts ?? [];
-    const contexts = current.includes(context)
-      ? current.filter((item) => item !== context)
-      : [...current, context];
+    const contexts = current.includes(context) ? current.filter((item) => item !== context) : [...current, context];
     updateCurve(index, structured, { contexts });
   };
 
   const toggleRoadModifier = (index: number, structured: StructuredCurve, modifier: RecceMindRoadModifier) => {
     const current = structured.road_modifiers ?? [];
-    const road_modifiers = current.includes(modifier)
-      ? current.filter((item) => item !== modifier)
-      : [...current, modifier];
+    const road_modifiers = current.includes(modifier) ? current.filter((item) => item !== modifier) : [...current, modifier];
     updateCurve(index, structured, { road_modifiers });
   };
 
@@ -157,9 +161,7 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
     if (!canUseModifier) return;
     updateCurve(index, structured, {
       modifiers: [modifier],
-      target_severity: isValidTarget(structured.severity, structured.target_severity, modifier)
-        ? structured.target_severity
-        : nextTarget(structured.severity, modifier),
+      target_severity: isValidTarget(structured.severity, structured.target_severity, modifier) ? structured.target_severity : nextTarget(structured.severity, modifier),
     });
   };
 
@@ -194,9 +196,7 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
   const noteCount = pacenotes.filter((note) => note.type === "note").length;
   const distanceCount = pacenotes.length - noteCount;
 
-  if (!pacenotes.length) {
-    return <div className="rounded-2xl border border-dashed border-zinc-800 p-8 text-center text-sm text-zinc-600">No hay notas que editar.</div>;
-  }
+  if (!pacenotes.length) return <div className="rounded-2xl border border-dashed border-zinc-800 p-8 text-center text-sm text-zinc-600">No hay notas que editar.</div>;
 
   return (
     <div className="space-y-4">
@@ -204,25 +204,12 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-[9px] uppercase tracking-[0.24em] text-zinc-600">Navegador de notas</p>
-            <p className="mt-1 text-xs text-zinc-400">{noteCount} llamadas · {distanceCount} enlaces · edita una nota cada vez</p>
+            <p className="mt-1 text-xs text-zinc-400">{noteCount} llamadas · {distanceCount} enlaces · posición de llamada editable</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar nota o metro…"
-              className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white outline-none placeholder:text-zinc-700 focus:border-zinc-500 sm:w-52"
-            />
-            <button
-              type="button"
-              onClick={() => setShowDistances((current) => !current)}
-              className={`rounded-xl border px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] ${showDistances ? "border-zinc-700 text-zinc-300" : "border-amber-400/30 bg-amber-400/10 text-amber-100"}`}
-            >
-              {showDistances ? "Ocultar enlaces" : "Mostrar enlaces"}
-            </button>
-            <button type="button" onClick={() => addCustomNote()} className="rounded-xl bg-white px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-black">
-              + Nota manual
-            </button>
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar nota o metro…" className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-white outline-none placeholder:text-zinc-700 focus:border-zinc-500 sm:w-52" />
+            <button type="button" onClick={() => setShowDistances((current) => !current)} className={`rounded-xl border px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] ${showDistances ? "border-zinc-700 text-zinc-300" : "border-amber-400/30 bg-amber-400/10 text-amber-100"}`}>{showDistances ? "Ocultar enlaces" : "Mostrar enlaces"}</button>
+            <button type="button" onClick={() => addCustomNote()} className="rounded-xl bg-white px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-black">+ Nota manual</button>
           </div>
         </div>
       </div>
@@ -235,64 +222,24 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
               const active = index === activeIndex;
               const curve = note.structured?.kind === "curve" ? note.structured : null;
               return (
-                <button
-                  key={`${note.distance}-${index}-${note.text}`}
-                  type="button"
-                  onClick={() => setSelectedIndex(index)}
-                  className={`w-full border-l-4 ${noteAccent(note)} rounded-xl border-y border-r px-3 py-2.5 text-left transition ${active ? "border-y-white/20 border-r-white/20 bg-white/[0.08]" : "border-y-transparent border-r-transparent bg-transparent hover:bg-white/[0.035]"}`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[9px] text-zinc-600">{Math.round(note.distance)} m</span>
-                    <span className="text-[8px] uppercase tracking-[0.16em] text-zinc-700">{noteKindLabel(note)}</span>
-                  </div>
+                <button key={`${note.distance}-${index}-${note.text}`} type="button" onClick={() => setSelectedIndex(index)} className={`w-full border-l-4 ${noteAccent(note)} rounded-xl border-y border-r px-3 py-2.5 text-left transition ${active ? "border-y-white/20 border-r-white/20 bg-white/[0.08]" : "border-y-transparent border-r-transparent bg-transparent hover:bg-white/[0.035]"}`}>
+                  <div className="flex items-center justify-between gap-2"><span className="font-mono text-[9px] text-zinc-600">{Math.round(note.distance)} m</span><span className="text-[8px] uppercase tracking-[0.16em] text-zinc-700">{noteKindLabel(note)}</span></div>
                   <p className={`mt-1 truncate text-xs font-medium ${active ? "text-white" : "text-zinc-400"}`}>{note.text}</p>
-                  {curve ? (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      <MiniChip label={`G${curve.severity}`} active />
-                      {curve.length === "long" ? <MiniChip label="Larga" /> : null}
-                      {curve.length === "very_long" ? <MiniChip label="Muy larga" /> : null}
-                      {curve.line === "dont_cut" ? <MiniChip label="No cortar" /> : null}
-                      {curve.warnings.includes("caution") ? <MiniChip label="Ojo" /> : null}
-                    </div>
-                  ) : null}
+                  {curve ? <div className="mt-2 flex flex-wrap gap-1"><MiniChip label={`G${curve.severity}`} active />{curve.length === "long" ? <MiniChip label="Larga" /> : null}{curve.length === "very_long" ? <MiniChip label="Muy larga" /> : null}{curve.line === "dont_cut" ? <MiniChip label="No cortar" /> : null}{curve.warnings.includes("caution") ? <MiniChip label="Ojo" /> : null}</div> : null}
                 </button>
               );
-            }) : (
-              <div className="p-8 text-center text-xs text-zinc-600">No hay notas que coincidan con el filtro.</div>
-            )}
+            }) : <div className="p-8 text-center text-xs text-zinc-600">No hay notas que coincidan con el filtro.</div>}
           </div>
         </div>
 
         <div className="xl:sticky xl:top-24 xl:self-start">
           <div className="rounded-[1.5rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.08),transparent_38%),rgba(9,9,11,0.96)] p-4 shadow-[0_24px_70px_rgba(0,0,0,0.28)] sm:p-5">
             <div className="flex flex-col gap-3 border-b border-zinc-800 pb-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">{activeNote ? `${Math.round(activeNote.distance)} m · ${noteKindLabel(activeNote)}` : "Nota"}</p>
-                <p className="mt-2 text-balance text-xl font-semibold leading-snug text-white sm:text-2xl">{activeNote?.text ?? "Selecciona una nota"}</p>
-              </div>
-              <div className="flex shrink-0 gap-1.5">
-                <button type="button" disabled={activeIndex <= 0} onClick={() => selectRelative(-1)} className="rounded-lg border border-zinc-800 px-3 py-2 text-[9px] uppercase tracking-[0.14em] text-zinc-400 disabled:opacity-25">Anterior</button>
-                <button type="button" disabled={activeIndex >= pacenotes.length - 1} onClick={() => selectRelative(1)} className="rounded-lg border border-zinc-800 px-3 py-2 text-[9px] uppercase tracking-[0.14em] text-zinc-400 disabled:opacity-25">Siguiente</button>
-              </div>
+              <div className="min-w-0"><p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">{activeNote ? `${Math.round(activeNote.distance)} m · ${noteKindLabel(activeNote)}` : "Nota"}</p><p className="mt-2 text-balance text-xl font-semibold leading-snug text-white sm:text-2xl">{activeNote?.text ?? "Selecciona una nota"}</p></div>
+              <div className="flex shrink-0 gap-1.5"><button type="button" disabled={activeIndex <= 0} onClick={() => selectRelative(-1)} className="rounded-lg border border-zinc-800 px-3 py-2 text-[9px] uppercase tracking-[0.14em] text-zinc-400 disabled:opacity-25">Anterior</button><button type="button" disabled={activeIndex >= pacenotes.length - 1} onClick={() => selectRelative(1)} className="rounded-lg border border-zinc-800 px-3 py-2 text-[9px] uppercase tracking-[0.14em] text-zinc-400 disabled:opacity-25">Siguiente</button></div>
             </div>
 
-            {activeNote ? (
-              <ActiveNoteEditor
-                note={activeNote}
-                index={activeIndex}
-                replaceStructured={replaceStructured}
-                replaceText={replaceText}
-                updateDistance={updateDistance}
-                updateCurve={updateCurve}
-                setSeverity={setSeverity}
-                setModifier={setModifier}
-                toggleWarning={toggleWarning}
-                toggleContext={toggleContext}
-                toggleRoadModifier={toggleRoadModifier}
-                removeManualNote={removeManualNote}
-                addCustomNote={addCustomNote}
-              />
-            ) : null}
+            {activeNote ? <ActiveNoteEditor note={activeNote} index={activeIndex} pacenotes={pacenotes} replaceStructured={replaceStructured} replaceText={replaceText} updateDistance={updateDistance} updateCallPosition={updateCallPosition} updateCurve={updateCurve} setSeverity={setSeverity} setModifier={setModifier} toggleWarning={toggleWarning} toggleContext={toggleContext} toggleRoadModifier={toggleRoadModifier} removeManualNote={removeManualNote} addCustomNote={addCustomNote} /> : null}
           </div>
         </div>
       </div>
@@ -300,26 +247,14 @@ export default function PacenoteEditor({ pacenotes, onChange }: PacenoteEditorPr
   );
 }
 
-function ActiveNoteEditor({
-  note,
-  index,
-  replaceStructured,
-  replaceText,
-  updateDistance,
-  updateCurve,
-  setSeverity,
-  setModifier,
-  toggleWarning,
-  toggleContext,
-  toggleRoadModifier,
-  removeManualNote,
-  addCustomNote,
-}: {
+function ActiveNoteEditor({ note, index, pacenotes, replaceStructured, replaceText, updateDistance, updateCallPosition, updateCurve, setSeverity, setModifier, toggleWarning, toggleContext, toggleRoadModifier, removeManualNote, addCustomNote }: {
   note: RecceMindPacenote;
   index: number;
+  pacenotes: RecceMindPacenote[];
   replaceStructured: (index: number, structured: RecceMindStructuredPacenote) => void;
   replaceText: (index: number, text: string) => void;
   updateDistance: (index: number, value: string) => void;
+  updateCallPosition: (index: number, value: number) => void;
   updateCurve: (index: number, structured: StructuredCurve, patch: Partial<StructuredCurve>) => void;
   setSeverity: (index: number, structured: StructuredCurve, severity: RecceMindSeverity) => void;
   setModifier: (index: number, structured: StructuredCurve, modifier: RecceMindModifier | null) => void;
@@ -331,51 +266,24 @@ function ActiveNoteEditor({
 }) {
   if (note.type === "distance") {
     const structuredMeters = note.structured?.kind === "distance" ? note.structured.meters : Number(note.text);
-    return (
-      <div className="py-5">
-        <p className="text-[9px] uppercase tracking-[0.22em] text-zinc-600">Distancia de enlace</p>
-        <div className="mt-3 flex max-w-xs items-end gap-3">
-          <input
-            type="number"
-            min={0}
-            step={5}
-            value={Number.isFinite(structuredMeters) ? Math.round(structuredMeters) : ""}
-            onChange={(event) => updateDistance(index, event.target.value)}
-            className="min-w-0 flex-1 rounded-2xl border border-zinc-700 bg-black/40 px-4 py-3 text-right font-mono text-3xl font-semibold text-white outline-none focus:border-white/40"
-          />
-          <span className="pb-3 text-sm text-zinc-500">m</span>
-        </div>
-        <p className="mt-3 max-w-lg text-xs leading-5 text-zinc-600">Esta distancia se utiliza en el PDF y en la lectura del copiloto. Puedes redondearla a la forma en que realmente cantaríais el tramo.</p>
-      </div>
-    );
+    return <div className="py-5"><p className="text-[9px] uppercase tracking-[0.22em] text-zinc-600">Distancia de enlace</p><div className="mt-3 flex max-w-xs items-end gap-3"><input type="number" min={0} step={5} value={Number.isFinite(structuredMeters) ? Math.round(structuredMeters) : ""} onChange={(event) => updateDistance(index, event.target.value)} className="min-w-0 flex-1 rounded-2xl border border-zinc-700 bg-black/40 px-4 py-3 text-right font-mono text-3xl font-semibold text-white outline-none focus:border-white/40" /><span className="pb-3 text-sm text-zinc-500">m</span></div><p className="mt-3 max-w-lg text-xs leading-5 text-zinc-600">Esta distancia se utiliza en el PDF y en la lectura del copiloto.</p></div>;
   }
+
+  const positionBounds = callPositionBounds(pacenotes, index);
+  const positionControl = (
+    <section className="rounded-2xl border border-orange-400/15 bg-orange-400/[0.045] p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div><p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-orange-200/60">Punto de llamada</p><p className="mt-1 text-xs leading-5 text-zinc-500">Mueve cuándo debe cantarse la nota sin cambiar la geometría de la curva.</p></div>
+        <div className="flex items-end gap-2"><input aria-label="Posición de llamada en metros" type="number" min={positionBounds.min} max={Number.isFinite(positionBounds.max) ? positionBounds.max : undefined} step={1} value={Math.round(note.distance)} onChange={(event) => updateCallPosition(index, Number(event.target.value))} className="w-28 rounded-xl border border-orange-400/20 bg-black/35 px-3 py-2 text-right font-mono text-lg font-bold text-white outline-none focus:border-orange-300/60" /><span className="pb-2 text-xs text-zinc-500">m</span></div>
+      </div>
+      <div className="mt-3 grid grid-cols-6 gap-1.5">{POSITION_STEPS.map((step) => <button key={step} type="button" onClick={() => updateCallPosition(index, note.distance + step)} className="rounded-lg border border-zinc-800 bg-black/20 px-1 py-2 text-[9px] font-semibold text-zinc-400 hover:border-orange-300/30 hover:text-orange-100">{step > 0 ? `+${step}` : step}</button>)}</div>
+    </section>
+  );
 
   const structured = note.structured;
   if (!structured || structured.kind !== "curve") {
     const canDelete = note.curve_index === null;
-    return (
-      <div className="space-y-5 py-5">
-        <div>
-          <p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-zinc-600">Texto de la nota</p>
-          <input
-            value={note.text}
-            onChange={(event) => replaceText(index, event.target.value)}
-            className="w-full rounded-2xl border border-zinc-700 bg-black/35 px-4 py-3 text-lg font-medium text-white outline-none focus:border-white/40"
-          />
-        </div>
-        <div>
-          <p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-zinc-600">Añadir rápidamente después</p>
-          <div className="flex flex-wrap gap-2">
-            {QUICK_CUSTOM_NOTES.map((label) => <Toggle key={label} active={false} label={`+ ${label}`} onClick={() => addCustomNote(label)} />)}
-          </div>
-        </div>
-        {canDelete ? (
-          <button type="button" onClick={() => removeManualNote(index)} className="rounded-xl border border-red-400/20 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.16em] text-red-300 transition hover:bg-red-400/10">
-            Eliminar nota manual
-          </button>
-        ) : null}
-      </div>
-    );
+    return <div className="space-y-5 py-5">{positionControl}<div><p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-zinc-600">Texto de la nota</p><input value={note.text} onChange={(event) => replaceText(index, event.target.value)} className="w-full rounded-2xl border border-zinc-700 bg-black/35 px-4 py-3 text-lg font-medium text-white outline-none focus:border-white/40" /></div><div><p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-zinc-600">Añadir rápidamente después</p><div className="flex flex-wrap gap-2">{QUICK_CUSTOM_NOTES.map((label) => <Toggle key={label} active={false} label={`+ ${label}`} onClick={() => addCustomNote(label)} />)}</div></div>{canDelete ? <button type="button" onClick={() => removeManualNote(index)} className="rounded-xl border border-red-400/20 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.16em] text-red-300 transition hover:bg-red-400/10">Eliminar nota manual</button> : null}</div>;
   }
 
   const modifier = structured.modifiers[0] ?? null;
@@ -384,102 +292,14 @@ function ActiveNoteEditor({
 
   return (
     <div className="space-y-5 pt-5">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
-        <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Curva</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Control label="Dirección">
-            <div className="grid grid-cols-2 gap-2">
-              {(["left", "right"] as const).map((direction) => (
-                <Choice key={direction} active={structured.direction === direction} label={direction === "left" ? "Izquierda" : "Derecha"} onClick={() => updateCurve(index, structured, { direction })} />
-              ))}
-            </div>
-          </Control>
+      {positionControl}
+      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4"><p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Curva</p><div className="grid gap-4 lg:grid-cols-2"><Control label="Dirección"><div className="grid grid-cols-2 gap-2">{(["left", "right"] as const).map((direction) => <Choice key={direction} active={structured.direction === direction} label={direction === "left" ? "Izquierda" : "Derecha"} onClick={() => updateCurve(index, structured, { direction })} />)}</div></Control><Control label="Grado de entrada"><div className="grid grid-cols-6 gap-1.5">{SEVERITIES.map((severity) => <button key={severity} type="button" onClick={() => setSeverity(index, structured, severity)} className={`rounded-xl py-2.5 text-sm font-bold transition ${structured.severity === severity ? "bg-rose-500 text-white shadow-[0_0_0_1px_rgba(251,113,133,0.35)]" : "border border-zinc-800 bg-black/20 text-zinc-500 hover:border-zinc-600 hover:text-white"}`}>{severity}</button>)}</div></Control></div></section>
 
-          <Control label="Grado de entrada">
-            <div className="grid grid-cols-6 gap-1.5">
-              {SEVERITIES.map((severity) => (
-                <button key={severity} type="button" onClick={() => setSeverity(index, structured, severity)} className={`rounded-xl py-2.5 text-sm font-bold transition ${structured.severity === severity ? "bg-rose-500 text-white shadow-[0_0_0_1px_rgba(251,113,133,0.35)]" : "border border-zinc-800 bg-black/20 text-zinc-500 hover:border-zinc-600 hover:text-white"}`}>{severity}</button>
-              ))}
-            </div>
-          </Control>
-        </div>
-      </section>
+      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4"><p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Forma de la curva</p><div className="grid gap-4 lg:grid-cols-2"><Control label="Evolución"><div className="grid grid-cols-3 gap-2">{([[null, "Constante"], ["tightens", "Cierra"], ["opens", "Abre"]] as const).map(([value, label]) => { const impossible = value === "tightens" ? structured.severity === 1 : value === "opens" ? structured.severity === 6 : false; return <Choice key={label} active={modifier === value} label={label} disabled={impossible} onClick={() => setModifier(index, structured, value)} />; })}</div></Control><Control label="Grado final"><div className={`grid grid-cols-6 gap-1.5 transition ${modifier ? "opacity-100" : "pointer-events-none opacity-25"}`}>{SEVERITIES.map((severity) => { const invalid = !modifier || (modifier === "tightens" ? severity >= structured.severity : severity <= structured.severity); return <button key={severity} type="button" disabled={invalid} onClick={() => updateCurve(index, structured, { target_severity: severity })} className={`rounded-xl py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-20 ${structured.target_severity === severity ? "bg-amber-400 text-black" : "border border-zinc-800 bg-black/20 text-zinc-500 hover:text-white"}`}>{severity}</button>; })}</div></Control><Control label="Longitud"><div className="grid grid-cols-3 gap-2"><Choice active={structured.length === "standard"} label="Normal" onClick={() => updateCurve(index, structured, { length: "standard" })} /><Choice active={structured.length === "long"} label="Larga" onClick={() => updateCurve(index, structured, { length: "long" })} /><Choice active={structured.length === "very_long"} label="Muy larga" onClick={() => updateCurve(index, structured, { length: "very_long" })} /></div></Control><Control label="Trazada"><div className="grid grid-cols-3 gap-2"><Choice active={!structured.line} label="Normal" onClick={() => updateCurve(index, structured, { line: undefined })} /><Choice active={structured.line === "cut"} label="Cortar" onClick={() => updateCurve(index, structured, { line: "cut" })} /><Choice active={structured.line === "dont_cut"} label="No cortar" onClick={() => updateCurve(index, structured, { line: "dont_cut" })} /></div></Control></div></section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
-        <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Forma de la curva</p>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Control label="Evolución">
-            <div className="grid grid-cols-3 gap-2">
-              {([[null, "Constante"], ["tightens", "Cierra"], ["opens", "Abre"]] as const).map(([value, label]) => {
-                const impossible = value === "tightens" ? structured.severity === 1 : value === "opens" ? structured.severity === 6 : false;
-                return <Choice key={label} active={modifier === value} label={label} disabled={impossible} onClick={() => setModifier(index, structured, value)} />;
-              })}
-            </div>
-          </Control>
+      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4"><p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Referencias y avisos</p><div className="space-y-4"><div><p className="mb-2 text-[9px] uppercase tracking-[0.2em] text-zinc-600">Entorno</p><div className="flex flex-wrap gap-2"><Toggle active={contexts.includes("crest")} label="En rasante" onClick={() => toggleContext(index, structured, "crest")} /><Toggle active={contexts.includes("junction")} label="En cruce" onClick={() => toggleContext(index, structured, "junction")} /><Toggle active={contexts.includes("barrier")} label="En valla" onClick={() => toggleContext(index, structured, "barrier")} /><Toggle active={roadModifiers.includes("narrows")} label="Se estrecha" onClick={() => toggleRoadModifier(index, structured, "narrows")} /></div></div><div><p className="mb-2 text-[9px] uppercase tracking-[0.2em] text-zinc-600">Prioridad</p><div className="flex flex-wrap gap-2"><Toggle active={structured.warnings.includes("caution")} label="Ojo" onClick={() => toggleWarning(index, structured, "caution")} /><Toggle active={structured.warnings.includes("brake")} label="Frena" onClick={() => toggleWarning(index, structured, "brake")} /><label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-zinc-500">Marcha<select value={structured.gear ?? ""} onChange={(event) => updateCurve(index, structured, { gear: event.target.value ? Number(event.target.value) : undefined })} className="bg-transparent text-zinc-100 outline-none"><option value="">—</option>{[1, 2, 3, 4, 5, 6].map((gear) => <option key={gear} value={gear} className="bg-zinc-950">{gear}</option>)}</select></label></div></div></div></section>
 
-          <Control label="Grado final">
-            <div className={`grid grid-cols-6 gap-1.5 transition ${modifier ? "opacity-100" : "pointer-events-none opacity-25"}`}>
-              {SEVERITIES.map((severity) => {
-                const invalid = !modifier || (modifier === "tightens" ? severity >= structured.severity : severity <= structured.severity);
-                return <button key={severity} type="button" disabled={invalid} onClick={() => updateCurve(index, structured, { target_severity: severity })} className={`rounded-xl py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-20 ${structured.target_severity === severity ? "bg-amber-400 text-black" : "border border-zinc-800 bg-black/20 text-zinc-500 hover:text-white"}`}>{severity}</button>;
-              })}
-            </div>
-          </Control>
-
-          <Control label="Longitud">
-            <div className="grid grid-cols-3 gap-2">
-              <Choice active={structured.length === "standard"} label="Normal" onClick={() => updateCurve(index, structured, { length: "standard" })} />
-              <Choice active={structured.length === "long"} label="Larga" onClick={() => updateCurve(index, structured, { length: "long" })} />
-              <Choice active={structured.length === "very_long"} label="Muy larga" onClick={() => updateCurve(index, structured, { length: "very_long" })} />
-            </div>
-          </Control>
-
-          <Control label="Trazada">
-            <div className="grid grid-cols-3 gap-2">
-              <Choice active={!structured.line} label="Normal" onClick={() => updateCurve(index, structured, { line: undefined })} />
-              <Choice active={structured.line === "cut"} label="Cortar" onClick={() => updateCurve(index, structured, { line: "cut" })} />
-              <Choice active={structured.line === "dont_cut"} label="No cortar" onClick={() => updateCurve(index, structured, { line: "dont_cut" })} />
-            </div>
-          </Control>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
-        <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-zinc-500">Referencias y avisos</p>
-        <div className="space-y-4">
-          <div>
-            <p className="mb-2 text-[9px] uppercase tracking-[0.2em] text-zinc-600">Entorno</p>
-            <div className="flex flex-wrap gap-2">
-              <Toggle active={contexts.includes("crest")} label="En rasante" onClick={() => toggleContext(index, structured, "crest")} />
-              <Toggle active={contexts.includes("junction")} label="En cruce" onClick={() => toggleContext(index, structured, "junction")} />
-              <Toggle active={contexts.includes("barrier")} label="En valla" onClick={() => toggleContext(index, structured, "barrier")} />
-              <Toggle active={roadModifiers.includes("narrows")} label="Se estrecha" onClick={() => toggleRoadModifier(index, structured, "narrows")} />
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-2 text-[9px] uppercase tracking-[0.2em] text-zinc-600">Prioridad</p>
-            <div className="flex flex-wrap gap-2">
-              <Toggle active={structured.warnings.includes("caution")} label="Ojo" onClick={() => toggleWarning(index, structured, "caution")} />
-              <Toggle active={structured.warnings.includes("brake")} label="Frena" onClick={() => toggleWarning(index, structured, "brake")} />
-              <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.14em] text-zinc-500">
-                Marcha
-                <select value={structured.gear ?? ""} onChange={(event) => updateCurve(index, structured, { gear: event.target.value ? Number(event.target.value) : undefined })} className="bg-transparent text-zinc-100 outline-none">
-                  <option value="">—</option>
-                  {[1, 2, 3, 4, 5, 6].map((gear) => <option key={gear} value={gear} className="bg-zinc-950">{gear}</option>)}
-                </select>
-              </label>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-dashed border-zinc-800 p-4">
-        <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-600">Nota manual después de esta llamada</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {QUICK_CUSTOM_NOTES.map((label) => <Toggle key={label} active={false} label={`+ ${label}`} onClick={() => addCustomNote(label)} />)}
-        </div>
-      </section>
+      <section className="rounded-2xl border border-dashed border-zinc-800 p-4"><p className="text-[9px] uppercase tracking-[0.2em] text-zinc-600">Nota manual después de esta llamada</p><div className="mt-2 flex flex-wrap gap-2">{QUICK_CUSTOM_NOTES.map((label) => <Toggle key={label} active={false} label={`+ ${label}`} onClick={() => addCustomNote(label)} />)}</div></section>
     </div>
   );
 }
