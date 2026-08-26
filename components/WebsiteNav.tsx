@@ -14,6 +14,7 @@ const navItems = [
   { href: "/events", label: "Eventos", page: "events" },
   { href: "/routes", label: "Rutas", page: "routes" },
   { href: "/partners", label: "Colaboradores", page: "partners" },
+  { href: "/bonoa", label: "Bonōa", page: "bonoa" },
   { href: "/#contact", label: "Contacto", page: "contact" },
 ];
 

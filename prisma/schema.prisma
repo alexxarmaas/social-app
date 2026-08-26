@@ -39,7 +39,6 @@ model User {
   triggeredNotifications Notification[] @relation("TriggeredNotifications")
 
 
-
   followers          Follow[] @relation("UserFollowing")
   following          Follow[] @relation("UserFollowers")
 
@@ -49,6 +48,20 @@ model User {
   eventPhotos        EventPhoto[]
   ownedClubs         Club[]        @relation("ClubOwner")
   pushSubscriptions  PushSubscription[]
+  bonoaSsoCodes      BonoaSsoCode[]
+}
+
+model BonoaSsoCode {
+  id        String   @id
+  codeHash  String   @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@index([userId])
 }
 
 model PushSubscription {
@@ -305,7 +318,6 @@ model Store {
 
   listings MarketplaceListing[]
 }
-
 
 
 // Follow model
