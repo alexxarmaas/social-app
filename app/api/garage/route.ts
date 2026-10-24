@@ -41,3 +41,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No se ha podido guardar el vehiculo." }, { status: 503 });
   }
 }
+
+
+/**
+ * Only a signed-in owner can see their saved vehicle choices.
+ * Public garage data is served through the existing /garage pages instead.
+ */
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  const ownerId = session?.user?.id;
+  if (!ownerId) return NextResponse.json({ error: "Inicia sesion." }, { status: 401 });
+  try {
+    const cars = await prisma.car.findMany({
+      where: { ownerId },
+      select: { id: true, make: true, model: true, year: true },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+    return NextResponse.json({ cars }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch (error) {
+    console.error("Garage selection unavailable", error);
+    return NextResponse.json({ error: "No se pudieron consultar los vehiculos." }, { status: 503 });
+  }
+}
