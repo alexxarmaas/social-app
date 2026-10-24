@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { authOptions } from "@/app/lib/auth";
 import { safeCarImage } from "@/app/lib/community";
-import { publicCar } from "@/app/lib/community-data";
+import { publicCar, publicCarPhotos } from "@/app/lib/community-data";
 import { buildPremiumMetadata, metadataBase } from "@/app/lib/seo";
 import { CarShareButton } from "@/components/garage/CarShareButton";
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CarDetailsPage({ params }: Props) {
   const { id } = await params;
-  const [car, session] = await Promise.all([publicCar(id), getServerSession(authOptions)]);
+  const [car, session, photos] = await Promise.all([publicCar(id), getServerSession(authOptions), publicCarPhotos(id)]);
   if (!car) notFound();
   const image = safeCarImage(car.imageUrl);
   const mine = session?.user?.id === car.ownerId;
@@ -57,6 +57,18 @@ export default async function CarDetailsPage({ params }: Props) {
             </div>
           </div>
         </div>
+        {photos.length ? <section className="mt-12">
+          <h2 className="mb-6 text-2xl font-black uppercase tracking-wider text-orange-400">Galeria de detalles</h2>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {photos.map((photo) => {
+              const src = safeCarImage(photo.url);
+              return src ? <figure key={photo.id} className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+                <div className="relative aspect-[4/3]"><Image src={src} alt={photo.caption || car.make + " " + car.model} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" /></div>
+                {photo.caption ? <figcaption className="p-4 text-sm text-zinc-400">{photo.caption}</figcaption> : null}
+              </figure> : null;
+            })}
+          </div>
+        </section> : null}
         {car.description || car.modifications ? <div className="mt-9 grid gap-5 md:grid-cols-2">
           {car.description ? <section className="rounded-3xl border border-white/10 p-6 sm:p-8"><h2 className="text-xl font-black uppercase">La historia</h2><p className="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-400">{car.description}</p></section> : null}
           {car.modifications ? <section className="rounded-3xl border border-white/10 p-6 sm:p-8"><h2 className="text-xl font-black uppercase">Modificaciones</h2><p className="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-400">{car.modifications}</p></section> : null}

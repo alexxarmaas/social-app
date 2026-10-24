@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import CarForm from "@/components/garage/CarForm";
+import PhotoGalleryEditor from "@/components/garage/PhotoGalleryEditor";
+import { publicCarPhotos } from "@/app/lib/community-data";
 
 type Props = { params: Promise<{ id: string }> };
 export const metadata: Metadata = { title: "Editar mi coche", robots: { index: false, follow: false } };
@@ -13,7 +15,10 @@ export default async function EditCarPage({ params }: Props) {
   const session = await getServerSession(authOptions);
   const { id } = await params;
   if (!session?.user?.id) redirect("/login?next=%2Fgarage%2Fmine");
-  const car = await prisma.car.findFirst({ where: { id, ownerId: session.user.id } });
+  const [car, photos] = await Promise.all([
+    prisma.car.findFirst({ where: { id, ownerId: session.user.id } }),
+    publicCarPhotos(id),
+  ]);
   if (!car) notFound();
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
@@ -26,6 +31,7 @@ export default async function EditCarPage({ params }: Props) {
           horsepower: car.horsepower, modifications: car.modifications || "",
           description: car.description || "", imageUrl: car.imageUrl || "",
         }} />
+        {process.env.COMMUNITY_GALLERY_ENABLED === "true" ? <PhotoGalleryEditor carId={car.id} initial={photos} /> : null}
       </div>
     </main>
   );
