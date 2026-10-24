@@ -51,3 +51,10 @@ Transformar la web de eventos y rutas en una comunidad gratuita del motor, conse
 - Migraciones aditivas; sin borrados de datos.
 - Comprobar seguridad, RLS/permisos, límites de subida y anti-spam.
 - No activar anuncios personalizados sin consentimiento adecuado.
+
+## Avance de implementación (rama feat/tramassso-community-v1)
+- Implementados registro y login públicos, perfiles y Garage CRUD con validación Zod y subida Cloudinary.
+- Implementada portada orientada a comunidad, navegación responsive y SEO de Garage.
+- Implementados directorio de clubes, creación de clubs, solicitudes y moderación exclusiva del propietario.
+- Pendiente: verificación de email, antispam distribuido, QA manual, CMP, políticas legales, carnet QR, marketplace y unificación de datos de eventos.
+- La primera CI (tras Garage y portada) pasó lint, typecheck, tests y build. Nueva CI requerida tras cambios de Clubs.

@@ -13,6 +13,7 @@ export default async function WebsiteFooter() {
           <div><p className="text-xs font-bold uppercase tracking-[0.25em] text-lime-300">Explora</p>
             <div className="mt-5 grid gap-3 text-sm text-zinc-400">
               <Link href="/garage" className="hover:text-white">Garage de la comunidad</Link>
+              <Link href="/clubs" className="hover:text-white">Clubes</Link>
               <Link href="/events" className="hover:text-white">Eventos</Link>
               <Link href="/routes" className="hover:text-white">Rutas</Link>
               <Link href="/partners" className="hover:text-white">Colaboradores</Link>

@@ -109,9 +109,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-20 sm:px-5 lg:grid-cols-2 lg:px-8">
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-20 sm:px-5 lg:grid-cols-3 lg:px-8">
         <Link href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-lime-300/40">
           <MdMap className="text-lime-300" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">03 / Rutas</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredRoute?.title || "El camino tambien importa."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Explora trazados de Gran Canaria preparados para disfrutar de la carretera."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-lime-300">Explorar rutas <MdArrowOutward /></span></div>
+        </Link>
+        <Link href="/clubs" className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-lime-300/40">
+          <MdDirectionsCar className="text-lime-300" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">05 / Clubes</p>
+          <h2 className="mt-4 text-3xl font-black uppercase">Encuentra a tu gente.</h2>
+          <p className="mt-3 text-sm text-zinc-400">Crea tu propio club o solicita unirte a los grupos de la comunidad, gratis.</p>
+          <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-lime-300">Ver clubes <MdArrowOutward /></span></div>
         </Link>
         <Link href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-lime-300/40">
           <MdOutlineHandshake className="text-lime-300" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">04 / Colaboradores</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredPartner?.name || "La industria se mueve con nosotros."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredPartner?.category || "Negocios, talleres y marcas que comparten nuestra pasion."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-lime-300">Ver colaboradores <MdArrowOutward /></span></div>
