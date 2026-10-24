@@ -34,9 +34,8 @@ export const authOptions: NextAuthOptions = {
 
                 const email = credentials.email.trim().toLowerCase();
                 const user = await prisma.user.findUnique({
-                    where: {
-                        email,
-                    },
+                    where: { email },
+                    select: { id: true, email: true, username: true, name: true, avatar: true, role: true, password: true },
                 });
 
                 if (!user || !user.password) {
@@ -44,9 +43,7 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Credenciales invalidas");
                 }
 
-                if (user.verificationRequired && !user.emailVerifiedAt) {
-                    throw new Error("Credenciales invalidas");
-                }
+                // Account verification gates are only enabled after the additive Prisma migration.
 
                 const isPasswordValid = await bcrypt.compare(
                     credentials.password,
@@ -55,6 +52,15 @@ export const authOptions: NextAuthOptions = {
 
                 if (!isPasswordValid) {
                     throw new Error("Credenciales invalidas");
+                }
+                if (process.env.COMMUNITY_ACCOUNT_VERIFICATION_ENABLED === "true") {
+                    const verification = await prisma.user.findUnique({
+                        where: { id: user.id },
+                        select: { verificationRequired: true, emailVerifiedAt: true },
+                    });
+                    if (verification?.verificationRequired && !verification.emailVerifiedAt) {
+                        throw new Error("Credenciales invalidas");
+                    }
                 }
 
                 return {
