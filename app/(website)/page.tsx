@@ -1,193 +1,139 @@
+import Image from "next/image";
 import Link from "next/link";
-import { MdInsights, MdLocationOn, MdOutlineHandshake, MdSpeed, MdStraighten } from "react-icons/md";
+import { MdArrowOutward, MdCalendarMonth, MdDirectionsCar, MdMap, MdOutlineHandshake } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
+import { latestPublicCars } from "@/app/lib/community-data";
+import { safeCarImage } from "@/app/lib/community";
+import CarCard from "@/components/garage/CarCard";
 import ContactForm from "@/components/contact/ContactForm";
-import EventCountdown from "@/components/events/EventCountdown";
+import AdBanner from "@/components/ads/AdBanner";
+import { getAdsenseSlot, TRAMASSSO_ADSENSE_SLOTS } from "@/app/lib/adsense";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [{ events }, { routes }, { partners }] = await Promise.all([
-    listPublicEvents(),
-    listPublicRoutes(),
-    listPublicPartners(),
+  const [{ events }, { routes }, { partners }, cars] = await Promise.all([
+    listPublicEvents(), listPublicRoutes(), listPublicPartners(), latestPublicCars(3),
   ]);
-  const nextEvent = events[0] ?? null;
-  const featuredRoute = routes.find((route) => route.coordinates && route.coordinates.length >= 2) ?? routes[0] ?? null;
-  const featuredPartner = partners.find((partner) => partner.is_featured) ?? partners[0] ?? null;
+  const nextEvent = events[0] || null;
+  const featuredRoute = routes.find((item) => item.coordinates && item.coordinates.length > 1) || routes[0] || null;
+  const featuredPartner = partners.find((item) => item.is_featured) || partners[0] || null;
+  const garageSlot = getAdsenseSlot(process.env.NEXT_PUBLIC_ADSENSE_SLOT_GARAGE, TRAMASSSO_ADSENSE_SLOTS.events);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-5 sm:py-12 lg:grid-cols-[1.12fr_0.88fr] lg:items-center lg:px-8 lg:py-20">
-        <div className="space-y-7">
-          <div className="space-y-4">
-            <p className="racing-eyebrow text-[10px] uppercase tracking-[0.32em] text-zinc-500 sm:text-xs sm:tracking-[0.5em]">Gran Canaria</p>
-            <h1 className="max-w-3xl text-4xl font-black uppercase leading-tight tracking-[0.05em] text-white sm:text-5xl sm:tracking-[0.08em] md:text-6xl lg:text-7xl">
-              Motor, rutas y comunidad.
+    <main className="min-h-screen overflow-hidden bg-[#08090a] text-white">
+      <section className="relative isolate border-b border-white/10">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_75%_30%,rgba(192,255,84,0.08),transparent_43%),linear-gradient(180deg,#08090a,#101112)]" />
+        <div className="mx-auto grid min-h-[670px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-5 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
+          <div>
+            <p className="inline-flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-lime-300"><span className="h-2 w-2 rounded-full bg-lime-300" /> Nacido en Gran Canaria. Sin limites.</p>
+            <h1 className="mt-7 max-w-3xl text-balance text-5xl font-black uppercase leading-[1.02] tracking-[0.025em] sm:text-7xl lg:text-[5.5rem]">
+              No es solo <span className="text-lime-300">un coche.</span> Es tu historia.
             </h1>
-            <p className="max-w-xl text-sm leading-7 text-zinc-400 md:text-base">
-              Eventos seleccionados, rutas con caracter y marcas conectadas al mundo del motor.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
-              <MdInsights className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">{events.length}</p>
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Eventos</p>
+            <p className="mt-8 max-w-xl text-base leading-8 text-zinc-400 sm:text-lg">Una comunidad hecha por y para quienes viven el motor. Crea tu garaje, encuentra quedadas, descubre rutas y comparte cada etapa de tu proyecto.</p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/register" className="inline-flex items-center gap-3 rounded-xl bg-lime-300 px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-lime-200">
+                Unirme gratis <MdArrowOutward size={18} />
+              </Link>
+              <Link href="/garage" className="inline-flex items-center gap-3 rounded-xl border border-white/20 bg-white/5 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] text-white transition hover:border-white/60">
+                Explorar Garage
+              </Link>
             </div>
-            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
-              <MdLocationOn className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">GC</p>
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Local</p>
-            </div>
-            <div className="racing-card rounded-[1.35rem] border p-4 sm:rounded-3xl sm:p-5">
-              <MdSpeed className="relative z-10 text-red-300" size={20} />
-              <p className="mt-3 text-2xl font-black text-white sm:text-3xl">{routes.length}</p>
-              <p className="text-[9px] uppercase tracking-[0.18em] text-zinc-500 sm:text-[10px] sm:tracking-[0.3em]">Rutas</p>
+            <div className="mt-12 flex flex-wrap gap-6 border-t border-white/10 pt-7 text-xs uppercase tracking-widest text-zinc-500">
+              <span>100% comunidad</span><span>Sin cuotas</span><span>Coches reales</span>
             </div>
           </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link href="/events" className="racing-button w-full rounded-full px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] transition sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
-              Ver eventos
-            </Link>
-            <Link href="/routes" className="w-full rounded-full border border-white/15 px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-zinc-200 transition hover:border-red-500/60 hover:text-white sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
-              Explorar rutas
-            </Link>
-            <Link href="#contact" className="w-full rounded-full border border-white/15 px-6 py-3.5 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-zinc-200 transition hover:border-red-500/60 hover:text-white sm:w-auto sm:py-3 sm:text-xs sm:tracking-[0.35em]">
-              Contactar
-            </Link>
-          </div>
-        </div>
-
-        <div className="racing-panel rounded-[1.5rem] p-2 sm:rounded-[2rem] sm:p-3">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[1.2rem] border border-white/5 bg-black sm:rounded-[1.6rem]">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              className="absolute inset-0 h-full w-full object-cover opacity-70 grayscale"
-              poster="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop"
-            >
-              <source src="https://assets.mixkit.co/videos/preview/mixkit-black-sports-car-driving-on-a-scenic-road-39854-large.mp4" type="video/mp4" />
-            </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-              <div className="grid gap-3 rounded-[1.2rem] border border-red-500/25 bg-black/70 p-4 backdrop-blur-md sm:rounded-[1.5rem] sm:p-5">
-                <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-[10px] sm:tracking-[0.4em]">
-                  <span>Tramassso GC</span>
-                  <span>2026</span>
-                </div>
-                <div className="grid gap-2 text-xs text-zinc-300 sm:text-sm">
-                  <div className="flex items-center justify-between">
-                    <span>Eventos</span>
-                    <span className="text-white">Seleccionados</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Rutas</span>
-                    <span className="text-white">Con mapa</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Marcas</span>
-                    <span className="text-white">Directo</span>
-                  </div>
-                </div>
+          <div className="relative">
+            <div className="absolute -inset-3 rounded-[2.3rem] border border-lime-300/10" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900">
+              {nextEvent?.cover_image_url ? (
+                <Image src={nextEvent.cover_image_url} alt={nextEvent.title} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover opacity-80" />
+              ) : (
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(192,255,84,0.20),transparent_35%),repeating-linear-gradient(125deg,transparent_0,transparent_35px,rgba(255,255,255,.025)_36px,transparent_37px),linear-gradient(135deg,#27272a,#050505)]" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+              <div className="absolute left-6 top-6 rounded-full border border-white/20 bg-black/60 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur">Tramassso / Motor culture</div>
+              <div className="absolute inset-x-6 bottom-7">
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-lime-300">{nextEvent ? "Proxima quedada" : "Estamos construyendo algo grande"}</p>
+                <h2 className="mt-3 text-3xl font-black uppercase leading-tight tracking-wide sm:text-4xl">{nextEvent?.title || "Tu pasion. Tu gente. Tu sitio."}</h2>
+                <p className="mt-3 text-sm text-zinc-300">{nextEvent ? nextEvent.location : "Forma parte desde el principio."}</p>
+                <Link href={nextEvent ? "/events/" + nextEvent.id : "/events"} className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white hover:text-lime-300">Descubre los eventos <MdArrowOutward size={18} /></Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 px-4 pb-10 sm:gap-5 sm:px-5 sm:pb-14 lg:grid-cols-3 lg:px-8">
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdSpeed size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Eventos seleccionados</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Quedadas con ruta, estetica y comunidad.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdOutlineHandshake size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Visibilidad para marcas</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Presencia directa en eventos y contenido.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdStraighten size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Rutas con caracter</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Trazados por Gran Canaria con mapa.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdLocationOn size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Comunidad local</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Motor, creadores y marcas en Gran Canaria.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdInsights size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Experiencias premium</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Activaciones cuidadas, sin ruido.</p>
-        </article>
-        <article className="racing-card rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-          <MdOutlineHandshake size={22} className="relative z-10 text-red-300" />
-          <h2 className="mt-4 text-xl font-semibold uppercase tracking-[0.1em] text-white sm:text-2xl sm:tracking-[0.16em]">Patrocinadores</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-400">Formatos listos para rutas y eventos.</p>
-        </article>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-5 sm:pb-20 lg:px-8">
-        <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
-          <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Proximo evento</p>
-            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {nextEvent ? nextEvent.title : "Proxima salida"}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {nextEvent ? `${nextEvent.location} · ${new Date(nextEvent.date).toLocaleDateString("es-ES")}` : "En preparacion."}
-            </p>
-            <Link href={nextEvent ? `/events/${nextEvent.id}` : "/events"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
-              Ver eventos
-            </Link>
-            {nextEvent ? <EventCountdown date={nextEvent.date} compact /> : null}
-          </article>
-
-          <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Ruta destacada</p>
-            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {featuredRoute ? featuredRoute.title : "Nueva ruta"}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredRoute ? `${featuredRoute.start_point} · ${featuredRoute.distance_km} km${featuredRoute.coordinates?.length ? " · mapa" : ""}` : "Trazado en preparacion."}
-            </p>
-            <Link href={featuredRoute ? `/routes/${featuredRoute.id}` : "/routes"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
-              Ver rutas
-            </Link>
-          </article>
-
-          <article className="racing-card min-w-0 rounded-[1.5rem] border p-5 sm:rounded-[2rem] sm:p-6">
-            <p className="text-[10px] uppercase tracking-[0.32em] text-zinc-500">Colaborador</p>
-            <h2 className="mt-4 break-words font-sans text-xl font-semibold tracking-tight text-white sm:text-2xl">
-              {featuredPartner ? featuredPartner.name : "Marcas en pista"}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredPartner ? featuredPartner.category : "Directorio en seleccion."}
-            </p>
-            <Link href={featuredPartner ? `/partners/${featuredPartner.id}` : "/partners"} className="racing-button mt-5 inline-flex rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] transition">
-              Ver colaboradores
-            </Link>
-          </article>
-        </div>
-      </section>
-
-      <section id="contact" className="mx-auto max-w-7xl px-3 pb-16 sm:px-5 sm:pb-20 lg:px-8">
-        <div className="racing-panel grid min-w-0 gap-5 rounded-[1.5rem] p-5 sm:gap-8 sm:rounded-[2.2rem] sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:p-10">
-          <div className="min-w-0 space-y-3 sm:space-y-4">
-            <p className="racing-eyebrow text-[9px] uppercase tracking-[0.22em] text-zinc-500 sm:text-xs sm:tracking-[0.45em]">Marcas y colaboraciones</p>
-            <h2 className="max-w-full break-words text-[1.65rem] font-black uppercase leading-[1.05] tracking-[0.03em] text-white [overflow-wrap:anywhere] sm:text-4xl sm:tracking-[0.08em]">Entra en la ruta</h2>
-            <p className="max-w-lg text-xs leading-relaxed text-zinc-400 sm:text-sm sm:leading-7">Cuentanos que quieres activar y lo movemos.</p>
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-5 lg:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-5">
+          <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">01 / Community Garage</p>
+            <h2 className="mt-4 text-4xl font-black uppercase tracking-wide sm:text-5xl">Los coches de la gente.</h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Detras de cada coche hay una historia. Enseña el tuyo y descubre como otros viven su proyecto.</p>
           </div>
-
-          <ContactForm />
+          <Link href="/garage" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-lime-300 hover:text-white">Ver todo el Garage <MdArrowOutward /></Link>
         </div>
+        {cars.length ? <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{cars.map((car) => <CarCard key={car.id} car={car} />)}</div> :
+          <div className="mt-9 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="relative flex min-h-[290px] flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-700/50 via-zinc-900 to-black p-8">
+              <p className="font-aeroblade text-6xl uppercase tracking-wide text-white/10 sm:text-8xl">Tramassso.</p>
+              <div className="relative mt-8"><h3 className="text-2xl font-black uppercase">Tu coche merece su espacio.</h3><p className="mt-3 text-sm text-zinc-400">Publica la primera ficha del Garage Tramassso.</p></div>
+            </div>
+            <div className="flex flex-col justify-center rounded-3xl border border-lime-300/20 bg-lime-300/[0.06] p-8">
+              <p className="text-xs font-bold uppercase tracking-widest text-lime-300">Gratis desde el primer dia</p><h3 className="mt-4 text-2xl font-black uppercase">Crea. Comparte. Conecta.</h3>
+              <p className="mt-4 text-sm leading-7 text-zinc-400">Guarda las especificaciones de tu coche, sube su foto y consigue un enlace que podras compartir en tus historias.</p>
+              <Link href="/garage/new" className="mt-7 inline-flex w-fit rounded-xl bg-lime-300 px-6 py-3 text-xs font-black uppercase tracking-widest text-black">Crear mi garaje ↗</Link>
+            </div>
+          </div>}
+        <div className="mt-8"><AdBanner slot={garageSlot} label="Publicidad" /></div>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#111214] py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">02 / Meets & Events</p><h2 className="mt-4 text-4xl font-black uppercase tracking-wide sm:text-5xl">Nos vemos en persona.</h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Las mejores historias empiezan al apagar el motor y conocer a quien tienes al lado.</p></div>
+            <Link href="/events" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-lime-300">Todos los eventos <MdArrowOutward /></Link>
+          </div>
+          {events.length ? <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {events.slice(0, 3).map((event) => (
+              <Link href={"/events/" + event.id} key={event.id} className="group overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 transition hover:border-lime-300/40">
+                <div className="relative aspect-[16/10] bg-zinc-800">
+                  {event.cover_image_url ? <Image src={event.cover_image_url} alt={event.title} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition group-hover:scale-105" /> :
+                    <div className="flex h-full items-center justify-center text-5xl text-white/10"><MdCalendarMonth /></div>}
+                </div>
+                <div className="p-6"><p className="text-xs font-bold uppercase tracking-widest text-lime-300">{new Date(event.date).toLocaleDateString("es-ES", { timeZone: "Atlantic/Canary", day: "2-digit", month: "short", year: "numeric" })}</p>
+                  <h3 className="mt-3 text-xl font-black uppercase">{event.title}</h3><p className="mt-3 text-sm text-zinc-500">{event.location}</p></div>
+              </Link>
+            ))}
+          </div> : <div className="mt-9 rounded-3xl border border-white/10 p-10 text-sm text-zinc-400">Los proximos eventos se anunciaran aqui. Sigue la comunidad para enterarte.</div>}
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-20 sm:px-5 lg:grid-cols-2 lg:px-8">
+        <Link href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-lime-300/40">
+          <MdMap className="text-lime-300" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">03 / Rutas</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredRoute?.title || "El camino tambien importa."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Explora trazados de Gran Canaria preparados para disfrutar de la carretera."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-lime-300">Explorar rutas <MdArrowOutward /></span></div>
+        </Link>
+        <Link href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-lime-300/40">
+          <MdOutlineHandshake className="text-lime-300" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">04 / Colaboradores</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredPartner?.name || "La industria se mueve con nosotros."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredPartner?.category || "Negocios, talleres y marcas que comparten nuestra pasion."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-lime-300">Ver colaboradores <MdArrowOutward /></span></div>
+        </Link>
+      </section>
+
+      <section className="border-t border-white/10 bg-[#111214] py-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-5 lg:grid-cols-2 lg:px-8">
+          <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Tu comunidad te espera</p><h2 className="mt-5 text-4xl font-black uppercase leading-tight sm:text-5xl">La carretera es mejor en compañia.</h2><p className="mt-5 max-w-md text-sm leading-7 text-zinc-400">Forma parte de Tramassso sin cuotas. Tu perfil, tus coches y tus planes. Todo en un mismo sitio.</p></div>
+          <div className="flex flex-col items-start gap-4 rounded-3xl border border-lime-300/20 bg-lime-300/[0.05] p-8">
+            <MdDirectionsCar className="text-lime-300" size={38} /><p className="text-xl font-black uppercase">El siguiente proyecto es el tuyo.</p>
+            <Link href="/register" className="rounded-xl bg-lime-300 px-8 py-4 text-xs font-black uppercase tracking-widest text-black">Crear cuenta gratis ↗</Link>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="mx-auto grid max-w-7xl gap-9 px-4 py-20 sm:px-5 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
+        <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Marcas / Publicidad / Colaboraciones</p>
+          <h2 className="mt-5 text-4xl font-black uppercase">Crezcamos juntos.</h2>
+          <p className="mt-5 max-w-sm text-sm leading-7 text-zinc-400">¿Tienes un taller, un negocio o una marca del motor? Hablemos de colaboraciones y espacios publicitarios identificados.</p>
+        </div>
+        <ContactForm />
       </section>
     </main>
   );
