@@ -38,7 +38,7 @@ export function communityOrigin() {
   } catch { return null; }
 }
 export function communityRegistrationReady() {
-  return Boolean(communityOrigin() && process.env.SMTP_USER && process.env.SMTP_PASSWORD && process.env.COMMUNITY_REGISTRATION_ENABLED === "true");
+  return Boolean(communityOrigin() && process.env.SMTP_USER && process.env.SMTP_PASSWORD && process.env.COMMUNITY_REGISTRATION_ENABLED === "true" && process.env.COMMUNITY_SECURITY_V2_ENABLED === "true" && process.env.COMMUNITY_ACCOUNT_VERIFICATION_ENABLED === "true");
 }
 export async function issueAccountToken(userId: string, purpose: "verify" | "reset", expiresMinutes: number) {
   const token = newAccountToken();

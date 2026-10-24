@@ -258,6 +258,9 @@ export async function updateEventRegistration(id: string, status: RegistrationSt
 }
 
 export async function deleteEventRegistration(id: string) {
+  if (process.env.EVENT_TICKETING_V2_ENABLED === "true") {
+    return { error: "Cancela la inscripcion en lugar de eliminarla para mantener correctamente la lista de espera." };
+  }
   const client = createSupabaseServiceClient();
   const { data, error } = await client.from("event_registrations").delete().eq("id", id).select("id").maybeSingle();
   return error || !data ? { error: "No se pudo eliminar la inscripcion." } : { success: true as const };

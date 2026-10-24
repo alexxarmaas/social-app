@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/app/lib/prisma";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
-import { requestIdentifier } from "@/app/lib/rate-limit";
+import { requestIdentifier, checkRateLimit } from "@/app/lib/rate-limit";
 import { persistentRateLimit } from "@/app/lib/community-security";
 
 const secret = process.env.NEXTAUTH_SECRET;
@@ -23,7 +23,10 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 const requestHeaders = await headers();
-                const rateLimit = await persistentRateLimit("login:" + requestIdentifier(requestHeaders), 12, 15 * 60);
+                const loginBucket = "login:" + requestIdentifier(requestHeaders);
+                const rateLimit = process.env.COMMUNITY_SECURITY_V2_ENABLED === "true"
+                    ? await persistentRateLimit(loginBucket, 12, 15 * 60)
+                    : checkRateLimit(loginBucket, 8, 15 * 60 * 1000);
                 if (!rateLimit.allowed) {
                     throw new Error("Credenciales invalidas");
                 }
