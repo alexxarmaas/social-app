@@ -17,5 +17,5 @@ export function CarShareButton({ title }: { title: string }) {
       }
     }
   }
-  return <button type="button" onClick={share} className="rounded-xl bg-lime-300 px-6 py-3 text-xs font-black uppercase tracking-widest text-black hover:bg-lime-200">{copied ? "Enlace copiado" : "Compartir coche ↗"}</button>;
+  return <button type="button" onClick={share} className="rounded-xl bg-orange-500 px-6 py-3 text-xs font-black uppercase tracking-widest text-black hover:bg-orange-400">{copied ? "Enlace copiado" : "Compartir coche ↗"}</button>;
 }

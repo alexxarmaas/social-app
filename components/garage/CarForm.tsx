@@ -105,7 +105,7 @@ export default function CarForm({ initial, carId }: { initial?: Partial<FormFiel
     }
   }
 
-  const inputClass = "mt-2 w-full rounded-xl border border-white/15 bg-black/50 px-4 py-3 text-base text-white outline-none focus:border-lime-300";
+  const inputClass = "mt-2 w-full rounded-xl border border-white/15 bg-black/50 px-4 py-3 text-base text-white outline-none focus:border-orange-500";
   return (
     <form onSubmit={save} className="space-y-6 rounded-3xl border border-white/10 bg-white/[0.035] p-5 sm:p-8">
       <div className="grid gap-5 sm:grid-cols-2">
@@ -136,14 +136,14 @@ export default function CarForm({ initial, carId }: { initial?: Partial<FormFiel
       </label>
       <div className="space-y-3 rounded-2xl border border-dashed border-white/20 p-5">
         <p className="text-xs font-semibold uppercase tracking-widest text-zinc-300">Fotografia principal</p>
-        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={upload} disabled={uploading || busy} className="block w-full text-sm text-zinc-400 file:mr-4 file:rounded-lg file:border-0 file:bg-lime-300 file:px-4 file:py-2 file:font-bold file:text-black" />
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={upload} disabled={uploading || busy} className="block w-full text-sm text-zinc-400 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-500 file:px-4 file:py-2 file:font-bold file:text-black" />
         <p className="text-xs text-zinc-500">JPG, PNG, WebP o AVIF. Maximo 10 MB. Cloudinary debe estar configurado.</p>
-        {fields.imageUrl ? <p className="break-all text-xs text-lime-300">Imagen lista: {fields.imageUrl}</p> : null}
-        {uploading ? <p role="status" className="text-sm text-lime-300">Subiendo fotografia...</p> : null}
+        {fields.imageUrl ? <p className="break-all text-xs text-orange-500">Imagen lista: {fields.imageUrl}</p> : null}
+        {uploading ? <p role="status" className="text-sm text-orange-500">Subiendo fotografia...</p> : null}
       </div>
       {error ? <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">{error}</p> : null}
       <div className="flex flex-wrap gap-3">
-        <button type="submit" disabled={busy || uploading} className="rounded-xl bg-lime-300 px-7 py-3.5 text-xs font-black uppercase tracking-widest text-black hover:bg-lime-200 disabled:opacity-60">{busy ? "Guardando..." : carId ? "Guardar cambios" : "Publicar en Garage"}</button>
+        <button type="submit" disabled={busy || uploading} className="rounded-xl bg-orange-500 px-7 py-3.5 text-xs font-black uppercase tracking-widest text-black hover:bg-orange-400 disabled:opacity-60">{busy ? "Guardando..." : carId ? "Guardar cambios" : "Publicar en Garage"}</button>
         {carId ? <button type="button" disabled={busy} onClick={remove} className="rounded-xl border border-rose-500/40 px-6 py-3 text-xs font-bold uppercase text-rose-200 disabled:opacity-50">Eliminar ficha</button> : null}
       </div>
     </form>

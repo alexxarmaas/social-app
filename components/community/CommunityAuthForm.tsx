@@ -53,7 +53,7 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
   return (
     <main className="min-h-[75vh] bg-zinc-950 px-4 py-16 text-white">
       <div className="mx-auto max-w-md">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-lime-300">Tramassso / Comunidad</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-orange-500">Tramassso / Comunidad</p>
         <h1 className="mt-5 text-4xl font-black uppercase tracking-wider">{register ? "Entra al club." : "Bienvenido de vuelta."}</h1>
         <p className="mt-4 text-sm leading-7 text-zinc-400">
           {register ? "Crea tu perfil gratis y empieza a construir tu garaje digital." : "Accede a tu garaje y sigue preparando tu proximo proyecto."}
@@ -64,13 +64,13 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
               <label className="block text-xs font-medium uppercase tracking-widest text-zinc-300">
                 Tu nombre
                 <input required minLength={2} maxLength={70} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-lime-300" />
+                  className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-orange-500" />
               </label>
               <label className="block text-xs font-medium uppercase tracking-widest text-zinc-300">
                 Nombre de usuario
                 <input required pattern="[a-zA-Z0-9_]{3,24}" minLength={3} maxLength={24} autoComplete="username"
                   value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="tu_alias"
-                  className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none placeholder:text-zinc-600 focus:border-lime-300" />
+                  className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none placeholder:text-zinc-600 focus:border-orange-500" />
               </label>
               <div className="absolute -left-[9999px]" aria-hidden="true">
                 <label>Website<input tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} /></label>
@@ -80,29 +80,29 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
           <label className="block text-xs font-medium uppercase tracking-widest text-zinc-300">
             Email
             <input type="email" autoComplete="email" required maxLength={160} value={email} onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-lime-300" />
+              className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-orange-500" />
           </label>
           <label className="block text-xs font-medium uppercase tracking-widest text-zinc-300">
             Contraseña
             <input type="password" autoComplete={register ? "new-password" : "current-password"} minLength={register ? 12 : undefined} maxLength={128} required
               value={password} onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-lime-300" />
+              className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base normal-case tracking-normal text-white outline-none focus:border-orange-500" />
             {register ? <span className="mt-2 block text-[11px] normal-case tracking-normal text-zinc-500">Minimo 12 caracteres. No reutilices una contraseña antigua.</span> : null}
           </label>
           {register ? (
             <label className="flex items-start gap-3 text-xs leading-6 text-zinc-400">
-              <input type="checkbox" className="mt-1 accent-lime-300" required checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+              <input type="checkbox" className="mt-1 accent-orange-500" required checked={consent} onChange={(e) => setConsent(e.target.checked)} />
               <span>He leido la <Link href="/privacidad" className="underline text-white">politica de privacidad</Link>. Entiendo que mi alias y los coches que publique seran visibles para todos.</span>
             </label>
           ) : null}
           {error ? <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">{error}</p> : null}
-          <button type="submit" disabled={busy} className="w-full rounded-xl bg-lime-300 px-5 py-3.5 text-xs font-black uppercase tracking-[0.22em] text-black transition hover:bg-lime-200 disabled:opacity-60">
+          <button type="submit" disabled={busy} className="w-full rounded-xl bg-orange-500 px-5 py-3.5 text-xs font-black uppercase tracking-[0.22em] text-black transition hover:bg-orange-400 disabled:opacity-60">
             {busy ? "Procesando..." : register ? "Crear cuenta gratis" : "Entrar a mi garaje"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-zinc-400">
           {register ? "¿Ya tienes cuenta?" : "¿Aun no formas parte?"}{" "}
-          <Link href={register ? "/login" : "/register"} className="font-semibold text-lime-300 underline">
+          <Link href={register ? "/login" : "/register"} className="font-semibold text-orange-500 underline">
             {register ? "Inicia sesion" : "Unete gratis"}
           </Link>
         </p>
