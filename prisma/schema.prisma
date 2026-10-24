@@ -24,6 +24,10 @@ model User {
   location  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  emailVerifiedAt DateTime?
+  verificationRequired Boolean @default(false)
+
+  accountTokens AccountToken[]
 
   posts               Post[]
   comments            Comment[]
@@ -93,11 +97,13 @@ model Car {
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  photos CarPhoto[]
 }
 
 // Post model for user content
 model Post {
   id        String   @id @default(uuid())
+  status    String   @default("published") // new community posts set "pending" explicitly
   content   String
   imageUrl  String?
   createdAt DateTime @default(now())
@@ -112,6 +118,7 @@ model Post {
   comments      Comment[]
   likes         Like[]
   notifications Notification[]
+  reports PostReport[]
 }
 
 // Comment model for post interactions
@@ -404,4 +411,47 @@ model RecceMindStage {
   updatedAt      DateTime @default(now()) @updatedAt
 
   @@index([ownerId, updatedAt(sort: Desc)], map: "RecceMindStage_ownerId_updatedAt_idx")
+}
+
+model CarPhoto {
+  id String @id @default(uuid())
+  carId String
+  car Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+  url String
+  caption String?
+  sortOrder Int @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([carId, sortOrder])
+}
+
+model PostReport {
+  id String @id @default(uuid())
+  postId String
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporterId String
+  reason String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, reporterId])
+  @@index([postId])
+}
+
+model AccountToken {
+  id String @id @default(uuid())
+  tokenHash String @unique
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose String
+  expiresAt DateTime
+  usedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose, expiresAt])
+}
+
+model CommunityRateLimit {
+  key String @id
+  count Int @default(0)
+  resetAt DateTime
 }
