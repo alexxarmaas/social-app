@@ -127,13 +127,13 @@ export async function sendRegistrationNotification(
 export async function sendRegistrationStatusNotification(input: {
   name: string;
   email: string;
-  status: "new" | "confirmed" | "cancelled";
+  status: "new" | "confirmed" | "cancelled" | "waitlisted";
   event_title: string;
   event_date: string;
   event_location: string;
   ticket_url?: string;
 }) {
-  if (input.status === "new") return { delivered: false, reason: "not-needed" as const };
+  if (input.status === "new" || input.status === "waitlisted") return { delivered: false, reason: "not-needed" as const };
   const config = readEmailConfig();
   if (!config) return { delivered: false, reason: "not-configured" as const };
   const confirmed = input.status === "confirmed";

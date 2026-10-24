@@ -182,8 +182,16 @@ export async function listEventRegistrations(): Promise<{ items: EventRegistrati
     return { items: [], error: migrationError(error.message) ? "Ejecuta la migracion de matriculas para activar esta bandeja." : "No se pudieron cargar las inscripciones." };
   }
 
+  type RegistrationRow = {
+    id: unknown; event_id: unknown; participation_mode: unknown;
+    name: unknown; email: unknown; phone: unknown; vehicle: unknown;
+    license_plate: unknown; companions: unknown; status: unknown;
+    created_at: unknown; checked_in_at?: unknown;
+    events?: { title?: string; date?: string } | Array<{ title?: string; date?: string }> | null;
+  };
+  const typedRows = (data ?? []) as unknown as RegistrationRow[];
   return {
-    items: (data ?? []).map((row) => {
+    items: typedRows.map((row) => {
       const related = Array.isArray(row.events) ? row.events[0] : row.events;
       return {
         id: String(row.id),
