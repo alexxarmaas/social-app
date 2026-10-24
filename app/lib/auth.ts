@@ -3,7 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/app/lib/prisma";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
-import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
+import { requestIdentifier } from "@/app/lib/rate-limit";
+import { persistentRateLimit } from "@/app/lib/community-security";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
@@ -22,7 +23,7 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 const requestHeaders = await headers();
-                const rateLimit = checkRateLimit(`login:${requestIdentifier(requestHeaders)}`, 8, 15 * 60 * 1000);
+                const rateLimit = await persistentRateLimit("login:" + requestIdentifier(requestHeaders), 12, 15 * 60);
                 if (!rateLimit.allowed) {
                     throw new Error("Credenciales invalidas");
                 }
@@ -40,6 +41,10 @@ export const authOptions: NextAuthOptions = {
 
                 if (!user || !user.password) {
                     await bcrypt.compare(credentials.password, "$2b$12$8fKpR5f3iIxZaMmpRQ0kSeQkAEaVScOJRAV7xF6T3aVYtb0cPx6je");
+                    throw new Error("Credenciales invalidas");
+                }
+
+                if (user.verificationRequired && !user.emailVerifiedAt) {
                     throw new Error("Credenciales invalidas");
                 }
 
