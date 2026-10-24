@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
+import { socialEnabled } from "@/app/lib/community-social";
+import FollowButton from "@/components/community/FollowButton";
 import Link from "next/link";
 import { prisma } from "@/app/lib/prisma";
 import CarCard from "@/components/garage/CarCard";
@@ -13,7 +17,8 @@ async function findMember(username: string) {
     return await prisma.user.findUnique({
       where: { username },
       select: {
-        username: true, name: true, bio: true, location: true,
+        id: true, username: true, name: true, bio: true, location: true,
+        _count: { select: { followers: true, following: true } },
         cars: {
           orderBy: { createdAt: "desc" },
           select: {
@@ -42,6 +47,15 @@ export default async function MemberPage({ params }: Props) {
   const { username } = await params;
   const member = await findMember(username);
   if (!member) notFound();
+  const session = await getServerSession(authOptions);
+  const enabled = socialEnabled();
+  const isSelf = session?.user?.id === member.id;
+  const following = enabled && session?.user?.id && !isSelf
+    ? Boolean(await prisma.follow.findUnique({
+        where: { followerId_followingId: { followerId: session.user.id, followingId: member.id } },
+        select: { id: true },
+      }))
+    : false;
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-7xl">
@@ -52,13 +66,17 @@ export default async function MemberPage({ params }: Props) {
             <div><h1 className="text-3xl font-black uppercase sm:text-5xl">@{member.username}</h1><p className="mt-2 text-zinc-400">{member.name || "Miembro de Tramassso"}</p></div>
           </div>
           {member.bio ? <p className="mt-6 max-w-2xl whitespace-pre-line text-sm leading-7 text-zinc-400">{member.bio}</p> : null}
+          {enabled ? <div className="mt-6 flex flex-wrap items-center gap-4">
+            <FollowButton username={member.username} initialFollowing={following} signedIn={Boolean(session?.user?.id)} isSelf={isSelf} />
+            <p className="text-xs uppercase tracking-wider text-zinc-400">{member._count.followers} seguidores · {member._count.following} siguiendo</p>
+          </div> : null}
           {member.location ? <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-400">📍 {member.location}</p> : null}
           <p className="mt-6 text-xs uppercase tracking-widest text-orange-500">{member.cars.length} coches en su garage</p>
         </div>
         <h2 className="mt-12 text-2xl font-black uppercase tracking-wider">Sus proyectos</h2>
         {member.cars.length ? <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{member.cars.map((car) => <CarCard key={car.id} car={car} />)}</div> :
           <p className="mt-6 rounded-2xl border border-white/10 p-8 text-sm text-zinc-500">Aun no hay vehiculos publicados en este perfil.</p>}
-        <Link href="/garage" className="mt-8 inline-block text-sm font-semibold text-orange-500 underline">Explorar mas proyectos →</Link>
+        <div className="mt-8 flex flex-wrap gap-6 text-sm"><Link href="/garage" className="font-semibold text-orange-500 underline">Explorar mas proyectos →</Link><Link href="/community" className="font-semibold text-orange-500 underline">Ver la comunidad →</Link></div>
       </div>
     </main>
   );
