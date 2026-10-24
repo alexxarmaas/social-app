@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { carSchema, registrationSchema, safeCarImage, usernameSchema } from "../app/lib/community";
+import { carSchema, registrationSchema, safeCarImage, usernameSchema, communityProfileSchema } from "../app/lib/community";
 
 test("validates usernames and rejects reserved punctuation", () => {
   assert.equal(usernameSchema.safeParse("driver_24").success, true);
@@ -25,4 +25,12 @@ test("checks vehicle fields and limits", () => {
   assert.equal(carSchema.safeParse({ make: "Honda", model: "Prelude", year: 1992 }).success, true);
   assert.equal(carSchema.safeParse({ make: "Honda", model: "Prelude", year: 1788 }).success, false);
   assert.equal(carSchema.safeParse({ make: "Honda", model: "Prelude", year: 1992, horsepower: 5000 }).success, false);
+});
+
+
+test("profile updates validate public fields", () => {
+  assert.equal(communityProfileSchema.safeParse({ name: "Ana", bio: "Honda y carretera", location: "Gran Canaria" }).success, true);
+  assert.equal(communityProfileSchema.safeParse({ name: "A", bio: "", location: "" }).success, false);
+  assert.equal(communityProfileSchema.safeParse({ name: "Ana", bio: "X".repeat(1500) }).success, false);
+  assert.equal(communityProfileSchema.safeParse({ name: "Ana", role: "superadmin" }).success, false);
 });

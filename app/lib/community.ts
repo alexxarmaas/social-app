@@ -56,3 +56,10 @@ export function carDatabaseData(input: z.infer<typeof carSchema>) {
     imageUrl: input.imageUrl || null,
   };
 }
+
+
+export const communityProfileSchema = z.object({
+  name: z.string().trim().min(2, "Indica un nombre de al menos dos caracteres.").max(70),
+  bio: z.string().trim().max(1200).default(""),
+  location: z.string().trim().max(80).default(""),
+}).strict();

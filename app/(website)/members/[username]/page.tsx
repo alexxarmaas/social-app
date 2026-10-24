@@ -13,7 +13,7 @@ async function findMember(username: string) {
     return await prisma.user.findUnique({
       where: { username },
       select: {
-        username: true, name: true, bio: true,
+        username: true, name: true, bio: true, location: true,
         cars: {
           orderBy: { createdAt: "desc" },
           select: {
@@ -52,6 +52,7 @@ export default async function MemberPage({ params }: Props) {
             <div><h1 className="text-3xl font-black uppercase sm:text-5xl">@{member.username}</h1><p className="mt-2 text-zinc-400">{member.name || "Miembro de Tramassso"}</p></div>
           </div>
           {member.bio ? <p className="mt-6 max-w-2xl whitespace-pre-line text-sm leading-7 text-zinc-400">{member.bio}</p> : null}
+          {member.location ? <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-400">📍 {member.location}</p> : null}
           <p className="mt-6 text-xs uppercase tracking-widest text-orange-500">{member.cars.length} coches en su garage</p>
         </div>
         <h2 className="mt-12 text-2xl font-black uppercase tracking-wider">Sus proyectos</h2>

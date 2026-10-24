@@ -42,6 +42,7 @@ export default async function MyGaragePage() {
           <Link href="/garage/new" className="rounded-xl bg-orange-500 px-5 py-3 text-xs font-black uppercase tracking-widest text-black">+ Añadir coche</Link>
           <Link href={"/members/" + encodeURIComponent(session.user.username)} className="rounded-xl border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white">Ver mi perfil publico</Link>
           <Link href="/clubs" className="rounded-xl border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white">Explorar clubes</Link>
+          <Link href="/account" className="rounded-xl border border-orange-500/50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-orange-400">Editar mi perfil</Link>
         </div>
         {cars.length ?
           <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{cars.map((car) => <CarCard key={car.id} car={car} />)}</div> :
