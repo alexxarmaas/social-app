@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SponsorSpotlight from "@/components/ads/SponsorSpotlight";
 import type { Metadata } from "next";
 import { prisma } from "@/app/lib/prisma";
 import { buildPremiumMetadata } from "@/app/lib/seo";
@@ -42,6 +43,7 @@ export default async function ClubsPage() {
           <h2 className="text-3xl font-black uppercase">Tu club puede ser el primero.</h2><p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-zinc-400">Todavia no hay clubes publicados, o la base de datos no esta disponible. Abre tu comunidad gratis.</p>
           <Link href="/clubs/new" className="mt-7 inline-flex rounded-xl border border-orange-500 px-6 py-3 text-xs font-bold uppercase text-orange-500">Crear mi club</Link>
         </div>}
+        <SponsorSpotlight placement="clubs" />
       </div>
     </main>
   );

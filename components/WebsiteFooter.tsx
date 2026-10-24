@@ -17,6 +17,7 @@ export default async function WebsiteFooter() {
               <Link href="/events" className="hover:text-white">Eventos</Link>
               <Link href="/routes" className="hover:text-white">Rutas</Link>
               <Link href="/partners" className="hover:text-white">Colaboradores</Link>
+              <Link href="/anunciarse" className="hover:text-white">Publicidad y patrocinios</Link>
             </div>
           </div>
           <div><p className="text-xs font-bold uppercase tracking-[0.25em] text-orange-500">La comunidad</p>

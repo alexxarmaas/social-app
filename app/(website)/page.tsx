@@ -7,7 +7,8 @@ import { safeCarImage } from "@/app/lib/community";
 import CarCard from "@/components/garage/CarCard";
 import ContactForm from "@/components/contact/ContactForm";
 import AdBanner from "@/components/ads/AdBanner";
-import { getAdsenseSlot, TRAMASSSO_ADSENSE_SLOTS } from "@/app/lib/adsense";
+import { isValidAdsenseSlot } from "@/app/lib/adsense";
+import SponsorSpotlight from "@/components/ads/SponsorSpotlight";
 
 export const revalidate = 60;
 
@@ -18,7 +19,7 @@ export default async function HomePage() {
   const nextEvent = events[0] || null;
   const featuredRoute = routes.find((item) => item.coordinates && item.coordinates.length > 1) || routes[0] || null;
   const featuredPartner = partners.find((item) => item.is_featured) || partners[0] || null;
-  const garageSlot = getAdsenseSlot(process.env.NEXT_PUBLIC_ADSENSE_SLOT_GARAGE, TRAMASSSO_ADSENSE_SLOTS.events);
+  const garageSlot = process.env.NEXT_PUBLIC_ADSENSE_SLOT_GARAGE?.trim() ?? "";
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#08090a] text-white">
@@ -84,7 +85,8 @@ export default async function HomePage() {
               <Link href="/garage/new" className="mt-7 inline-flex w-fit rounded-xl bg-orange-500 px-6 py-3 text-xs font-black uppercase tracking-widest text-black">Crear mi garaje ↗</Link>
             </div>
           </div>}
-        <div className="mt-8"><AdBanner slot={garageSlot} label="Publicidad" /></div>
+        <SponsorSpotlight placement="home" />
+        {isValidAdsenseSlot(garageSlot) ? <div className="mt-8"><AdBanner slot={garageSlot} label="Publicidad" /></div> : null}
       </section>
 
       <section className="border-y border-white/10 bg-[#111214] py-20">

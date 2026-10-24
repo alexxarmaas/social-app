@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CarCard from "@/components/garage/CarCard";
+import SponsorSpotlight from "@/components/ads/SponsorSpotlight";
 import { latestPublicCars } from "@/app/lib/community-data";
 import { buildPremiumMetadata } from "@/app/lib/seo";
 
@@ -36,6 +37,7 @@ export default async function GaragePage() {
             <Link href="/garage/new" className="mt-7 inline-flex rounded-xl border border-orange-500 px-6 py-3 text-xs font-bold uppercase tracking-widest text-orange-500">Publicar mi coche</Link>
           </div>
         )}
+        <SponsorSpotlight placement="garage" />
       </div>
     </main>
   );
