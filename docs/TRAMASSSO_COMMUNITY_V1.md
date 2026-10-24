@@ -58,3 +58,20 @@ Transformar la web de eventos y rutas en una comunidad gratuita del motor, conse
 - Implementados directorio de clubes, creación de clubs, solicitudes y moderación exclusiva del propietario.
 - Pendiente: verificación de email, antispam distribuido, QA manual, CMP, políticas legales, carnet QR, marketplace y unificación de datos de eventos.
 - La primera CI (tras Garage y portada) pasó lint, typecheck, tests y build. Nueva CI requerida tras cambios de Clubs.
+
+
+## Segunda iteración — Identidad e integraciones
+
+- [x] Restauración de negro/naranja/rojo en portada, navegación, Garage, Clubes y formularios.
+- [x] Inscripciones de eventos conectadas al Garage autenticado mediante un GET privado que expone solo marca, modelo y año.
+- [x] Carnet digital **visual** para cada afiliación aprobada, con identificador de referencia privado (sin QR ni numeración consecutiva).
+- [x] Clubes administrados y carnets visibles en el área privada del miembro.
+- [x] Colaboradores destacados procedentes del panel Supabase integrados en Inicio, Garage y Clubes.
+- [x] Clics salientes a colaboradores medidos en Vercel Analytics por posicion.
+- [x] Página pública \`/anunciarse\` conectada al formulario de contacto existente.
+- [x] Tarjeta OpenGraph dinámica de vehículos para compartir y guardar.
+- [x] Editor privado de perfil (nombre público, biografía y zona).
+
+**Validaciones automáticas:** CI GitHub Actions (\`npm run check\`, \`npm run build\`) y despliegue Preview de Vercel para cada commit.
+
+**Pendiente para release:** pruebas E2E y accesibilidad en móvil; revisión de protección contra registros masivos en serverless (rate limiting distribuido), verificación de email, CAPTCHA opcional, mecanismo real de check-in QR, carnet consecutivo si se desea, auditoría RGPD/CMP, promoción y monitorización de producción. No confundir carnet visual con entrada verificada.

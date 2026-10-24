@@ -1,6 +1,6 @@
 # Tramassso
 
-Web de eventos, rutas y colaboradores de Tramassso, con panel privado de contenido y consola interna de RecceMind. Está construida con Next.js 16, React 19, Prisma/PostgreSQL, Supabase y Cloudinary.
+Plataforma de motor Tramassso: comunidad gratuita con Garage de coches, perfiles, clubes, eventos, rutas y colaboradores, con panel privado de contenido y consola interna de RecceMind. Está construida con Next.js 16, React 19, Prisma/PostgreSQL, Supabase y Cloudinary.
 
 ## Requisitos
 
@@ -115,3 +115,22 @@ El dominio publica el identificador de editor en `/ads.txt` y en la metaetiqueta
 - Rota de inmediato cualquier clave que haya sido expuesta.
 - Las imágenes del contenido deben usar HTTPS; las subidas admiten JPG, PNG, WebP, GIF o AVIF hasta 10 MB.
 - La rama principal valida lint, tipos, pruebas y build mediante GitHub Actions.
+
+
+## Tramassso Community V1 (rama feat/tramassso-community-v1)
+
+- **Identidad:** estética negra con naranja/rojo en la nueva experiencia.
+- **Comunidad:** registro gratuito, acceso con credenciales y perfiles públicos con edición privada de nombre, biografía y zona.
+- **Garage:** altas, ediciones, borrados, fotografía principal mediante Cloudinary, fichas SEO y carteles OpenGraph descargables.
+- **Clubes:** creación de clubes, directorio, solicitudes de ingreso, moderación por propietario y carnet visual para miembros aprobados. El carnet **no** sirve como control de acceso ni es un QR verificable.
+- **Eventos:** quien inicia sesión puede utilizar uno de sus vehículos guardados para completar el formulario Supabase de inscripción existente. La matrícula se sigue introduciendo manualmente por privacidad.
+- **Colaboradores:** los destacados ya gestionados en Supabase se muestran en Inicio, Garage y Clubes; los clics se registran en Vercel Analytics incluyendo la sección. Se ha añadido \`/anunciarse\` reutilizando el formulario de contacto.
+- **AdSense:** mantiene los espacios existentes; la nueva ubicación de Garage requiere \`NEXT_PUBLIC_ADSENSE_SLOT_GARAGE\` válido para mostrarse, sin reutilizar el identificador de eventos.
+
+### Fuentes de datos
+
+Las cuentas, coches y clubes utilizan **Prisma/PostgreSQL**. Los eventos, rutas, colaboradores y solicitudes de inscripción existentes mantienen **Supabase** como fuente de verdad. No se crean duplicados de inscripciones en Prisma.
+
+### Puesta en producción
+
+Primero, probar en Preview las rutas \`/register\`, \`/login\`, \`/account\`, \`/garage\`, \`/clubs\`, \`/events\` y \`/anunciarse\`, el proceso completo de registro y la subida de fotos. Configurar Cloudinary, correo, protección antiabuso distribuida, términos, privacidad y consentimiento publicitario antes de abrir el registro público. La rama no debe fusionarse sin validación manual. Más detalle en \`docs/TRAMASSSO_COMMUNITY_V1.md\`.
