@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { authOptions } from "@/app/lib/auth";
 import { safeCarImage } from "@/app/lib/community";
 import { publicCar } from "@/app/lib/community-data";
-import { buildPremiumMetadata } from "@/app/lib/seo";
+import { buildPremiumMetadata, metadataBase } from "@/app/lib/seo";
 import { CarShareButton } from "@/components/garage/CarShareButton";
 
 type Props = { params: Promise<{ id: string }> };
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: car.make + " " + car.model + " (" + car.year + ")",
     description: "Descubre este proyecto de @" + car.owner.username + " en el Garage de Tramassso.",
     path: "/garage/" + car.id,
-    image: safeCarImage(car.imageUrl),
+    image: new URL("/garage/" + car.id + "/opengraph-image", metadataBase).toString(),
     type: "article",
   });
 }
@@ -52,6 +52,7 @@ export default async function CarDetailsPage({ params }: Props) {
             </div>
             <div className="flex flex-wrap gap-3">
               <CarShareButton title={car.make + " " + car.model} />
+              <a href={"/garage/" + car.id + "/opengraph-image"} download={"tramassso-" + car.id.slice(0, 8) + ".png"} className="rounded-xl border border-orange-500/50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-orange-400 hover:border-orange-400">Guardar tarjeta</a>
               {mine ? <Link href={"/garage/" + car.id + "/edit"} className="rounded-xl border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-widest">Editar mi ficha</Link> : null}
             </div>
           </div>
