@@ -2,7 +2,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-export default function PostComposer() {
+export default function PostComposer({ clubId }: { clubId?: string } = {}) {
   const router = useRouter();
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -44,7 +44,7 @@ export default function PostComposer() {
     try {
       const response = await fetch("/api/community/posts", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content, imageUrl }),
+        body: JSON.stringify({ content, imageUrl, ...(clubId ? { clubId } : {}) }),
       });
       const result: { error?: string; status?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || "No se pudo publicar.");

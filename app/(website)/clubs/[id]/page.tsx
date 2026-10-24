@@ -6,6 +6,9 @@ import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
 import MembershipButton from "@/components/clubs/MembershipButton";
 import { buildPremiumMetadata } from "@/app/lib/seo";
+import { socialEnabled } from "@/app/lib/community-social";
+import PostComposer from "@/components/community/PostComposer";
+import PostCard, { type CommunityPost } from "@/components/community/PostCard";
 
 type Props = { params: Promise<{ id: string }> };
 export const dynamic = "force-dynamic";
@@ -40,6 +43,28 @@ export default async function ClubPage({ params }: Props) {
   const membership = session?.user?.id && !isOwner
     ? await prisma.clubMember.findUnique({ where: { userId_clubId: { userId: session.user.id, clubId: club.id } }, select: { status: true } })
     : null;
+  const enabled = socialEnabled();
+  const isMember = isOwner || membership?.status === "approved";
+  let posts: CommunityPost[] = [];
+  if (enabled) {
+    try {
+      const entries = await prisma.post.findMany({
+        where: { clubId: club.id, status: "published" },
+        orderBy: { createdAt: "desc" }, take: 10,
+        select: {
+          id: true, content: true, imageUrl: true, createdAt: true,
+          author: { select: { username: true, name: true } },
+          _count: { select: { likes: true } },
+          likes: { where: { userId: session?.user?.id || "__visitor__" }, select: { id: true } },
+        },
+      });
+      posts = entries.map((entry) => ({
+        id: entry.id, content: entry.content, imageUrl: entry.imageUrl,
+        createdAt: entry.createdAt.toISOString(), author: entry.author,
+        likes: entry._count.likes, liked: entry.likes.length > 0,
+      }));
+    } catch (error) { console.error("Club posts unavailable", error); }
+  }
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-5xl">
@@ -58,6 +83,12 @@ export default async function ClubPage({ params }: Props) {
           </div>
         </div>
         <p className="mt-7 text-sm text-zinc-500">Las solicitudes de ingreso requieren aprobacion del responsable del club. No se muestran datos privados de sus miembros.</p>
+        {enabled ? <section className="mt-14 space-y-6">
+          <h2 className="text-3xl font-black uppercase">La actividad del club</h2>
+          {isMember ? <PostComposer clubId={club.id} /> : <p className="rounded-2xl border border-white/10 p-5 text-sm text-zinc-400">Únete al club para compartir publicaciones.</p>}
+          {posts.map((post) => <PostCard key={post.id} post={post} signedIn={Boolean(session?.user?.id)} />)}
+          {!posts.length ? <p className="rounded-2xl border border-white/10 p-6 text-sm text-zinc-400">Todavía no hay publicaciones aprobadas en este club.</p> : null}
+        </section> : null}
       </div>
     </main>
   );
