@@ -29,8 +29,8 @@ export default async function ClubManagePage({ params }: Props) {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-3xl">
-        <Link href={"/clubs/" + club.id} className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-lime-300">← Volver al club</Link>
-        <p className="mt-8 text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Administracion de club</p>
+        <Link href={"/clubs/" + club.id} className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-orange-500">← Volver al club</Link>
+        <p className="mt-8 text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Administracion de club</p>
         <h1 className="mt-4 text-4xl font-black uppercase">{club.name}</h1>
         <p className="mt-4 text-sm text-zinc-400">Revisa las solicitudes de ingreso. Solo el responsable del club puede aceptar o rechazar nuevos miembros.</p>
         <ApplicationsPanel clubId={club.id} initial={club.members} />
