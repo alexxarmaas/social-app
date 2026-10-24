@@ -131,6 +131,7 @@ export async function sendRegistrationStatusNotification(input: {
   event_title: string;
   event_date: string;
   event_location: string;
+  ticket_url?: string;
 }) {
   if (input.status === "new") return { delivered: false, reason: "not-needed" as const };
   const config = readEmailConfig();
@@ -148,6 +149,7 @@ export async function sendRegistrationStatusNotification(input: {
         `Evento: ${input.event_title}`,
         `Fecha: ${new Date(input.event_date).toLocaleString("es-ES")}`,
         `Lugar: ${input.event_location}`,
+        ...(input.ticket_url ? ["", "Tu entrada digital con QR:", input.ticket_url, "Presentala al acceder al evento. Es personal y de un solo uso."] : []),
         "", "Si necesitas ayuda, responde a este correo.", "", "Tramassso",
       ].join("\n"),
     });

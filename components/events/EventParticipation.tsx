@@ -64,6 +64,7 @@ export default function EventParticipation({ event, remaining }: { event: EventR
 
   const isManaged = event.participation_mode === "managed";
   const full = isManaged && remaining === 0;
+  const waitlistEnabled = process.env.NEXT_PUBLIC_EVENT_WAITLIST_ENABLED === "true";
 
   async function submit(eventForm: FormEvent<HTMLFormElement>) {
     eventForm.preventDefault();
@@ -87,11 +88,11 @@ export default function EventParticipation({ event, remaining }: { event: EventR
           website: values.get("website"),
         }),
       });
-      const data: { success?: boolean; error?: string } = await response.json();
+      const data: { success?: boolean; error?: string; status?: string } = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error ?? "No se pudo enviar la solicitud.");
       form.reset();
       setVehicle("");
-      setMessage(isManaged ? "Solicitud recibida. Te enviaremos un correo y Tramassso revisara la plaza." : "Interes registrado. Te avisaremos si hay novedades.");
+      setMessage(data.status === "waitlisted" ? "El aforo esta completo: te hemos apuntado a la lista de espera. Te avisaremos si se libera una plaza." : isManaged ? "Solicitud recibida. Te enviaremos un correo y Tramassso revisara la plaza." : "Interes registrado. Te avisaremos si hay novedades.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo enviar la solicitud.");
     } finally {
@@ -108,9 +109,9 @@ export default function EventParticipation({ event, remaining }: { event: EventR
           ? "La solicitud la gestiona Tramassso. Enviarla no confirma la plaza hasta que la revisemos."
           : "Tramassso guardara tu interes de forma independiente. Esto no equivale a la inscripcion oficial del organizador."}
       </p>
-      {isManaged && remaining !== null ? <p className="mt-3 text-xs uppercase tracking-[0.24em] text-zinc-300">{remaining} plazas disponibles</p> : null}
+      {isManaged && remaining !== null ? <p className="mt-3 text-xs uppercase tracking-[0.24em] text-zinc-300">{remaining} plazas disponibles {full && waitlistEnabled ? "· Lista de espera disponible" : ""}</p> : null}
 
-      {full ? (
+      {full && !waitlistEnabled ? (
         <p className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">El aforo esta completo.</p>
       ) : (
         <form onSubmit={submit} className="mt-5 grid gap-4 sm:grid-cols-2">
