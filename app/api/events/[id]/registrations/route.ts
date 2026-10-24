@@ -24,6 +24,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       date: result.event.date,
       location: result.event.location,
       participation_mode: result.event.participation_mode as "interest" | "managed",
+      status: "status" in result ? result.status : "new",
     });
     return NextResponse.json({ success: true, status: "status" in result ? result.status : "new", notification: notification.delivered ? "delivered" : "pending" }, { status: 201 });
   } catch (error) {

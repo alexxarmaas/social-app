@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/app/lib/auth";
 import { createSupabaseServiceClient } from "@/app/lib/supabase";
 import { persistentRateLimit } from "@/app/lib/community-security";
+import { sendWaitlistPromotionNotification } from "@/app/lib/contact-email";
 
 export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (process.env.EVENT_TICKETING_V2_ENABLED !== "true")
@@ -26,6 +27,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
   });
   if (error) return NextResponse.json({ error: "No se pudo cancelar." }, { status: 503 });
   const result = data as { success?: boolean; error?: string };
+  if (result?.success && "promotedId" in result && typeof result.promotedId === "string") await sendWaitlistPromotionNotification(result.promotedId);
   return result?.success ? NextResponse.json({ ok: true }) :
     NextResponse.json({ error: result?.error || "No se pudo cancelar." }, { status: 409 });
 }

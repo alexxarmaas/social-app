@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentAdminSession } from "@/app/lib/admin-auth";
 import { deleteEventRegistration, registrationStatusSchema, updateEventRegistration } from "@/app/lib/event-registrations";
 import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
-import { sendRegistrationStatusNotification } from "@/app/lib/contact-email";
+import { sendRegistrationStatusNotification, sendWaitlistPromotionNotification } from "@/app/lib/contact-email";
 
 async function authorize(request: NextRequest) {
   if (!(await getCurrentAdminSession())) return NextResponse.json({ error: "Acceso denegado." }, { status: 403 });
@@ -21,6 +21,7 @@ export async function PATCH(request: NextRequest) {
   revalidatePath("/admin");
   if ("error" in result) return NextResponse.json(result, { status: 400 });
   const notification = result.notification ? await sendRegistrationStatusNotification(result.notification) : null;
+  if ("promotedId" in result && result.promotedId) await sendWaitlistPromotionNotification(result.promotedId);
   return NextResponse.json({ success: true, notification: notification?.delivered ? "delivered" : "pending" });
 }
 
