@@ -15,12 +15,14 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
   const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const register = mode === "register";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
     setBusy(true);
     try {
       if (register) {
@@ -29,11 +31,14 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, username, email, password, consent, website }),
         });
-        const result: { error?: string } = await response.json();
+        const result: { error?: string; message?: string } = await response.json();
         if (!response.ok) {
           setError(result.error || "No se pudo crear tu cuenta.");
           return;
         }
+        setNotice(result.message || "Revisa tu correo y confirma tu cuenta.");
+        setPassword("");
+        return;
       }
       const response = await signIn("credentials", { redirect: false, email, password });
       if (response?.error) {
@@ -95,11 +100,13 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
               <span>He leido la <Link href="/privacidad" className="underline text-white">politica de privacidad</Link>. Entiendo que mi alias y los coches que publique seran visibles para todos.</span>
             </label>
           ) : null}
+          {notice ? <p role="status" className="rounded-xl border border-orange-500/30 bg-orange-500/10 p-3 text-sm text-orange-200">{notice} <Link href="/verify-email" className="underline">Solicitar nuevo enlace</Link></p> : null}
           {error ? <p role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">{error}</p> : null}
           <button type="submit" disabled={busy} className="w-full rounded-xl bg-orange-500 px-5 py-3.5 text-xs font-black uppercase tracking-[0.22em] text-black transition hover:bg-orange-400 disabled:opacity-60">
             {busy ? "Procesando..." : register ? "Crear cuenta gratis" : "Entrar a mi garaje"}
           </button>
         </form>
+        {!register ? <div className="mt-5 flex flex-wrap justify-center gap-5 text-sm"><Link className="text-orange-400 underline" href="/forgot-password">Olvide mi contraseña</Link><Link className="text-zinc-400 underline" href="/verify-email">Verificar mi correo</Link></div> : null}
         <p className="mt-6 text-center text-sm text-zinc-400">
           {register ? "¿Ya tienes cuenta?" : "¿Aun no formas parte?"}{" "}
           <Link href={register ? "/login" : "/register"} className="font-semibold text-orange-500 underline">
