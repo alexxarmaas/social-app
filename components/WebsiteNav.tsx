@@ -8,6 +8,7 @@ import { MdClose, MdMenu } from "react-icons/md";
 
 const primary = [
   { href: "/garage", label: "Garage" },
+  { href: "/community", label: "Comunidad" },
   { href: "/clubs", label: "Clubes" },
   { href: "/events", label: "Eventos" },
   { href: "/routes", label: "Rutas" },
