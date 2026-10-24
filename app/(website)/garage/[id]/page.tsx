@@ -34,7 +34,7 @@ export default async function CarDetailsPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-12 text-white">
       <article className="mx-auto max-w-6xl">
-        <Link href="/garage" className="text-xs font-semibold uppercase tracking-widest text-zinc-500 hover:text-lime-300">← Volver al garage</Link>
+        <Link href="/garage" className="text-xs font-semibold uppercase tracking-widest text-zinc-500 hover:text-orange-500">← Volver al garage</Link>
         <div className="mt-7 grid overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="relative min-h-[320px] bg-gradient-to-br from-zinc-800 to-black lg:min-h-[580px]">
             {image ? <Image src={image} alt={car.make + " " + car.model} fill priority sizes="(max-width: 1024px) 100vw, 65vw" className="object-cover" /> :
@@ -42,7 +42,7 @@ export default async function CarDetailsPage({ params }: Props) {
           </div>
           <div className="flex flex-col justify-between gap-12 p-6 sm:p-10">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Tramassso / Garage</p>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Tramassso / Garage</p>
               <h1 className="mt-5 text-4xl font-black uppercase leading-tight tracking-wide sm:text-5xl">{car.make} {car.model}</h1>
               <p className="mt-4 text-sm text-zinc-400">Proyecto de <Link className="font-bold text-white underline" href={"/members/" + encodeURIComponent(car.owner.username)}>@{car.owner.username}</Link></p>
               <div className="mt-8 grid grid-cols-2 gap-3">

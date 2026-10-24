@@ -11,7 +11,7 @@ export default function MembershipButton({ clubId, initialStatus, signedIn }: {
   const [status, setStatus] = useState(initialStatus);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  if (!signedIn) return <Link href={"/login?next=" + encodeURIComponent("/clubs/" + clubId)} className="inline-flex rounded-xl bg-lime-300 px-6 py-3 text-xs font-black uppercase text-black">Entrar para unirme ↗</Link>;
+  if (!signedIn) return <Link href={"/login?next=" + encodeURIComponent("/clubs/" + clubId)} className="inline-flex rounded-xl bg-orange-500 px-6 py-3 text-xs font-black uppercase text-black">Entrar para unirme ↗</Link>;
   async function toggle() {
     setBusy(true); setError("");
     try {
@@ -24,7 +24,7 @@ export default function MembershipButton({ clubId, initialStatus, signedIn }: {
   }
   return (
     <div>
-      <button onClick={toggle} type="button" disabled={busy} className="rounded-xl border border-lime-300 bg-lime-300 px-6 py-3 text-xs font-black uppercase text-black disabled:opacity-60">
+      <button onClick={toggle} type="button" disabled={busy} className="rounded-xl border border-orange-500 bg-orange-500 px-6 py-3 text-xs font-black uppercase text-black disabled:opacity-60">
         {busy ? "Procesando..." : status === "pending" ? "Cancelar solicitud pendiente" : status === "approved" ? "Salir del club" : status === "rejected" ? "Retirar solicitud rechazada" : "Solicitar unirme"}
       </button>
       {error ? <p role="alert" className="mt-3 text-sm text-rose-300">{error}</p> : null}

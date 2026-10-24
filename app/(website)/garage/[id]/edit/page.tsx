@@ -18,7 +18,7 @@ export default async function EditCarPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-3xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Garage / Edicion</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Garage / Edicion</p>
         <h1 className="mb-9 mt-4 text-4xl font-black uppercase">Actualiza tu coche.</h1>
         <CarForm carId={car.id} initial={{
           make: car.make, model: car.model, year: car.year,

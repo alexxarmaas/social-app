@@ -20,10 +20,10 @@ export default async function MyGaragePage() {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-7xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Area personal</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Area personal</p>
         <h1 className="mt-4 text-5xl font-black uppercase">Mi garaje</h1>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/garage/new" className="rounded-xl bg-lime-300 px-5 py-3 text-xs font-black uppercase tracking-widest text-black">+ Añadir coche</Link>
+          <Link href="/garage/new" className="rounded-xl bg-orange-500 px-5 py-3 text-xs font-black uppercase tracking-widest text-black">+ Añadir coche</Link>
           <Link href={"/members/" + encodeURIComponent(session.user.username)} className="rounded-xl border border-white/20 px-5 py-3 text-xs font-bold uppercase tracking-widest text-white">Ver mi perfil publico</Link>
         </div>
         {cars.length ?

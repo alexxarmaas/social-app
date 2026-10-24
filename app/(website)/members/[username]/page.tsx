@@ -45,19 +45,19 @@ export default async function MemberPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white">
       <div className="mx-auto max-w-7xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-lime-300">Tramassso / Miembros</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Tramassso / Miembros</p>
         <div className="mt-6 rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-800/60 to-black p-6 sm:p-10">
           <div className="flex flex-wrap items-center gap-5">
-            <div aria-hidden="true" className="flex h-20 w-20 items-center justify-center rounded-full bg-lime-300 text-3xl font-black text-black">{member.username.slice(0, 1).toUpperCase()}</div>
+            <div aria-hidden="true" className="flex h-20 w-20 items-center justify-center rounded-full bg-orange-500 text-3xl font-black text-black">{member.username.slice(0, 1).toUpperCase()}</div>
             <div><h1 className="text-3xl font-black uppercase sm:text-5xl">@{member.username}</h1><p className="mt-2 text-zinc-400">{member.name || "Miembro de Tramassso"}</p></div>
           </div>
           {member.bio ? <p className="mt-6 max-w-2xl whitespace-pre-line text-sm leading-7 text-zinc-400">{member.bio}</p> : null}
-          <p className="mt-6 text-xs uppercase tracking-widest text-lime-300">{member.cars.length} coches en su garage</p>
+          <p className="mt-6 text-xs uppercase tracking-widest text-orange-500">{member.cars.length} coches en su garage</p>
         </div>
         <h2 className="mt-12 text-2xl font-black uppercase tracking-wider">Sus proyectos</h2>
         {member.cars.length ? <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{member.cars.map((car) => <CarCard key={car.id} car={car} />)}</div> :
           <p className="mt-6 rounded-2xl border border-white/10 p-8 text-sm text-zinc-500">Aun no hay vehiculos publicados en este perfil.</p>}
-        <Link href="/garage" className="mt-8 inline-block text-sm font-semibold text-lime-300 underline">Explorar mas proyectos →</Link>
+        <Link href="/garage" className="mt-8 inline-block text-sm font-semibold text-orange-500 underline">Explorar mas proyectos →</Link>
       </div>
     </main>
   );

@@ -11,7 +11,7 @@ export default function ClubForm() {
   const [location, setLocation] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const input = "mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base text-white outline-none focus:border-lime-300";
+  const input = "mt-2 w-full rounded-xl border border-white/15 bg-zinc-950 px-4 py-3 text-base text-white outline-none focus:border-orange-500";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +46,7 @@ export default function ClubForm() {
         <textarea rows={5} maxLength={1600} className={input} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Cuenta de que va vuestro club..." />
       </label>
       {error ? <p role="alert" className="rounded-xl bg-rose-500/10 p-3 text-sm text-rose-200">{error}</p> : null}
-      <button disabled={busy} type="submit" className="rounded-xl bg-lime-300 px-7 py-3.5 text-xs font-black uppercase tracking-widest text-black disabled:opacity-50">{busy ? "Creando..." : "Crear club gratuito"}</button>
+      <button disabled={busy} type="submit" className="rounded-xl bg-orange-500 px-7 py-3.5 text-xs font-black uppercase tracking-widest text-black disabled:opacity-50">{busy ? "Creando..." : "Crear club gratuito"}</button>
     </form>
   );
 }

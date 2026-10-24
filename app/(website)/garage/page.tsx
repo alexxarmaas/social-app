@@ -18,11 +18,11 @@ export default async function GaragePage() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.35em] text-lime-300">La comunidad / Garage</p>
+            <p className="text-xs font-bold uppercase tracking-[0.35em] text-orange-500">La comunidad / Garage</p>
             <h1 className="mt-4 text-5xl font-black uppercase tracking-[0.05em] sm:text-7xl">Cada coche tiene una historia.</h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-zinc-400">Proyectos reales. Modificaciones, recuerdos y mucho motor. Descubre los garajes de la comunidad o presenta el tuyo.</p>
           </div>
-          <Link href="/garage/new" className="rounded-xl bg-lime-300 px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition hover:bg-lime-200">+ Añadir mi coche</Link>
+          <Link href="/garage/new" className="rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase tracking-widest text-black transition hover:bg-orange-400">+ Añadir mi coche</Link>
         </div>
         {cars.length ? (
           <div className="mt-12 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -30,10 +30,10 @@ export default async function GaragePage() {
           </div>
         ) : (
           <div className="mt-12 rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black px-6 py-20 text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-lime-300">Un garaje por estrenar</p>
+            <p className="text-sm font-bold uppercase tracking-[0.3em] text-orange-500">Un garaje por estrenar</p>
             <h2 className="mt-5 text-3xl font-black uppercase">Se el primero en dejar huella.</h2>
             <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-zinc-400">Todavia no hay coches publicados o el servicio no esta disponible. Puedes crear tu primera ficha gratis.</p>
-            <Link href="/garage/new" className="mt-7 inline-flex rounded-xl border border-lime-300 px-6 py-3 text-xs font-bold uppercase tracking-widest text-lime-300">Publicar mi coche</Link>
+            <Link href="/garage/new" className="mt-7 inline-flex rounded-xl border border-orange-500 px-6 py-3 text-xs font-bold uppercase tracking-widest text-orange-500">Publicar mi coche</Link>
           </div>
         )}
       </div>

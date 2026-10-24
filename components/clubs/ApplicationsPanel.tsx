@@ -30,7 +30,7 @@ export default function ApplicationsPanel({ clubId, initial }: { clubId: string;
         <div key={member.id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 p-5">
           <div><p className="font-bold">@{member.user.username}</p><p className="text-xs text-zinc-500">{member.user.name}</p></div>
           <div className="flex gap-2">
-            <button type="button" disabled={Boolean(busy)} onClick={() => act(member.id, "approved")} className="rounded-lg bg-lime-300 px-4 py-2 text-xs font-bold text-black disabled:opacity-50">Aceptar</button>
+            <button type="button" disabled={Boolean(busy)} onClick={() => act(member.id, "approved")} className="rounded-lg bg-orange-500 px-4 py-2 text-xs font-bold text-black disabled:opacity-50">Aceptar</button>
             <button type="button" disabled={Boolean(busy)} onClick={() => act(member.id, "rejected")} className="rounded-lg border border-white/20 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">Rechazar</button>
           </div>
         </div>
