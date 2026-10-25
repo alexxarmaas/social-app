@@ -16,13 +16,9 @@
   --font-aeroblade: var(--font-aeroblade);
 }
 
-.font-aeroblade,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Aeroblade is a display/logo font. Using it on every heading makes
+   long labels overflow cards and breaks layouts at tablet widths. */
+.font-aeroblade {
   font-family: var(--font-aeroblade);
 }
 

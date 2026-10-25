@@ -30,7 +30,7 @@ export default async function HomePage() {
         <div className="mx-auto grid min-h-[670px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-5 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
           <div>
             <p className="inline-flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-orange-500"><span className="h-2 w-2 rounded-full bg-orange-500" /> Nacido en Gran Canaria. Sin limites.</p>
-            <h1 className="mt-7 max-w-3xl text-balance text-5xl font-black uppercase leading-[1.02] tracking-[0.025em] sm:text-7xl lg:text-[5.5rem]">
+            <h1 className="font-aeroblade mt-7 max-w-3xl text-balance text-5xl font-black uppercase leading-[1.02] tracking-[0.025em] sm:text-7xl lg:text-[5.5rem]">
               No es solo <span className="text-orange-500">un coche.</span> Es tu historia.
             </h1>
             <p className="mt-8 max-w-xl text-base leading-8 text-zinc-400 sm:text-lg">Una comunidad hecha por y para quienes viven el motor. Crea tu garaje, encuentra quedadas, descubre rutas y comparte cada etapa de tu proyecto.</p>
@@ -113,18 +113,54 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-20 sm:px-5 lg:grid-cols-3 lg:px-8">
-        <Link href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-orange-500/40">
-          <MdMap className="text-orange-500" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">03 / Rutas</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredRoute?.title || "El camino tambien importa."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Explora trazados de Gran Canaria preparados para disfrutar de la carretera."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-orange-500">Explorar rutas <MdArrowOutward /></span></div>
+      <section aria-label="Descubre Tramassso" className="mx-auto grid max-w-7xl gap-5 px-4 py-16 sm:px-5 lg:grid-cols-3 lg:gap-6 lg:px-8 lg:py-20">
+        <Link href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"}
+          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
+          <MdMap aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
+          <div className="mt-7 flex min-w-0 flex-1 flex-col">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">03 / Rutas</p>
+            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
+              {featuredRoute?.title || "El camino también importa."}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Explora trazados de Gran Canaria preparados para disfrutar de la carretera."}
+            </p>
+            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
+              Explorar rutas <MdArrowOutward aria-hidden="true" />
+            </span>
+          </div>
         </Link>
-        <Link href="/clubs" className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-orange-500/40">
-          <MdDirectionsCar className="text-orange-500" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">05 / Clubes</p>
-          <h2 className="mt-4 text-3xl font-black uppercase">Encuentra a tu gente.</h2>
-          <p className="mt-3 text-sm text-zinc-400">Crea tu propio club o solicita unirte a los grupos de la comunidad, gratis.</p>
-          <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-orange-500">Ver clubes <MdArrowOutward /></span></div>
+        <Link href="/clubs"
+          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
+          <MdDirectionsCar aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
+          <div className="mt-7 flex min-w-0 flex-1 flex-col">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">04 / Clubes</p>
+            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
+              Encuentra a tu gente.
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              Crea tu propio club o solicita unirte a los grupos de la comunidad, gratis.
+            </p>
+            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
+              Ver clubes <MdArrowOutward aria-hidden="true" />
+            </span>
+          </div>
         </Link>
-        <Link href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"} className="group flex min-h-[315px] flex-col justify-between rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-8 transition hover:border-orange-500/40">
-          <MdOutlineHandshake className="text-orange-500" size={35} /><div><p className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">04 / Colaboradores</p><h2 className="mt-4 text-3xl font-black uppercase">{featuredPartner?.name || "La industria se mueve con nosotros."}</h2><p className="mt-3 text-sm text-zinc-400">{featuredPartner?.category || "Negocios, talleres y marcas que comparten nuestra pasion."}</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase text-orange-500">Ver colaboradores <MdArrowOutward /></span></div>
+        <Link href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"}
+          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
+          <MdOutlineHandshake aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
+          <div className="mt-7 flex min-w-0 flex-1 flex-col">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">05 / Colaboradores</p>
+            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
+              {featuredPartner?.name || "Marcas que viven el motor."}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">
+              {featuredPartner?.category || "Talleres, negocios y marcas que comparten nuestra pasión."}
+            </p>
+            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
+              Ver colaboradores <MdArrowOutward aria-hidden="true" />
+            </span>
+          </div>
         </Link>
       </section>
 
