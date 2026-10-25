@@ -16,7 +16,7 @@ export default async function MyTramasssoPage() {
   const userId = session.user.id;
   const enabled = socialEnabled();
 
-  const [member, ownedClubs, clubMemberships, posts] = await Promise.all([
+  const [member, ownedClubs, clubMemberships, posts, unread] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -27,6 +27,7 @@ export default async function MyTramasssoPage() {
     prisma.club.count({ where: { ownerId: userId } }),
     prisma.clubMember.count({ where: { userId, status: "approved" } }),
     enabled ? prisma.post.count({ where: { authorId: userId, status: "published" } }) : Promise.resolve(0),
+    enabled ? prisma.notification.count({ where: { userId, read: false } }) : Promise.resolve(0),
   ]);
   if (!member) redirect("/login");
 
@@ -46,6 +47,7 @@ export default async function MyTramasssoPage() {
     { href: "/my-events", title: "Mis eventos", detail: "Inscripciones y entradas", icon: "02" },
     { href: "/clubs", title: "Mis clubes", detail: (ownedClubs + clubMemberships) + " vinculaciones", icon: "03" },
     { href: "/account", title: "Mi perfil", detail: "Datos públicos y privacidad", icon: "04" },
+    ...(enabled ? [{ href: "/notifications", title: "Notificaciones", detail: unread + " sin leer", icon: "05" }] : []),
   ];
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white sm:py-20">
@@ -62,7 +64,7 @@ export default async function MyTramasssoPage() {
           </Link>
         </div>
 
-        <section aria-label="Accesos rápidos" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section aria-label="Accesos rápidos" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {shortcuts.map((item) => <Link key={item.href} href={item.href}
             className="group flex min-h-36 flex-col justify-between rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-5 transition hover:border-orange-500/50">
             <span className="text-xs font-black uppercase tracking-[0.2em] text-orange-400">{item.icon}</span>

@@ -16,7 +16,7 @@ const primary = [
   { href: "/partners", label: "Colaboradores" },
 ];
 
-export default function WebsiteNav({ registrationOpen }: { registrationOpen: boolean }) {
+export default function WebsiteNav({ registrationOpen, socialOpen }: { registrationOpen: boolean; socialOpen: boolean }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const { status } = useSession();
@@ -38,6 +38,7 @@ export default function WebsiteNav({ registrationOpen }: { registrationOpen: boo
           {primary.map((item) => navLink(item.href, item.label))}
         </div>
         <div className="hidden items-center gap-3 lg:flex">
+          {status === "authenticated" && socialOpen ? <Link href="/notifications" className="px-3 py-2 text-xs font-semibold text-zinc-400 transition hover:text-orange-400">Avisos</Link> : null}
           {status === "unauthenticated" ? <Link href="/login" className="px-3 py-2 text-xs font-semibold text-zinc-400 transition hover:text-white">Entrar</Link> : null}
           <Link href={accountHref} className="rounded-xl border border-orange-500 bg-orange-500 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black transition hover:bg-orange-400">{accountText} ↗</Link>
         </div>
@@ -49,6 +50,7 @@ export default function WebsiteNav({ registrationOpen }: { registrationOpen: boo
         <div id="tramassso-mobile-nav" className="border-t border-white/10 bg-[#08090a] px-4 py-5 lg:hidden">
           <div className="mx-auto grid max-w-7xl gap-2">
             {primary.map((item) => navLink(item.href, item.label))}
+            {status === "authenticated" && socialOpen ? <Link href="/notifications" onClick={() => setOpen(false)} className="rounded-xl border border-orange-500/20 px-3 py-3 text-xs font-bold uppercase text-orange-400">Mis notificaciones</Link> : null}
             <div className="mt-3 grid grid-cols-2 gap-3 border-t border-white/10 pt-4">
               <Link href="/login" onClick={() => setOpen(false)} className="rounded-xl border border-white/20 p-3 text-center text-xs font-bold uppercase">Entrar</Link>
               <Link href={accountHref} onClick={() => setOpen(false)} className="rounded-xl bg-orange-500 p-3 text-center text-xs font-black uppercase text-black">{accountText}</Link>
