@@ -4,10 +4,12 @@ import { useState } from "react";
 
 type PendingPost = { id: string; content: string; createdAt: string; imageUrl: string | null; author: { username: string } };
 type Report = { id: string; reason: string; createdAt: string; post: { id: string; content: string; status: string; author: { username: string } } };
+type PendingComment = { id: string; content: string; createdAt: string; author: { username: string }; post: { id: string } };
 
-export default function CommunityModeration({ initialPending, initialReports }: { initialPending: PendingPost[]; initialReports: Report[] }) {
+export default function CommunityModeration({ initialPending, initialReports, initialComments }: { initialPending: PendingPost[]; initialReports: Report[]; initialComments: PendingComment[] }) {
   const [pending, setPending] = useState(initialPending);
   const [reports, setReports] = useState(initialReports);
+  const [comments, setComments] = useState(initialComments);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
   async function moderate(id: string, status: "published" | "hidden") {
@@ -26,6 +28,22 @@ export default function CommunityModeration({ initialPending, initialReports }: 
     finally { setBusy(""); }
   }
 
+  async function moderateComment(id: string, status: "published" | "hidden") {
+    setBusy(id); setMessage("");
+    try {
+      const response = await fetch("/api/admin/community/comments/" + id, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const result: { ok?: boolean; error?: string } = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "No se pudo revisar.");
+      setComments((items) => items.filter((item) => item.id !== id));
+      setMessage(status === "published" ? "Comentario aprobado." : "Comentario rechazado.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Error de conexión.");
+    } finally { setBusy(""); }
+  }
+
   return <div className="space-y-10">
     {message ? <p role="status" className="rounded-xl border border-orange-500/20 p-4 text-sm text-orange-400">{message}</p> : null}
     <section>
@@ -42,6 +60,24 @@ export default function CommunityModeration({ initialPending, initialReports }: 
           </div>
         </article>)}
         {!pending.length ? <p className="rounded-2xl border border-white/10 p-7 text-sm text-zinc-500">No hay publicaciones pendientes.</p> : null}
+      </div>
+    </section>
+    <section>
+      <h2 className="text-2xl font-black uppercase">Comentarios pendientes ({comments.length})</h2>
+      <p className="mt-3 text-sm text-zinc-400">Los comentarios necesitan aprobación antes de mostrarse.</p>
+      <div className="mt-6 space-y-4">
+        {comments.map((comment) => <article key={comment.id} className="rounded-2xl border border-white/10 p-6">
+          <p className="text-xs uppercase tracking-wider text-orange-400">@{comment.author.username}</p>
+          <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-300">{comment.content}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href={"/community/" + comment.post.id} className="rounded-xl border border-white/10 px-4 py-2 text-xs text-zinc-400">Ver publicación</Link>
+            <button type="button" disabled={Boolean(busy)} onClick={() => moderateComment(comment.id, "published")}
+              className="rounded-xl bg-orange-500 px-4 py-2 text-xs font-bold text-black">Aprobar</button>
+            <button type="button" disabled={Boolean(busy)} onClick={() => moderateComment(comment.id, "hidden")}
+              className="rounded-xl border border-red-500/40 px-4 py-2 text-xs font-bold text-red-300">Rechazar</button>
+          </div>
+        </article>)}
+        {!comments.length ? <p className="rounded-2xl border border-white/10 p-7 text-sm text-zinc-500">No hay comentarios pendientes.</p> : null}
       </div>
     </section>
     <section>
