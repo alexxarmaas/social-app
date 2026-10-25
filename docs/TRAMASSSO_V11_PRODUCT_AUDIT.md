@@ -40,11 +40,16 @@
 5. UX de registro cerrado: deja de anunciar una cuenta que devolvería error 503; `/empezar` permite explorar sin login.
 6. Notificaciones privadas por likes/seguidores y comentarios aprobados; cola local en BD, sin email.
 7. Conversaciones públicas con comentario pendiente de moderación, API de publicación y revisión del staff.
+9. Muro segmentado entre publicaciones recientes y perfiles seguidos.
+10. Eventos analíticos de registro, primera publicación de coche, clubes, follows, posts y solicitudes de eventos, sin correo, matrícula ni ID de usuario.
 8. Evento de diciembre publicado en la web oficial en modo informativo sin registrar participantes.
+9. Panel de lanzamiento para responsables (`/admin/lanzamiento`) con recuentos y alertas.
+10. Instrumentación con Vercel Analytics de conversiones y acciones principales, sin datos personales.
 
 ## 4. Puerta de lanzamiento: validación imprescindible
 
 **P0 seguridad y datos:**
+- Supabase Advisor confirmó 22 errores de RLS desactivado en `public`; además 25 claves foráneas sin índice (optimización secundaria), 5 índices sin uso y 2 advertencias por políticas permisivas. Enlace de referencia: https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public.
 - Verificar un backup **restaurable** y plan de reversión de Vercel.
 - Revisar/autorizar `supabase/migrations/20261025_isolate_prisma_api.sql` para cerrar el acceso directo anon/auth a tablas privadas. No aplicarlo automáticamente sin validar permisos y relaciones.
 - Reconciliar el historial Prisma antes de `prisma migrate deploy`; no reinstalar baseline.
@@ -73,3 +78,9 @@
 ## 6. Criterio de terminado
 
 No etiquetar «listo para producción» hasta que P0 y P1 se validen con evidencias. CI verde solo prueba compilación, contratos y lógica aislada. El desarrollo queda en PR borrador hasta entonces.
+
+## 7. Estado final de auditoría
+- Última revisión: 25/10/2026. Publicación del evento piloto: https://www.tramassso.com/events/4c300fbd-bfaa-4a2a-a119-175a40409cd7
+- URL oficial todavía sirve la versión de `master`; rama de comunidad pendiente de publicación completa.
+- No confundir CI y Preview READY con tests E2E: no se han probado todavía registros ni check-in en producción.
+- Próximo paso **obligatorio**: autorización y ejecución controlada del aislamiento de tablas privadas de Prisma, conciliación del historial de migraciones y backup verificable antes de abrir inscripciones o cuentas.
