@@ -20,8 +20,8 @@ export default function WebsiteNav() {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const { status } = useSession();
-  const accountHref = status === "authenticated" ? "/garage/mine" : "/register";
-  const accountText = status === "authenticated" ? "Mi garaje" : "Unirme gratis";
+  const accountHref = status === "authenticated" ? "/mi-tramassso" : "/register";
+  const accountText = status === "authenticated" ? "Mi Tramassso" : "Unirme gratis";
 
   function navLink(href: string, label: string) {
     const active = path === href || path.startsWith(href + "/");

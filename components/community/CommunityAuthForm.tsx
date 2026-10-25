@@ -46,7 +46,7 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
         return;
       }
       const next = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("next") : null;
-      router.push(safeInternalPath(next, "/garage/mine"));
+      router.push(safeInternalPath(next, "/mi-tramassso"));
       router.refresh();
     } catch {
       setError("No hemos podido conectar. Intentalo de nuevo.");
