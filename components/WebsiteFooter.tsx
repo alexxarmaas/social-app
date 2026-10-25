@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getPublicStats } from "@/app/lib/tramassso-content";
+import { communityRegistrationReady } from "@/app/lib/community-security";
 
 export default async function WebsiteFooter() {
   const stats = await getPublicStats();
@@ -25,7 +26,7 @@ export default async function WebsiteFooter() {
           </div>
           <div><p className="text-xs font-bold uppercase tracking-[0.25em] text-orange-500">La comunidad</p>
             <p className="mt-5 text-sm text-zinc-400">{stats.events} eventos · {stats.routes} rutas · {stats.partners} colaboradores publicados</p>
-            <Link href="/register" className="mt-6 inline-flex rounded-xl border border-orange-500/50 px-5 py-3 text-xs font-bold uppercase tracking-wider text-orange-500 hover:border-orange-500">Unirme gratis ↗</Link>
+            <Link href={communityRegistrationReady() ? "/register" : "/empezar"} className="mt-6 inline-flex rounded-xl border border-orange-500/50 px-5 py-3 text-xs font-bold uppercase tracking-wider text-orange-500 hover:border-orange-500">{communityRegistrationReady() ? "Unirme gratis" : "Conoce el proyecto"} ↗</Link>
           </div>
         </div>
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-zinc-500">

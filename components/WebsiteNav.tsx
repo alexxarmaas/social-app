@@ -16,12 +16,12 @@ const primary = [
   { href: "/partners", label: "Colaboradores" },
 ];
 
-export default function WebsiteNav() {
+export default function WebsiteNav({ registrationOpen }: { registrationOpen: boolean }) {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const { status } = useSession();
-  const accountHref = status === "authenticated" ? "/mi-tramassso" : "/register";
-  const accountText = status === "authenticated" ? "Mi Tramassso" : "Unirme gratis";
+  const accountHref = status === "authenticated" ? "/mi-tramassso" : registrationOpen ? "/register" : "/empezar";
+  const accountText = status === "authenticated" ? "Mi Tramassso" : registrationOpen ? "Unirme gratis" : "Descubrir Tramassso";
 
   function navLink(href: string, label: string) {
     const active = path === href || path.startsWith(href + "/");

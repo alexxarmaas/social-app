@@ -9,6 +9,7 @@ import ContactForm from "@/components/contact/ContactForm";
 import AdBanner from "@/components/ads/AdBanner";
 import { isValidAdsenseSlot } from "@/app/lib/adsense";
 import SponsorSpotlight from "@/components/ads/SponsorSpotlight";
+import { communityRegistrationReady } from "@/app/lib/community-security";
 
 export const revalidate = 60;
 
@@ -20,6 +21,7 @@ export default async function HomePage() {
   const featuredRoute = routes.find((item) => item.coordinates && item.coordinates.length > 1) || routes[0] || null;
   const featuredPartner = partners.find((item) => item.is_featured) || partners[0] || null;
   const garageSlot = process.env.NEXT_PUBLIC_ADSENSE_SLOT_GARAGE?.trim() ?? "";
+  const registrationOpen = communityRegistrationReady();
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#08090a] text-white">
@@ -33,8 +35,8 @@ export default async function HomePage() {
             </h1>
             <p className="mt-8 max-w-xl text-base leading-8 text-zinc-400 sm:text-lg">Una comunidad hecha por y para quienes viven el motor. Crea tu garaje, encuentra quedadas, descubre rutas y comparte cada etapa de tu proyecto.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/register" className="inline-flex items-center gap-3 rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-orange-400">
-                Unirme gratis <MdArrowOutward size={18} />
+              <Link href={registrationOpen ? "/register" : "/empezar"} className="inline-flex items-center gap-3 rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-orange-400">
+                {registrationOpen ? "Unirme gratis" : "Conoce Tramassso"} <MdArrowOutward size={18} />
               </Link>
               <Link href="/garage" className="inline-flex items-center gap-3 rounded-xl border border-white/20 bg-white/5 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] text-white transition hover:border-white/60">
                 Explorar Garage
@@ -131,7 +133,7 @@ export default async function HomePage() {
           <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Tu comunidad te espera</p><h2 className="mt-5 text-4xl font-black uppercase leading-tight sm:text-5xl">La carretera es mejor en compañia.</h2><p className="mt-5 max-w-md text-sm leading-7 text-zinc-400">Forma parte de Tramassso sin cuotas. Tu perfil, tus coches y tus planes. Todo en un mismo sitio.</p></div>
           <div className="flex flex-col items-start gap-4 rounded-3xl border border-orange-500/20 bg-orange-500/[0.05] p-8">
             <MdDirectionsCar className="text-orange-500" size={38} /><p className="text-xl font-black uppercase">El siguiente proyecto es el tuyo.</p>
-            <Link href="/register" className="rounded-xl bg-orange-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-black">Crear cuenta gratis ↗</Link>
+            <Link href={registrationOpen ? "/register" : "/empezar"} className="rounded-xl bg-orange-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-black">{registrationOpen ? "Crear cuenta gratis" : "Descubrir el proyecto"} ↗</Link>
           </div>
         </div>
       </section>
