@@ -64,5 +64,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: member.updatedAt, priority: 0.5,
     });
   }
+  if (process.env.COMMUNITY_SOCIAL_ENABLED === "true") {
+    try {
+      const posts = await prisma.post.findMany({
+        where: { status: "published" },
+        take: 300,
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, updatedAt: true },
+      });
+      for (const post of posts) entries.push({
+        url: new URL("/community/" + post.id, metadataBase).toString(),
+        lastModified: post.updatedAt, priority: 0.5,
+      });
+    } catch (error) {
+      console.error("Community sitemap unavailable", error);
+    }
+  }
   return entries;
 }

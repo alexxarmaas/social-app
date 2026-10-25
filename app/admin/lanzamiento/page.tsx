@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Estado de lanzamiento", robots: { in
 
 type SchemaReadiness = Pick<LaunchSignals,
   "hasPrismaHistory" | "hasAccountToken" | "hasRateLimit" | "hasCarPhoto" |
-  "hasPostReport" | "hasTicketColumn" | "anonReadsUsers" | "anonDeletesUsers" | "authenticatedEditsCars"
+  "hasPostReport" | "hasTicketColumn" | "hasCommentModeration" | "anonReadsUsers" | "anonDeletesUsers" | "authenticatedEditsCars"
 >;
 
 async function inspectSchema(): Promise<SchemaReadiness | null> {
@@ -21,6 +21,9 @@ async function inspectSchema(): Promise<SchemaReadiness | null> {
       (to_regclass('public."CommunityRateLimit"') IS NOT NULL) AS "hasRateLimit",
       (to_regclass('public."CarPhoto"') IS NOT NULL) AS "hasCarPhoto",
       (to_regclass('public."PostReport"') IS NOT NULL) AS "hasPostReport",
+      EXISTS(SELECT 1 FROM information_schema.columns
+        WHERE table_schema='public' AND table_name='Comment'
+        AND column_name='status') AS "hasCommentModeration",
       EXISTS(SELECT 1 FROM information_schema.columns
         WHERE table_schema='public' AND table_name='event_registrations'
         AND column_name='ticket_hash') AS "hasTicketColumn",

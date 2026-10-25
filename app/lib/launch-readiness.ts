@@ -5,6 +5,7 @@ export type LaunchSignals = {
   hasCarPhoto: boolean;
   hasPostReport: boolean;
   hasTicketColumn: boolean;
+  hasCommentModeration: boolean;
   anonReadsUsers: boolean;
   anonDeletesUsers: boolean;
   authenticatedEditsCars: boolean;
@@ -31,6 +32,8 @@ export function evaluateLaunch(signals: LaunchSignals): LaunchFinding[] {
     block("community-schema", "Faltan tablas necesarias para seguridad, galerías o moderación.");
   if (!signals.hasTicketColumn)
     block("tickets-schema", "Falta la migración de entradas y lista de espera.");
+  if (!signals.hasCommentModeration)
+    block("comments-schema", "Falta la columna de moderación de comentarios en Prisma.");
   if (!signals.securityEnabled || !signals.verificationEnabled || !signals.registrationEnabled)
     warn("registration-off", "El registro y la verificación todavía no están completamente activados.");
   if (!signals.ticketingEnabled)
