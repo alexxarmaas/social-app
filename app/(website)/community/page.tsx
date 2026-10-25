@@ -15,14 +15,22 @@ export const metadata: Metadata = buildPremiumMetadata({
   path: "/community",
 });
 
-export default async function CommunityPage() {
+export default async function CommunityPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const filters = await searchParams;
   const enabled = socialEnabled();
   const session = await getServerSession(authOptions);
+  const viewerId = session?.user?.id || null;
+  const followingTab = filters.tab === "siguiendo" && Boolean(viewerId);
   let posts: CommunityPost[] = [];
   if (enabled) {
     try {
       const results = await prisma.post.findMany({
-        where: { status: "published" },
+        where: {
+          status: "published",
+          ...(followingTab && viewerId ? {
+            author: { followers: { some: { followerId: viewerId } } },
+          } : {}),
+        },
         orderBy: { createdAt: "desc" },
         take: 30,
         select: {
@@ -47,7 +55,23 @@ export default async function CommunityPage() {
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-400">Tramassso / Comunidad</p>
         <h1 className="mt-5 text-5xl font-black uppercase tracking-wide sm:text-7xl">Gente de motor.</h1>
         <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400">Aquí se comparten los proyectos de verdad: tus avances, tus experiencias y las historias detrás de los coches.</p>
-        <div className="mt-12 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.4fr)]">
+        {enabled ? <nav aria-label="Filtrar muro" className="mt-9 flex flex-wrap gap-3">
+          <Link href="/community" aria-current={!followingTab ? "page" : undefined}
+            className={"rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider " +
+              (!followingTab ? "bg-orange-500 text-black" : "border border-white/15 text-zinc-300")}>
+            Recientes
+          </Link>
+          <Link href={viewerId ? "/community?tab=siguiendo" : "/login?next=%2Fcommunity%3Ftab%3Dsiguiendo"}
+            aria-current={followingTab ? "page" : undefined}
+            className={"rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider " +
+              (followingTab ? "bg-orange-500 text-black" : "border border-white/15 text-zinc-300")}>
+            Siguiendo
+          </Link>
+          <Link href="/members" className="rounded-xl border border-white/15 px-5 py-3 text-xs font-bold uppercase tracking-wider text-orange-400">
+            Encontrar miembros ↗
+          </Link>
+        </nav> : null}
+        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.4fr)]">
           <div className="space-y-6">
             {!enabled ? (
               <div className="rounded-3xl border border-orange-500/20 bg-orange-500/5 p-8">
@@ -63,7 +87,12 @@ export default async function CommunityPage() {
                   <Link href="/register" className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-xs font-bold uppercase text-black">Crear cuenta</Link>
                 </div>}
                 {posts.map((post) => <PostCard key={post.id} post={post} signedIn={Boolean(session?.user?.id)} />)}
-                {!posts.length ? <p className="rounded-3xl border border-white/10 p-8 text-center text-sm text-zinc-400">Todavía no hay publicaciones aprobadas. Las nuevas publicaciones se revisan antes de aparecer.</p> : null}
+                {!posts.length ? <div className="rounded-3xl border border-white/10 p-8 text-center text-sm text-zinc-400">
+                  <p>{followingTab
+                    ? "Todavía no hay publicaciones de personas a las que sigas."
+                    : "Todavía no hay publicaciones aprobadas. Las nuevas publicaciones se revisan antes de aparecer."}</p>
+                  {followingTab ? <Link href="/members" className="mt-5 inline-flex text-orange-400 underline">Descubrir miembros ↗</Link> : null}
+                </div> : null}
               </>
             )}
           </div>
