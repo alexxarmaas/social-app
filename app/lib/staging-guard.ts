@@ -34,8 +34,8 @@ export function isIsolatedStagingReady(env: StagingEnvironment) {
   } catch { return false; }
 }
 
-export function blocksPreviewMutation(method: string, env: StagingEnvironment) {
-  if (!unsafeMethods.has(method.toUpperCase())) return false;
+export function blocksPreviewMutation(method: string, env: StagingEnvironment, pathname = "") {
+  if (!unsafeMethods.has(method.toUpperCase()) && !(method.toUpperCase() === "GET" && pathname === "/api/bonoa/sso/start")) return false;
   const staging = env.VERCEL_ENV === "preview" || env.TRAMASSSO_STAGING_MODE === "true";
   return staging && !isIsolatedStagingReady(env);
 }

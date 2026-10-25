@@ -3,6 +3,7 @@ import { luxuryFallbackImage, metadataBase } from "@/app/lib/seo";
 import WebsiteNav from "@/components/WebsiteNav";
 import WebsiteFooter from "@/components/WebsiteFooter";
 import FloatingInstagram from "@/components/FloatingInstagram";
+import { isIsolatedStagingReady } from "@/app/lib/staging-guard";
 
 export const metadata: Metadata = {
   metadataBase,
@@ -23,5 +24,15 @@ export const metadata: Metadata = {
 };
 
 export default function WebsiteLayout({ children }: { children: React.ReactNode }) {
-  return <><WebsiteNav />{children}<WebsiteFooter /><FloatingInstagram /></>;
+  const isPreview = process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true";
+  const readOnly = isPreview && !isIsolatedStagingReady(process.env);
+  return <>
+    <WebsiteNav />
+    {readOnly ? (
+      <div role="status" className="border-b border-orange-500/30 bg-[#28120c] px-4 py-2.5 text-center text-xs font-semibold leading-5 text-orange-200">
+        Vista previa en solo lectura: registro, inscripciones y cambios desactivados hasta configurar staging aislado.
+      </div>
+    ) : null}
+    {children}<WebsiteFooter /><FloatingInstagram />
+  </>;
 }

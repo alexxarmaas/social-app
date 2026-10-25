@@ -8,6 +8,8 @@ export const TRAMASSSO_ADSENSE_SLOTS = {
 } as const;
 
 export function getValidAdsenseClientId() {
+  // Ads from production must not be served on preview and staging deployments.
+  if (process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true") return null;
   const clientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim();
 
   return clientId && ADSENSE_CLIENT_ID_PATTERN.test(clientId)

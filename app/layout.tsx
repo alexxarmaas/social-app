@@ -34,9 +34,10 @@ export const metadata: Metadata = {
     description: "Eventos deportivos, rutas de conduccion y experiencias premium para la comunidad del motor en Gran Canaria.",
     images: [luxuryFallbackImage],
   },
-  other: {
-    "google-adsense-account": "ca-pub-2456720977453256",
-  },
+  other: process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true"
+    ? {} : { "google-adsense-account": "ca-pub-2456720977453256" },
+  robots: process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true"
+    ? { index: false, follow: false, googleBot: { index: false, follow: false } } : undefined,
 };
 
 export const viewport: Viewport = {
@@ -65,8 +66,8 @@ export default function RootLayout({
             />
           ) : null}
           {children}
-          <Analytics />
-          <SpeedInsights />
+          {process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true" ? null : <Analytics />}
+          {process.env.VERCEL_ENV === "preview" || process.env.TRAMASSSO_STAGING_MODE === "true" ? null : <SpeedInsights />}
         </Provider>
       </body>
     </html>

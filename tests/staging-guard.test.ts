@@ -39,3 +39,8 @@ test("staging mode fails closed even when Vercel target is production", () => {
   assert.equal(blocksPreviewMutation("POST", { ...staging, VERCEL_ENV: "production", TRAMASSSO_STAGING_MODE: "true" }), false);
   assert.equal(blocksPreviewMutation("POST", { VERCEL_ENV: "production" }), false);
 });
+
+test("read-only Preview blocks state-changing GET for Bonoa SSO", () => {
+  assert.equal(blocksPreviewMutation("GET", { VERCEL_ENV: "preview" }, "/api/bonoa/sso/start"), true);
+  assert.equal(blocksPreviewMutation("GET", { VERCEL_ENV: "preview" }, "/api/routes/id/gpx"), false);
+});
