@@ -71,7 +71,9 @@ jobs:
             supabase/migrations/20260721_engagement_features.sql \
             supabase/migrations/20260722_partner_services.sql \
             supabase/migrations/20260723_required_vehicle_license_plate.sql \
-            supabase/migrations/20261024_event_tickets_waitlist.sql; do
+            supabase/migrations/20261024_event_tickets_waitlist.sql \
+            supabase/migrations/20261025_isolate_prisma_api.sql; do
             psql -v ON_ERROR_STOP=1 -f "$file"
           done
           psql -v ON_ERROR_STOP=1 -f scripts/ci-event-ticket-smoke.sql
+          psql -v ON_ERROR_STOP=1 -f scripts/ci-prisma-api-isolation-smoke.sql
