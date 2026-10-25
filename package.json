@@ -11,7 +11,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "check": "npm run lint && npm run typecheck && npm test",
     "create-superadmin": "tsx scripts/create-superadmin.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "staging:check": "tsx scripts/staging-preflight.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
