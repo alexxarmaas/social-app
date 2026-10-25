@@ -73,13 +73,15 @@ export async function sendContactNotification(input: ContactRequestInput) {
 
 export async function sendRegistrationNotification(
   input: RegistrationInput,
-  event: { title: string; date: string; location: string; participation_mode: "interest" | "managed" },
+  event: { title: string; date: string; location: string; participation_mode: "interest" | "managed"; status?: string },
 ) {
   const config = readEmailConfig();
   if (!config) return { delivered: false, reason: "not-configured" as const };
   const transport = createTransport(config);
   const modeLabel = event.participation_mode === "managed" ? "inscripcion" : "lista de interesados";
-  const attendeeMessage = event.participation_mode === "managed"
+  const attendeeMessage = event.status === "waitlisted"
+    ? "Estas en lista de espera. Todavia no tienes una plaza reservada: te avisaremos si queda una disponible."
+    : event.participation_mode === "managed"
     ? "Hemos recibido tu solicitud. Tramassso la revisara y podra contactarte para confirmar la plaza."
     : "Hemos guardado tu interes para enviarte novedades. Esto no equivale a una inscripcion oficial del organizador.";
 
@@ -127,12 +129,13 @@ export async function sendRegistrationNotification(
 export async function sendRegistrationStatusNotification(input: {
   name: string;
   email: string;
-  status: "new" | "confirmed" | "cancelled";
+  status: "new" | "confirmed" | "cancelled" | "waitlisted";
   event_title: string;
   event_date: string;
   event_location: string;
+  ticket_url?: string;
 }) {
-  if (input.status === "new") return { delivered: false, reason: "not-needed" as const };
+  if (input.status === "new" || input.status === "waitlisted") return { delivered: false, reason: "not-needed" as const };
   const config = readEmailConfig();
   if (!config) return { delivered: false, reason: "not-configured" as const };
   const confirmed = input.status === "confirmed";
@@ -148,12 +151,41 @@ export async function sendRegistrationStatusNotification(input: {
         `Evento: ${input.event_title}`,
         `Fecha: ${new Date(input.event_date).toLocaleString("es-ES")}`,
         `Lugar: ${input.event_location}`,
+        ...(input.ticket_url ? ["", "Tu entrada digital con QR:", input.ticket_url, "Presentala al acceder al evento. Es personal y de un solo uso."] : []),
         "", "Si necesitas ayuda, responde a este correo.", "", "Tramassso",
       ].join("\n"),
     });
     return { delivered: true as const };
   } catch (error) {
     console.error("No se pudo enviar el cambio de estado por SMTP.", error instanceof Error ? error.message : "Error desconocido");
+    return { delivered: false, reason: "send-failed" as const };
+  }
+}
+
+
+export async function sendWaitlistPromotionNotification(registrationId: string) {
+  const config = readEmailConfig();
+  if (!config) return { delivered: false, reason: "not-configured" as const };
+  try {
+    const { createSupabaseServiceClient } = await import("@/app/lib/supabase");
+    const { data, error } = await createSupabaseServiceClient().from("event_registrations")
+      .select("name,email,events(title)").eq("id", registrationId).maybeSingle();
+    if (error || !data) return { delivered: false, reason: "lookup-failed" as const };
+    const event = Array.isArray(data.events) ? data.events[0] : data.events;
+    await createTransport(config).sendMail({
+      from: '"Tramassso" <' + config.user + '>',
+      to: data.email,
+      subject: "Se ha liberado una plaza · " + safeHeader(event?.title || "Tramassso"),
+      text: [
+        "Hola " + data.name + ",", "",
+        "Se ha liberado una plaza y tu solicitud ha salido de la lista de espera.",
+        "El organizador todavía debe confirmar tu inscripción. Recibirás la entrada QR cuando se apruebe.",
+        "", "Tramassso",
+      ].join("\n"),
+    });
+    return { delivered: true as const };
+  } catch (error) {
+    console.error("Waitlist notification failed", error instanceof Error ? error.message : "unknown");
     return { delivered: false, reason: "send-failed" as const };
   }
 }

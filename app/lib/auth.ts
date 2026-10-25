@@ -3,7 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/app/lib/prisma";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
-import { checkRateLimit, requestIdentifier } from "@/app/lib/rate-limit";
+import { requestIdentifier, checkRateLimit } from "@/app/lib/rate-limit";
+import { persistentRateLimit } from "@/app/lib/community-security";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
@@ -22,7 +23,10 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 const requestHeaders = await headers();
-                const rateLimit = checkRateLimit(`login:${requestIdentifier(requestHeaders)}`, 8, 15 * 60 * 1000);
+                const loginBucket = "login:" + requestIdentifier(requestHeaders);
+                const rateLimit = process.env.COMMUNITY_SECURITY_V2_ENABLED === "true"
+                    ? await persistentRateLimit(loginBucket, 12, 15 * 60)
+                    : checkRateLimit(loginBucket, 8, 15 * 60 * 1000);
                 if (!rateLimit.allowed) {
                     throw new Error("Credenciales invalidas");
                 }
@@ -33,15 +37,16 @@ export const authOptions: NextAuthOptions = {
 
                 const email = credentials.email.trim().toLowerCase();
                 const user = await prisma.user.findUnique({
-                    where: {
-                        email,
-                    },
+                    where: { email },
+                    select: { id: true, email: true, username: true, name: true, avatar: true, role: true, password: true },
                 });
 
                 if (!user || !user.password) {
                     await bcrypt.compare(credentials.password, "$2b$12$8fKpR5f3iIxZaMmpRQ0kSeQkAEaVScOJRAV7xF6T3aVYtb0cPx6je");
                     throw new Error("Credenciales invalidas");
                 }
+
+                // Account verification gates are only enabled after the additive Prisma migration.
 
                 const isPasswordValid = await bcrypt.compare(
                     credentials.password,
@@ -50,6 +55,15 @@ export const authOptions: NextAuthOptions = {
 
                 if (!isPasswordValid) {
                     throw new Error("Credenciales invalidas");
+                }
+                if (process.env.COMMUNITY_ACCOUNT_VERIFICATION_ENABLED === "true") {
+                    const verification = await prisma.user.findUnique({
+                        where: { id: user.id },
+                        select: { verificationRequired: true, emailVerifiedAt: true },
+                    });
+                    if (verification?.verificationRequired && !verification.emailVerifiedAt) {
+                        throw new Error("Credenciales invalidas");
+                    }
                 }
 
                 return {

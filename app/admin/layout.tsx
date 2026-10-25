@@ -32,6 +32,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <nav className="mt-6 grid gap-2 text-[11px] uppercase tracking-[0.18em] text-zinc-400 sm:mt-9 sm:text-xs sm:tracking-[0.24em]">
           <Link href="/admin" className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-white/30 hover:text-white">Resumen</Link>
           <Link href="/events" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Eventos publicos</Link>
+          <Link href="/admin/lanzamiento" className="rounded-2xl border border-orange-500/35 px-4 py-3 text-orange-400 hover:border-orange-500">Estado de lanzamiento</Link>
+          <Link href="/admin/community" className="rounded-2xl border border-orange-500/30 px-4 py-3 text-orange-400 transition hover:border-orange-500/60 hover:bg-orange-500/[0.05]">Moderacion de comunidad</Link>
           <Link href="/routes" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Rutas publicas</Link>
           <Link href="/" className="rounded-2xl border border-zinc-800 px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.03] hover:text-white">Inicio publico</Link>
         </nav>

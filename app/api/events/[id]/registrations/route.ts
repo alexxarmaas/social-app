@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 import { ZodError } from "zod";
 import { createEventRegistration } from "@/app/lib/event-registrations";
 import { sendRegistrationNotification } from "@/app/lib/contact-email";
@@ -12,7 +14,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
   try {
     const { id } = await context.params;
-    const result = await createEventRegistration(id, await request.json());
+    const session = await getServerSession(authOptions);
+    const result = await createEventRegistration(id, await request.json(), session?.user?.id);
     if ("error" in result) return NextResponse.json(result, { status: 400 });
     if (!result.event || !result.input) return NextResponse.json({ success: true }, { status: 201 });
 
@@ -21,8 +24,9 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       date: result.event.date,
       location: result.event.location,
       participation_mode: result.event.participation_mode as "interest" | "managed",
+      status: "status" in result ? result.status : "new",
     });
-    return NextResponse.json({ success: true, notification: notification.delivered ? "delivered" : "pending" }, { status: 201 });
+    return NextResponse.json({ success: true, status: "status" in result ? result.status : "new", notification: notification.delivered ? "delivered" : "pending" }, { status: 201 });
   } catch (error) {
     const message = error instanceof ZodError
       ? error.issues.map((issue) => issue.message).join(" ")

@@ -1,6 +1,8 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { EventRecord } from "@/app/lib/tramassso-content";
 
@@ -15,6 +17,30 @@ function formatLicensePlateInput(value: string) {
 export default function EventParticipation({ event, remaining }: { event: EventRecord; remaining: number | null }) {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [vehicle, setVehicle] = useState("");
+  const [myCars, setMyCars] = useState<Array<{ id: string; make: string; model: string; year: number }>>([]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    setName((existing) => existing || session?.user?.name || "");
+    setEmail((existing) => existing || session?.user?.email || "");
+    const controller = new AbortController();
+    async function loadGarage() {
+      try {
+        const response = await fetch("/api/garage", { signal: controller.signal, cache: "no-store" });
+        if (!response.ok) return;
+        const result: { cars?: Array<{ id: string; make: string; model: string; year: number }> } = await response.json();
+        if (!controller.signal.aborted) setMyCars(result.cars || []);
+      } catch {
+        // The event registration form remains usable even when Garage is unavailable.
+      }
+    }
+    void loadGarage();
+    return () => controller.abort();
+  }, [status, session?.user?.email, session?.user?.name]);
 
   if (event.participation_mode === "information") {
     return (
@@ -39,6 +65,7 @@ export default function EventParticipation({ event, remaining }: { event: EventR
 
   const isManaged = event.participation_mode === "managed";
   const full = isManaged && remaining === 0;
+  const waitlistEnabled = process.env.NEXT_PUBLIC_EVENT_WAITLIST_ENABLED === "true";
 
   async function submit(eventForm: FormEvent<HTMLFormElement>) {
     eventForm.preventDefault();
@@ -62,10 +89,12 @@ export default function EventParticipation({ event, remaining }: { event: EventR
           website: values.get("website"),
         }),
       });
-      const data: { success?: boolean; error?: string } = await response.json();
+      const data: { success?: boolean; error?: string; status?: string } = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error ?? "No se pudo enviar la solicitud.");
+      track("Event_Registration_Submitted", { mode: isManaged ? "managed" : "interest", status: data.status === "waitlisted" ? "waitlisted" : "requested" });
       form.reset();
-      setMessage(isManaged ? "Solicitud recibida. Te enviaremos un correo y Tramassso revisara la plaza." : "Interes registrado. Te avisaremos si hay novedades.");
+      setVehicle("");
+      setMessage(data.status === "waitlisted" ? "El aforo esta completo: te hemos apuntado a la lista de espera. Te avisaremos si se libera una plaza." : isManaged ? "Solicitud recibida. Te enviaremos un correo y Tramassso revisara la plaza." : "Interes registrado. Te avisaremos si hay novedades.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo enviar la solicitud.");
     } finally {
@@ -82,17 +111,26 @@ export default function EventParticipation({ event, remaining }: { event: EventR
           ? "La solicitud la gestiona Tramassso. Enviarla no confirma la plaza hasta que la revisemos."
           : "Tramassso guardara tu interes de forma independiente. Esto no equivale a la inscripcion oficial del organizador."}
       </p>
-      {isManaged && remaining !== null ? <p className="mt-3 text-xs uppercase tracking-[0.24em] text-zinc-300">{remaining} plazas disponibles</p> : null}
+      {isManaged && remaining !== null ? <p className="mt-3 text-xs uppercase tracking-[0.24em] text-zinc-300">{remaining} plazas disponibles {full && waitlistEnabled ? "· Lista de espera disponible" : ""}</p> : null}
 
-      {full ? (
+      {full && !waitlistEnabled ? (
         <p className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">El aforo esta completo.</p>
       ) : (
         <form onSubmit={submit} className="mt-5 grid gap-4 sm:grid-cols-2">
           <input name="website" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px]" aria-hidden="true" />
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Nombre</span><input name="name" required maxLength={120} autoComplete="name" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Correo</span><input name="email" type="email" required maxLength={160} autoComplete="email" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Nombre</span><input name="name" required maxLength={120} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Correo</span><input name="email" type="email" required maxLength={160} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
           <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Telefono (opcional)</span><input name="phone" type="tel" maxLength={40} autoComplete="tel" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
-          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Marca y modelo</span><input name="vehicle" required minLength={2} maxLength={160} placeholder="Volkswagen Polo GTI" autoComplete="off" className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label>
+          <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Marca y modelo</span>
+            {myCars.length ? <select aria-label="Usar un coche guardado en Garage" defaultValue="" onChange={(e) => {
+              const selected = myCars.find((car) => car.id === e.target.value);
+              if (selected) setVehicle(selected.make + " " + selected.model + " (" + selected.year + ")");
+            }} className="rounded-2xl border border-orange-500/40 bg-black/40 px-4 py-2 text-sm text-white outline-none focus:border-orange-500">
+              <option value="">Elegir de mi Garage (opcional)</option>
+              {myCars.map((car) => <option key={car.id} value={car.id}>{car.make} {car.model} · {car.year}</option>)}
+            </select> : null}
+            <input name="vehicle" required minLength={2} maxLength={160} placeholder="Volkswagen Polo GTI" autoComplete="off" value={vehicle} onChange={(e) => setVehicle(e.target.value)} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-orange-500" />
+          </label>
           <label className="grid gap-2"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Matricula</span><input name="license_plate" required minLength={4} maxLength={16} placeholder="1234 ABC" autoCapitalize="characters" autoCorrect="off" spellCheck={false} onInput={(event) => { event.currentTarget.value = formatLicensePlateInput(event.currentTarget.value); }} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 uppercase text-white outline-none focus:border-zinc-400" /></label>
           {isManaged ? <label className="grid gap-2 sm:max-w-48"><span className="text-xs uppercase tracking-[0.22em] text-zinc-500">Acompañantes</span><input name="companions" type="number" min={0} max={20} defaultValue={0} className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-3 text-white outline-none focus:border-zinc-400" /></label> : null}
           <p className="text-xs leading-5 text-zinc-500 sm:col-span-2">La marca, el modelo y la matricula son obligatorios para identificar el vehiculo y controlar el acceso al evento.</p>
