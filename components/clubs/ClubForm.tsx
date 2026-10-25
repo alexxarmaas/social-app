@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ export default function ClubForm() {
       });
       const result: { id?: string; error?: string } = await response.json();
       if (!response.ok || !result.id) throw new Error(result.error || "No se pudo crear el club.");
+      track("Community_Club_Created");
       router.push("/clubs/" + result.id);
       router.refresh();
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Error inesperado."); }

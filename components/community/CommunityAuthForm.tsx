@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 
 import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
@@ -36,6 +37,7 @@ export default function CommunityAuthForm({ mode }: { mode: "login" | "register"
           setError(result.error || "No se pudo crear tu cuenta.");
           return;
         }
+        track("Community_Registration_Submitted");
         setNotice(result.message || "Revisa tu correo y confirma tu cuenta.");
         setPassword("");
         return;

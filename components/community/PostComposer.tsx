@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
@@ -48,6 +49,7 @@ export default function PostComposer({ clubId }: { clubId?: string } = {}) {
       });
       const result: { error?: string; status?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || "No se pudo publicar.");
+      track("Community_Post_Submitted", { context: clubId ? "club" : "global" });
       setMessage("¡Gracias! Tu publicacion se ha enviado a moderacion. Aparecera al aprobarse.");
       setContent(""); setImageUrl(""); router.refresh();
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Error de conexion."); }

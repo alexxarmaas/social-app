@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -82,6 +83,8 @@ export default function CarForm({ initial, carId }: { initial?: Partial<FormFiel
       });
       const result: { id?: string; error?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || "No hemos podido guardar el coche.");
+      if (!carId) track("Garage_Car_Published");
+      else track("Garage_Car_Updated");
       router.push("/garage/" + (carId || result.id));
       router.refresh();
     } catch (failure) {

@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -16,6 +17,7 @@ export default function FollowButton({ username, initialFollowing, signedIn, isS
       const response = await fetch("/api/community/follow/" + encodeURIComponent(username), { method: following ? "DELETE" : "POST" });
       const result: { following?: boolean; error?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || "No se pudo actualizar.");
+      if (result.following) track("Community_Member_Followed");
       setFollowing(Boolean(result.following));
     } catch (failure) { setError(failure instanceof Error ? failure.message : "Error de conexion."); }
     finally { setBusy(false); }

@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@vercel/analytics/react";
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useSession } from "next-auth/react";
@@ -90,6 +91,7 @@ export default function EventParticipation({ event, remaining }: { event: EventR
       });
       const data: { success?: boolean; error?: string; status?: string } = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error ?? "No se pudo enviar la solicitud.");
+      track("Event_Registration_Submitted", { mode: isManaged ? "managed" : "interest", status: data.status === "waitlisted" ? "waitlisted" : "requested" });
       form.reset();
       setVehicle("");
       setMessage(data.status === "waitlisted" ? "El aforo esta completo: te hemos apuntado a la lista de espera. Te avisaremos si se libera una plaza." : isManaged ? "Solicitud recibida. Te enviaremos un correo y Tramassso revisara la plaza." : "Interes registrado. Te avisaremos si hay novedades.");
