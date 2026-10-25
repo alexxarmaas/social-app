@@ -59,7 +59,10 @@ export default function PostCard({ post, signedIn }: { post: CommunityPost; sign
       {signedIn ? <button type="button" disabled={busy} onClick={toggleLike} aria-pressed={liked}
         className={"rounded-xl border px-4 py-2.5 font-bold uppercase tracking-wider " + (liked ? "border-orange-500/60 bg-orange-500/10 text-orange-400" : "border-white/15 text-zinc-300")}>{liked ? "♥" : "♡"} {likes} me gusta</button> :
         <Link href="/login?next=%2Fcommunity" className="text-orange-400 underline">Entra para dar me gusta · {likes}</Link>}
-      {signedIn ? <button type="button" onClick={() => setReporting(!reporting)} className="text-zinc-500 hover:text-orange-400">Denunciar</button> : null}
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href={"/community/" + post.id} className="font-semibold text-orange-400 underline">Ver conversación ↗</Link>
+        {signedIn ? <button type="button" onClick={() => setReporting(!reporting)} className="text-zinc-500 hover:text-orange-400">Denunciar</button> : null}
+      </div>
     </div>
     {reporting ? <div className="flex flex-wrap items-center gap-3 border-t border-white/10 p-5">
       <select aria-label="Motivo de denuncia" value={reportReason} onChange={(e) => setReportReason(e.target.value)} className="rounded-xl border border-white/15 bg-black px-4 py-3 text-xs text-white">
