@@ -124,6 +124,7 @@ model Post {
 // Comment model for post interactions
 model Comment {
   id        String   @id @default(uuid())
+  status    String   @default("published")
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -133,6 +134,8 @@ model Comment {
 
   postId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, status, createdAt])
 }
 
 // Like model for post engagement

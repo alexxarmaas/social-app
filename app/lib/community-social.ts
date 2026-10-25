@@ -18,3 +18,9 @@ export const moderationInputSchema = z.object({
 export function socialEnabled() {
   return process.env.COMMUNITY_SOCIAL_ENABLED === "true";
 }
+
+
+export const commentInputSchema = z.object({
+  content: z.string().trim().min(3, "Escribe al menos tres caracteres.").max(600),
+  website: z.string().max(200).optional(),
+}).strict();

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { moderationInputSchema, postInputSchema, reportInputSchema } from "../app/lib/community-social";
+import { moderationInputSchema, postInputSchema, reportInputSchema, commentInputSchema } from "../app/lib/community-social";
 import { registrationStatusSchema, registrationInputSchema } from "../app/lib/event-registrations";
 
 test("posts require meaningful content and trusted media", () => {
@@ -25,4 +25,12 @@ test("waitlist and guest consent are validated", () => {
   const valid = { name: "Maria Lopez", email: "maria@example.com", vehicle: "Honda Prelude", license_plate: "1234 ABC", privacy: true };
   assert.equal(registrationInputSchema.safeParse(valid).success, true);
   assert.equal(registrationInputSchema.safeParse({ ...valid, privacy: false }).success, false);
+});
+
+
+test("comments require a short, moderated text", () => {
+  assert.equal(commentInputSchema.safeParse({ content: "Qué bonito Prelude" }).success, true);
+  assert.equal(commentInputSchema.safeParse({ content: "ok" }).success, false);
+  assert.equal(commentInputSchema.safeParse({ content: "X".repeat(601) }).success, false);
+  assert.equal(commentInputSchema.safeParse({ content: "Hola", status: "published" }).success, false);
 });
