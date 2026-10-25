@@ -14,6 +14,7 @@ export default async function WebsiteFooter() {
             <div className="mt-5 grid gap-3 text-sm text-zinc-400">
               <Link href="/garage" className="hover:text-white">Garage de la comunidad</Link>
               <Link href="/community" className="hover:text-white">Muro de la comunidad</Link>
+              <Link href="/members" className="hover:text-white">Conoce a los miembros</Link>
               <Link href="/clubs" className="hover:text-white">Clubes</Link>
               <Link href="/events" className="hover:text-white">Eventos</Link>
               <Link href="/routes" className="hover:text-white">Rutas</Link>
