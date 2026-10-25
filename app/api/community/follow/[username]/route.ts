@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
@@ -25,11 +26,20 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
   try {
     const auth = await prepare((await params).username);
     if ("error" in auth) return auth.error;
-    await prisma.follow.upsert({
-      where: { followerId_followingId: { followerId: auth.followerId, followingId: auth.followingId } },
-      create: { followerId: auth.followerId, followingId: auth.followingId },
-      update: {},
-    });
+    try {
+      // A single transaction guarantees at most one notification per new follow.
+      await prisma.$transaction(async (tx) => {
+        await tx.follow.create({ data: { followerId: auth.followerId, followingId: auth.followingId } });
+        await tx.notification.create({
+          data: {
+            userId: auth.followingId, actorId: auth.followerId,
+            type: "FOLLOW", message: "ha empezado a seguir tu perfil.",
+          },
+        });
+      });
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")) throw error;
+    }
     return NextResponse.json({ following: true });
   } catch (error) {
     console.error("Follow failed", error);
