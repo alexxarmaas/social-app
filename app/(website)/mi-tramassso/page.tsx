@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -43,19 +44,19 @@ export default async function MyTramasssoPage() {
   const ratio = Math.round(done / steps.length * 100);
   const next = steps.find((step) => !step.done);
   const shortcuts = [
-    { href: "/garage/mine", title: "Mis coches", detail: member._count.cars + " vehículos", icon: "01" },
-    { href: "/my-events", title: "Mis eventos", detail: "Inscripciones y entradas", icon: "02" },
-    { href: "/clubs", title: "Mis clubes", detail: (ownedClubs + clubMemberships) + " vinculaciones", icon: "03" },
-    { href: "/account", title: "Mi perfil", detail: "Datos públicos y privacidad", icon: "04" },
-    ...(enabled ? [{ href: "/notifications", title: "Notificaciones", detail: unread + " sin leer", icon: "05" }] : []),
+    { href: "/garage/mine", title: "Mis coches", detail: member._count.cars + " vehículos", icon: "garage" as const },
+    { href: "/my-events", title: "Mis eventos", detail: "Inscripciones y entradas", icon: "events" as const },
+    { href: "/clubs", title: "Mis clubes", detail: (ownedClubs + clubMemberships) + " vinculaciones", icon: "clubs" as const },
+    { href: "/account", title: "Mi perfil", detail: "Datos públicos y privacidad", icon: "profile" as const },
+    ...(enabled ? [{ href: "/notifications", title: "Notificaciones", detail: unread + " sin leer", icon: "bell" as const }] : []),
   ];
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white sm:py-20">
       <div className="mx-auto max-w-6xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-400">Tu espacio / Tramassso</p>
+        <span className="trm-pill"><TramasssoIcon name="profile" frame={false} size="sm" /> Tu espacio / Tramassso</span>
         <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <h1 className="text-5xl font-black uppercase tracking-wide sm:text-6xl">Tu sitio en el motor.</h1>
+            <h1 className="font-sans text-[clamp(2.65rem,5.6vw,4.5rem)] font-black uppercase leading-[1.05] tracking-[-0.05em]">Tu sitio en el motor.</h1>
             <p className="mt-5 text-sm leading-7 text-zinc-400">Hola, @{member.username}. Tus coches, planes y comunidad en un solo lugar.</p>
           </div>
           <Link href={"/members/" + encodeURIComponent(member.username)}
@@ -66,9 +67,9 @@ export default async function MyTramasssoPage() {
 
         <section aria-label="Accesos rápidos" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {shortcuts.map((item) => <Link key={item.href} href={item.href}
-            className="group flex min-h-36 flex-col justify-between rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-5 transition hover:border-orange-500/50">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-orange-400">{item.icon}</span>
-            <div><h2 className="text-lg font-black uppercase">{item.title} ↗</h2><p className="mt-2 text-xs text-zinc-500">{item.detail}</p></div>
+            className="trm-discovery-card group flex min-h-44 flex-col justify-between p-5">
+            <TramasssoIcon name={item.icon} size="md" />
+            <div><h2 className="mt-6 flex items-center gap-2 font-sans text-base font-black uppercase tracking-tight">{item.title}<TramasssoIcon name="arrow" frame={false} size="sm" className="text-orange-400" /></h2><p className="mt-2 text-xs text-zinc-500">{item.detail}</p></div>
           </Link>)}
         </section>
 
@@ -93,8 +94,8 @@ export default async function MyTramasssoPage() {
             <h2 className="text-xl font-black uppercase tracking-wider">Tu checklist de arranque</h2>
             <div className="mt-6 space-y-4">
               {steps.map((step, i) => <div key={step.id} className="flex items-start gap-4 border-b border-white/10 pb-4 last:border-0 last:pb-0">
-                <span aria-hidden="true" className={"flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black " + (step.done ? "bg-orange-500/20 text-orange-300" : "bg-white/10 text-zinc-400")}>
-                  {step.done ? "✓" : String(i + 1).padStart(2, "0")}
+                <span aria-hidden="true" className={"flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black " + (step.done ? "border border-orange-500/25 bg-orange-500/15 text-orange-300" : "bg-white/10 text-zinc-400")}>
+                  {step.done ? <TramasssoIcon name="check" size="sm" frame={false} /> : String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="flex-1">
                   <h3 className="text-sm font-bold">{step.title}</h3>
