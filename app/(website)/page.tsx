@@ -1,14 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MdArrowOutward, MdCalendarMonth, MdDirectionsCar, MdMap, MdOutlineHandshake } from "react-icons/md";
 import { listPublicEvents, listPublicPartners, listPublicRoutes } from "@/app/lib/tramassso-content";
 import { latestPublicCars } from "@/app/lib/community-data";
-import { safeCarImage } from "@/app/lib/community";
 import CarCard from "@/components/garage/CarCard";
 import ContactForm from "@/components/contact/ContactForm";
 import AdBanner from "@/components/ads/AdBanner";
-import { isValidAdsenseSlot } from "@/app/lib/adsense";
 import SponsorSpotlight from "@/components/ads/SponsorSpotlight";
+import DiscoveryCard from "@/components/ui/DiscoveryCard";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
+import { isValidAdsenseSlot } from "@/app/lib/adsense";
 import { communityRegistrationReady } from "@/app/lib/community-security";
 
 export const revalidate = 60;
@@ -25,159 +25,220 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#08090a] text-white">
-      <section className="relative isolate border-b border-white/10">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_75%_30%,rgba(255,106,0,0.08),transparent_43%),linear-gradient(180deg,#08090a,#101112)]" />
-        <div className="mx-auto grid min-h-[670px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-5 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-          <div>
-            <p className="inline-flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-orange-500"><span className="h-2 w-2 rounded-full bg-orange-500" /> Nacido en Gran Canaria. Sin limites.</p>
-            <h1 className="font-aeroblade mt-7 max-w-3xl text-balance text-5xl font-black uppercase leading-[1.02] tracking-[0.025em] sm:text-7xl lg:text-[5.5rem]">
-              No es solo <span className="text-orange-500">un coche.</span> Es tu historia.
+      <section className="relative isolate overflow-hidden border-b border-white/10">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_75%_32%,rgba(255,106,0,0.11),transparent_48%),linear-gradient(180deg,#0c0c0e,#08090a)]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-16 pt-14 sm:px-5 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 lg:px-8 lg:py-24">
+          <div className="min-w-0">
+            <span className="trm-pill"><span className="h-1.5 w-1.5 rounded-full bg-orange-400" /> Nacido en Gran Canaria</span>
+            <h1 className="mt-7 max-w-3xl text-balance font-sans text-[clamp(3rem,6.5vw,6.2rem)] font-black uppercase leading-[0.99] tracking-[-0.065em]">
+              Tu coche.<br /><span className="text-orange-500">Tu historia.</span><br />Tu gente.
             </h1>
-            <p className="mt-8 max-w-xl text-base leading-8 text-zinc-400 sm:text-lg">Una comunidad hecha por y para quienes viven el motor. Crea tu garaje, encuentra quedadas, descubre rutas y comparte cada etapa de tu proyecto.</p>
+            <p className="mt-7 max-w-lg text-base leading-8 text-zinc-400 sm:text-lg">
+              El punto de encuentro para quienes viven el motor. Comparte tu proyecto, descubre coches reales, encuentra rutas y participa en quedadas.
+            </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href={registrationOpen ? "/register" : "/empezar"} className="inline-flex items-center gap-3 rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-black transition hover:bg-orange-400">
-                {registrationOpen ? "Unirme gratis" : "Conoce Tramassso"} <MdArrowOutward size={18} />
+              <Link href={registrationOpen ? "/register" : "/empezar"} className="trm-action">
+                {registrationOpen ? "Unirme gratis" : "Conoce Tramassso"}
+                <TramasssoIcon name="arrow" size="sm" frame={false} />
               </Link>
-              <Link href="/garage" className="inline-flex items-center gap-3 rounded-xl border border-white/20 bg-white/5 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] text-white transition hover:border-white/60">
+              <Link href="/garage" className="trm-action-secondary">
+                <TramasssoIcon name="garage" size="sm" frame={false} />
                 Explorar Garage
               </Link>
             </div>
-            <div className="mt-12 flex flex-wrap gap-6 border-t border-white/10 pt-7 text-xs uppercase tracking-widest text-zinc-500">
-              <span>100% comunidad</span><span>Sin cuotas</span><span>Coches reales</span>
+            <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
+              {["Comunidad gratuita", "Proyectos reales", "Motor sin etiquetas"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.075em] text-zinc-500">
+                  <TramasssoIcon name="check" frame={false} size="sm" className="text-orange-500" />
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-3 rounded-[2.3rem] border border-orange-500/10" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/10 bg-zinc-900">
+
+          <div className="relative min-w-0">
+            <div aria-hidden="true" className="pointer-events-none absolute -inset-3 rounded-[2rem] border border-orange-500/10" />
+            <Link href={nextEvent ? "/events/" + nextEvent.id : "/events"}
+              className="group relative flex min-h-[490px] flex-col justify-between overflow-hidden rounded-[1.8rem] border border-white/15 bg-[#151517] shadow-[0_32px_80px_rgba(0,0,0,.38)] transition-colors hover:border-orange-500/55 sm:min-h-[550px]">
               {nextEvent?.cover_image_url ? (
-                <Image src={nextEvent.cover_image_url} alt={nextEvent.title} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover opacity-80" />
+                <Image src={nextEvent.cover_image_url} alt={nextEvent.title} fill priority
+                  sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover opacity-70 transition-transform duration-700 group-hover:scale-[1.035]" />
               ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(255,106,0,0.20),transparent_35%),repeating-linear-gradient(125deg,transparent_0,transparent_35px,rgba(255,255,255,.025)_36px,transparent_37px),linear-gradient(135deg,#27272a,#050505)]" />
+                <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_70%_32%,rgba(255,106,0,.2),transparent_39%),repeating-linear-gradient(135deg,transparent_0,transparent_34px,rgba(255,255,255,.018)_35px,transparent_36px),linear-gradient(145deg,#281b16,#09090b_78%)]" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
-              <div className="absolute left-6 top-6 rounded-full border border-white/20 bg-black/60 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur">Tramassso / Motor culture</div>
-              <div className="absolute inset-x-6 bottom-7">
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-orange-500">{nextEvent ? "Proxima quedada" : "Estamos construyendo algo grande"}</p>
-                <h2 className="mt-3 text-3xl font-black uppercase leading-tight tracking-wide sm:text-4xl">{nextEvent?.title || "Tu pasion. Tu gente. Tu sitio."}</h2>
-                <p className="mt-3 text-sm text-zinc-300">{nextEvent ? nextEvent.location : "Forma parte desde el principio."}</p>
-                <Link href={nextEvent ? "/events/" + nextEvent.id : "/events"} className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white hover:text-orange-500">Descubre los eventos <MdArrowOutward size={18} /></Link>
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+              <div className="relative flex items-center justify-between gap-3 p-6 sm:p-8">
+                <span className="trm-pill border-white/20 bg-black/55 text-zinc-200">Próxima quedada</span>
+                <TramasssoIcon name="events" size="lg" className="border-white/20 bg-black/50 text-orange-300" />
               </div>
-            </div>
+              {!nextEvent?.cover_image_url ? (
+                <div aria-hidden="true" className="relative flex flex-1 items-center justify-center">
+                  <span className="font-aeroblade text-7xl text-white/[0.07] sm:text-8xl">TRM.</span>
+                </div>
+              ) : <div className="flex-1" />}
+              <div className="relative p-6 pt-20 sm:p-8 sm:pt-28">
+                <span className="trm-kicker">{nextEvent ? new Date(nextEvent.date).toLocaleDateString("es-ES", { timeZone: "Atlantic/Canary", day: "numeric", month: "long", year: "numeric" }) : "La próxima historia empieza aquí"}</span>
+                <h2 className="trm-card-title mt-3 text-3xl leading-[1.12] sm:text-[2.6rem]">
+                  {nextEvent?.title || "Nos vemos en la carretera."}
+                </h2>
+                <p className="mt-4 flex items-start gap-2 text-sm leading-6 text-zinc-300">
+                  <TramasssoIcon name="location" frame={false} size="sm" className="mt-0.5 text-orange-400" />
+                  {nextEvent?.location || "Gran Canaria"}
+                </p>
+                <span className="mt-6 inline-flex items-center gap-2 border-t border-white/20 pt-5 text-xs font-black uppercase tracking-wider text-white">
+                  Ver encuentro <TramasssoIcon name="arrow" frame={false} size="sm" className="text-orange-400" />
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-5 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-5 lg:px-8 lg:py-20">
         <div className="flex flex-wrap items-end justify-between gap-5">
-          <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">01 / Community Garage</p>
-            <h2 className="mt-4 text-4xl font-black uppercase tracking-wide sm:text-5xl">Los coches de la gente.</h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Detras de cada coche hay una historia. Enseña el tuyo y descubre como otros viven su proyecto.</p>
+          <div>
+            <p className="trm-kicker">01 / Garage de la comunidad</p>
+            <h2 className="mt-3 max-w-2xl text-balance font-sans text-4xl font-black uppercase leading-[1.05] tracking-[-0.04em] sm:text-5xl">Cada coche cuenta algo.</h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Fichas, fotos, modificaciones e historias. Sin importar los caballos o el presupuesto.</p>
           </div>
-          <Link href="/garage" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-500 hover:text-white">Ver todo el Garage <MdArrowOutward /></Link>
+          <Link href="/garage" className="trm-action-secondary">
+            Ver Garage <TramasssoIcon name="arrow" frame={false} size="sm" />
+          </Link>
         </div>
-        {cars.length ? <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{cars.map((car) => <CarCard key={car.id} car={car} />)}</div> :
-          <div className="mt-9 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="relative flex min-h-[290px] flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-700/50 via-zinc-900 to-black p-8">
-              <p className="font-aeroblade text-6xl uppercase tracking-wide text-white/10 sm:text-8xl">Tramassso.</p>
-              <div className="relative mt-8"><h3 className="text-2xl font-black uppercase">Tu coche merece su espacio.</h3><p className="mt-3 text-sm text-zinc-400">Publica la primera ficha del Garage Tramassso.</p></div>
+        {cars.length ? (
+          <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {cars.map((car) => <CarCard key={car.id} car={car} />)}
+          </div>
+        ) : (
+          <div className="mt-9 grid gap-5 md:grid-cols-[1.2fr_0.8fr]">
+            <div className="trm-surface relative flex min-h-[270px] flex-col justify-between overflow-hidden p-8">
+              <span aria-hidden="true" className="pointer-events-none absolute -right-4 -top-8 font-aeroblade text-7xl text-white/[0.04] sm:text-9xl">TRM.</span>
+              <TramasssoIcon name="garage" size="lg" />
+              <div className="relative">
+                <p className="trm-kicker">La primera plaza está libre</p>
+                <h3 className="mt-3 font-sans text-2xl font-black uppercase tracking-tight">Tu coche merece estar aquí.</h3>
+                <p className="mt-3 max-w-md text-sm leading-6 text-zinc-400">La comunidad empieza con las historias que compartimos.</p>
+              </div>
             </div>
-            <div className="flex flex-col justify-center rounded-3xl border border-orange-500/20 bg-orange-500/[0.06] p-8">
-              <p className="text-xs font-bold uppercase tracking-widest text-orange-500">Gratis desde el primer dia</p><h3 className="mt-4 text-2xl font-black uppercase">Crea. Comparte. Conecta.</h3>
-              <p className="mt-4 text-sm leading-7 text-zinc-400">Guarda las especificaciones de tu coche, sube su foto y consigue un enlace que podras compartir en tus historias.</p>
-              <Link href="/garage/new" className="mt-7 inline-flex w-fit rounded-xl bg-orange-500 px-6 py-3 text-xs font-black uppercase tracking-widest text-black">Crear mi garaje ↗</Link>
+            <div className="trm-surface flex flex-col justify-center p-8">
+              <span className="trm-pill w-fit">Gratis desde el primer día</span>
+              <h3 className="mt-5 font-sans text-2xl font-black uppercase leading-tight tracking-tight">Sube. Comparte. Conecta.</h3>
+              <p className="mt-4 text-sm leading-7 text-zinc-400">Guarda las características de tu coche, añade sus fotos y comparte tu ficha con un enlace propio.</p>
+              <Link href="/garage/new" className="trm-action mt-7 w-fit">
+                Publicar mi coche <TramasssoIcon name="arrow" frame={false} size="sm" />
+              </Link>
             </div>
-          </div>}
+          </div>
+        )}
         <SponsorSpotlight placement="home" />
         {isValidAdsenseSlot(garageSlot) ? <div className="mt-8"><AdBanner slot={garageSlot} label="Publicidad" /></div> : null}
       </section>
 
-      <section className="border-y border-white/10 bg-[#111214] py-20">
+      <section className="border-y border-white/10 bg-[#101113] py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-5 lg:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">02 / Meets & Events</p><h2 className="mt-4 text-4xl font-black uppercase tracking-wide sm:text-5xl">Nos vemos en persona.</h2>
-              <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Las mejores historias empiezan al apagar el motor y conocer a quien tienes al lado.</p></div>
-            <Link href="/events" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-500">Todos los eventos <MdArrowOutward /></Link>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="trm-kicker">02 / Encuentros</p>
+              <h2 className="mt-3 font-sans text-4xl font-black uppercase leading-[1.05] tracking-[-0.04em] sm:text-5xl">Lo mejor pasa fuera.</h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">Nos vemos, compartimos proyectos y hacemos kilómetros juntos.</p>
+            </div>
+            <Link href="/events" className="trm-action-secondary">
+              Todos los eventos <TramasssoIcon name="arrow" size="sm" frame={false} />
+            </Link>
           </div>
-          {events.length ? <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {events.slice(0, 3).map((event) => (
-              <Link href={"/events/" + event.id} key={event.id} className="group overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 transition hover:border-orange-500/40">
-                <div className="relative aspect-[16/10] bg-zinc-800">
-                  {event.cover_image_url ? <Image src={event.cover_image_url} alt={event.title} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition group-hover:scale-105" /> :
-                    <div className="flex h-full items-center justify-center text-5xl text-white/10"><MdCalendarMonth /></div>}
-                </div>
-                <div className="p-6"><p className="text-xs font-bold uppercase tracking-widest text-orange-500">{new Date(event.date).toLocaleDateString("es-ES", { timeZone: "Atlantic/Canary", day: "2-digit", month: "short", year: "numeric" })}</p>
-                  <h3 className="mt-3 text-xl font-black uppercase">{event.title}</h3><p className="mt-3 text-sm text-zinc-500">{event.location}</p></div>
-              </Link>
-            ))}
-          </div> : <div className="mt-9 rounded-3xl border border-white/10 p-10 text-sm text-zinc-400">Los proximos eventos se anunciaran aqui. Sigue la comunidad para enterarte.</div>}
+          {events.length ? (
+            <div className="mt-9 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {events.slice(0, 3).map((event) => (
+                <Link key={event.id} href={"/events/" + event.id}
+                  className="group flex min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0b0c0e] transition-colors hover:border-orange-500/50">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-[#17181a]">
+                    {event.cover_image_url ? (
+                      <Image src={event.cover_image_url} alt={event.title} fill
+                        sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle,rgba(255,106,0,.12),transparent_65%)]">
+                        <TramasssoIcon name="events" size="lg" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-4 left-4">
+                      <span className="trm-pill border-white/10 bg-black/80">
+                        {new Date(event.date).toLocaleDateString("es-ES", { timeZone: "Atlantic/Canary", day: "2-digit", month: "short", year: "numeric" })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="trm-card-title text-xl leading-snug">{event.title}</h3>
+                    <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-zinc-400">
+                      <TramasssoIcon name="location" size="sm" frame={false} className="mt-0.5 text-orange-400" />
+                      {event.location}
+                    </p>
+                    <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-extrabold uppercase tracking-wider text-orange-400">
+                      Ver evento <TramasssoIcon name="arrow" frame={false} size="sm" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="trm-surface mt-9 flex items-center gap-4 p-7">
+              <TramasssoIcon name="events" size="lg" />
+              <p className="text-sm text-zinc-400">Los próximos eventos se anunciarán aquí.</p>
+            </div>
+          )}
         </div>
       </section>
 
-      <section aria-label="Descubre Tramassso" className="mx-auto grid max-w-7xl gap-5 px-4 py-16 sm:px-5 lg:grid-cols-3 lg:gap-6 lg:px-8 lg:py-20">
-        <Link href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"}
-          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
-          <MdMap aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
-          <div className="mt-7 flex min-w-0 flex-1 flex-col">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">03 / Rutas</p>
-            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
-              {featuredRoute?.title || "El camino también importa."}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Explora trazados de Gran Canaria preparados para disfrutar de la carretera."}
-            </p>
-            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
-              Explorar rutas <MdArrowOutward aria-hidden="true" />
-            </span>
-          </div>
-        </Link>
-        <Link href="/clubs"
-          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
-          <MdDirectionsCar aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
-          <div className="mt-7 flex min-w-0 flex-1 flex-col">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">04 / Clubes</p>
-            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
-              Encuentra a tu gente.
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              Crea tu propio club o solicita unirte a los grupos de la comunidad, gratis.
-            </p>
-            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
-              Ver clubes <MdArrowOutward aria-hidden="true" />
-            </span>
-          </div>
-        </Link>
-        <Link href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"}
-          className="group flex min-w-0 flex-col rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition-colors hover:border-orange-500/50 sm:p-7">
-          <MdOutlineHandshake aria-hidden="true" className="shrink-0 text-orange-500" size={31} />
-          <div className="mt-7 flex min-w-0 flex-1 flex-col">
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">05 / Colaboradores</p>
-            <h2 className="mt-3 min-w-0 break-words font-sans text-[clamp(1.35rem,2.1vw,1.75rem)] font-black uppercase leading-[1.16] tracking-tight [overflow-wrap:anywhere]">
-              {featuredPartner?.name || "Marcas que viven el motor."}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
-              {featuredPartner?.category || "Talleres, negocios y marcas que comparten nuestra pasión."}
-            </p>
-            <span className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-bold uppercase text-orange-400 transition group-hover:text-orange-300">
-              Ver colaboradores <MdArrowOutward aria-hidden="true" />
-            </span>
-          </div>
-        </Link>
+      <section aria-label="Más formas de vivir Tramassso" className="mx-auto max-w-7xl px-4 py-16 sm:px-5 lg:px-8 lg:py-20">
+        <div className="mb-8">
+          <p className="trm-kicker">Más allá del Garage</p>
+          <h2 className="mt-3 font-sans text-3xl font-black uppercase tracking-[-0.035em] sm:text-4xl">Descubre tu próximo plan.</h2>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <DiscoveryCard href={featuredRoute ? "/routes/" + featuredRoute.id : "/routes"}
+            number="03" category="Rutas" title={featuredRoute?.title || "El camino también importa."}
+            description={featuredRoute ? featuredRoute.start_point + " · " + featuredRoute.distance_km + " km" : "Encuentra carreteras y rincones de Gran Canaria que merecen disfrutarse."}
+            action="Explorar rutas" icon="routes" />
+          <DiscoveryCard href="/clubs" number="04" category="Clubes"
+            title="Encuentra a tu gente."
+            description="Únete a los clubes de tu estilo o crea tu propio grupo. Gratis, sin complicaciones."
+            action="Ver clubes" icon="clubs" />
+          <DiscoveryCard href={featuredPartner ? "/partners/" + featuredPartner.id : "/partners"}
+            number="05" category="Colaboradores"
+            title={featuredPartner?.name || "Marcas que viven el motor."}
+            description={featuredPartner?.category || "Talleres, negocios y proyectos que impulsan nuestra comunidad."}
+            action="Ver colaboradores" icon="partners" />
+        </div>
       </section>
 
-      <section className="border-t border-white/10 bg-[#111214] py-20">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-5 lg:grid-cols-2 lg:px-8">
-          <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Tu comunidad te espera</p><h2 className="mt-5 text-4xl font-black uppercase leading-tight sm:text-5xl">La carretera es mejor en compañia.</h2><p className="mt-5 max-w-md text-sm leading-7 text-zinc-400">Forma parte de Tramassso sin cuotas. Tu perfil, tus coches y tus planes. Todo en un mismo sitio.</p></div>
-          <div className="flex flex-col items-start gap-4 rounded-3xl border border-orange-500/20 bg-orange-500/[0.05] p-8">
-            <MdDirectionsCar className="text-orange-500" size={38} /><p className="text-xl font-black uppercase">El siguiente proyecto es el tuyo.</p>
-            <Link href={registrationOpen ? "/register" : "/empezar"} className="rounded-xl bg-orange-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-black">{registrationOpen ? "Crear cuenta gratis" : "Descubrir el proyecto"} ↗</Link>
+      <section className="border-y border-white/10 bg-[#101113] py-16 lg:py-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:px-5 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+          <div>
+            <p className="trm-kicker">Tu comunidad te espera</p>
+            <h2 className="mt-4 max-w-2xl font-sans text-4xl font-black uppercase leading-[1.08] tracking-[-0.045em] sm:text-5xl">
+              La carretera es mejor en compañía.
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-7 text-zinc-400">Tu perfil, tus coches y tus planes. Todo en un mismo lugar, sin cuotas.</p>
+          </div>
+          <div className="trm-surface p-7 sm:p-8">
+            <TramasssoIcon name="members" size="lg" />
+            <h3 className="mt-5 font-sans text-xl font-black uppercase tracking-tight">El siguiente proyecto es el tuyo.</h3>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">Empieza formando parte de una comunidad de motor real.</p>
+            <Link href={registrationOpen ? "/register" : "/empezar"} className="trm-action mt-6">
+              {registrationOpen ? "Crear cuenta gratis" : "Descubre el proyecto"}
+              <TramasssoIcon name="arrow" frame={false} size="sm" />
+            </Link>
           </div>
         </div>
       </section>
 
-      <section id="contact" className="mx-auto grid max-w-7xl gap-9 px-4 py-20 sm:px-5 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
-        <div><p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-500">Marcas / Publicidad / Colaboraciones</p>
-          <h2 className="mt-5 text-4xl font-black uppercase">Crezcamos juntos.</h2>
-          <p className="mt-5 max-w-sm text-sm leading-7 text-zinc-400">¿Tienes un taller, un negocio o una marca del motor? Hablemos de colaboraciones y espacios publicitarios identificados.</p>
+      <section id="contact" className="mx-auto grid max-w-7xl gap-9 px-4 py-16 sm:px-5 lg:grid-cols-[0.85fr_1.15fr] lg:px-8 lg:py-20">
+        <div>
+          <TramasssoIcon name="partners" size="lg" />
+          <p className="trm-kicker mt-6">Marcas / Publicidad / Colaboraciones</p>
+          <h2 className="mt-3 font-sans text-4xl font-black uppercase tracking-tight">Crezcamos juntos.</h2>
+          <p className="mt-5 max-w-sm text-sm leading-7 text-zinc-400">
+            ¿Tienes un taller, una tienda o una marca del motor? Hablemos de colaboraciones y espacios publicitarios identificados.
+          </p>
         </div>
         <ContactForm />
       </section>
