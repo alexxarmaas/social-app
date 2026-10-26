@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import { useState } from "react";
 import { safeCarImage } from "@/app/lib/community";
 
@@ -45,32 +46,79 @@ export default function PostCard({ post, signedIn }: { post: CommunityPost; sign
     finally { setBusy(false); }
   }
 
-  return <article className="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/50">
-    <div className="flex items-center justify-between gap-3 p-5">
-      <div>
-        <Link href={"/members/" + encodeURIComponent(post.author.username)} className="font-bold text-white hover:text-orange-400">@{post.author.username}</Link>
-        <p className="mt-1 text-xs text-zinc-500">{new Date(post.createdAt).toLocaleDateString("es-ES", { timeZone: "Atlantic/Canary", day: "numeric", month: "short", year: "numeric" })}</p>
+  return (
+    <article className="overflow-hidden rounded-3xl border border-white/10 bg-[#111214]">
+      <div className="flex items-center justify-between gap-4 p-5 sm:p-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <span aria-hidden="true" className="trm-icon-frame h-11 w-11 rounded-full font-sans text-lg font-black">
+            {post.author.username.charAt(0).toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <Link href={"/members/" + encodeURIComponent(post.author.username)}
+              className="block truncate text-sm font-bold text-white hover:text-orange-400">
+              @{post.author.username}
+            </Link>
+            <p className="mt-1 text-xs text-zinc-500">
+              {new Date(post.createdAt).toLocaleDateString("es-ES", {
+                timeZone: "Atlantic/Canary", day: "numeric", month: "short", year: "numeric",
+              })}
+            </p>
+          </div>
+        </div>
+        <span className="trm-pill shrink-0 border-white/10 bg-white/[0.025] text-zinc-500">Comunidad</span>
       </div>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Tramassso / Feed</span>
-    </div>
-    <p className="whitespace-pre-wrap break-words px-5 pb-5 text-sm leading-7 text-zinc-300">{post.content}</p>
-    {image ? <div className="relative aspect-[16/10] bg-black"><Image src={image} alt={"Fotografia compartida por @" + post.author.username} fill sizes="(max-width: 768px) 100vw, 700px" className="object-cover" /></div> : null}
-    <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-xs">
-      {signedIn ? <button type="button" disabled={busy} onClick={toggleLike} aria-pressed={liked}
-        className={"rounded-xl border px-4 py-2.5 font-bold uppercase tracking-wider " + (liked ? "border-orange-500/60 bg-orange-500/10 text-orange-400" : "border-white/15 text-zinc-300")}>{liked ? "♥" : "♡"} {likes} me gusta</button> :
-        <Link href="/login?next=%2Fcommunity" className="text-orange-400 underline">Entra para dar me gusta · {likes}</Link>}
-      <div className="flex flex-wrap items-center gap-4">
-        <Link href={"/community/" + post.id} className="font-semibold text-orange-400 underline">Ver conversación ↗</Link>
-        {signedIn ? <button type="button" onClick={() => setReporting(!reporting)} className="text-zinc-500 hover:text-orange-400">Denunciar</button> : null}
+      <p className="whitespace-pre-wrap break-words px-5 pb-6 text-sm leading-7 text-zinc-200 sm:px-6">{post.content}</p>
+      {image ? (
+        <div className="relative aspect-[16/10] overflow-hidden bg-black">
+          <Image src={image} alt={"Fotografía compartida por @" + post.author.username} fill
+            sizes="(max-width: 768px) 100vw, 700px" className="object-cover" />
+        </div>
+      ) : null}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-5 py-4 sm:px-6">
+        {signedIn ? (
+          <button type="button" disabled={busy} onClick={toggleLike} aria-pressed={liked}
+            className={"inline-flex min-h-10 items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition-colors " +
+              (liked ? "border-orange-500/50 bg-orange-500/10 text-orange-300" : "border-white/15 text-zinc-300 hover:border-orange-500/50 hover:text-orange-300")}>
+            <TramasssoIcon name="heart" size="sm" frame={false} className={liked ? "text-orange-400" : ""} />
+            {likes} {likes === 1 ? "me gusta" : "me gusta"}
+          </button>
+        ) : (
+          <Link href={"/login?next=" + encodeURIComponent("/community/" + post.id)}
+            className="inline-flex items-center gap-2 text-xs text-orange-400 hover:underline">
+            <TramasssoIcon name="heart" frame={false} size="sm" /> {likes} me gusta
+          </Link>
+        )}
+        <div className="flex flex-wrap items-center gap-4">
+          <Link href={"/community/" + post.id}
+            className="inline-flex items-center gap-2 text-xs font-bold text-orange-400 hover:text-orange-300">
+            <TramasssoIcon name="community" frame={false} size="sm" /> Conversación
+            <TramasssoIcon name="arrow" frame={false} size="sm" />
+          </Link>
+          {signedIn ? (
+            <button type="button" onClick={() => setReporting(!reporting)}
+              aria-expanded={reporting}
+              className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-red-300">
+              <TramasssoIcon name="clubs" frame={false} size="sm" /> Denunciar
+            </button>
+          ) : null}
+        </div>
       </div>
-    </div>
-    {reporting ? <div className="flex flex-wrap items-center gap-3 border-t border-white/10 p-5">
-      <select aria-label="Motivo de denuncia" value={reportReason} onChange={(e) => setReportReason(e.target.value)} className="rounded-xl border border-white/15 bg-black px-4 py-3 text-xs text-white">
-        <option value="spam">Spam</option><option value="abuso">Acoso o insultos</option>
-        <option value="contenido_inapropiado">Contenido inapropiado</option><option value="privacidad">Privacidad</option><option value="otros">Otro motivo</option>
-      </select>
-      <button type="button" disabled={busy} onClick={report} className="rounded-xl bg-orange-500 px-4 py-3 text-xs font-bold text-black">Enviar denuncia</button>
-    </div> : null}
-    {notice ? <p role="status" className="border-t border-white/10 px-5 py-3 text-xs text-zinc-300">{notice}</p> : null}
-  </article>;
+      {reporting ? (
+        <div className="flex flex-wrap items-center gap-3 border-t border-white/10 bg-black/20 p-5">
+          <select aria-label="Motivo de denuncia" value={reportReason} onChange={(e) => setReportReason(e.target.value)}
+            className="min-h-11 rounded-xl border border-white/15 bg-black px-4 py-3 text-xs text-white">
+            <option value="spam">Spam</option>
+            <option value="abuso">Acoso o insultos</option>
+            <option value="contenido_inapropiado">Contenido inapropiado</option>
+            <option value="privacidad">Privacidad</option>
+            <option value="otros">Otro motivo</option>
+          </select>
+          <button type="button" disabled={busy} onClick={report} className="trm-action">
+            Enviar denuncia
+          </button>
+        </div>
+      ) : null}
+      {notice ? <p role="status" className="border-t border-white/10 px-5 py-3 text-xs text-zinc-300">{notice}</p> : null}
+    </article>
+  );
 }
