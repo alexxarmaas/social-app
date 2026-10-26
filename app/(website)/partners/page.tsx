@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import TrackSponsorClick from "@/components/TrackSponsorClick";
 import PartnerLogo from "@/components/partners/PartnerLogo";
 import { listPublicPartners } from "@/app/lib/tramassso-content";
@@ -18,48 +19,45 @@ export default async function PartnersPage() {
   const { partners } = await listPublicPartners();
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
-        <div className="max-w-3xl space-y-4">
-          <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.08em] md:text-5xl">Marcas en pista</h1>
-          <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Colaboradores seleccionados para rutas, eventos y activaciones.</p>
-        </div>
-
+    <main className="min-h-screen bg-[#08090a] text-white">
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-12 sm:px-5 sm:pt-16 lg:px-8">
+        <span className="trm-pill"><TramasssoIcon name="partners" size="sm" frame={false} /> Tramassso / Colaboradores</span>
+        <h1 className="mt-5 font-sans text-[clamp(2.7rem,5.8vw,4.8rem)] font-black uppercase leading-[1.04] tracking-[-0.05em]">Marcas que suman.</h1>
+        <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
+          Talleres, recambios y proyectos del motor que apuestan por esta comunidad.
+        </p>
         {partners.length ? (
           <div className="mt-10 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
             {partners.map((partner) => (
-              <article key={partner.id} className="racing-card flex min-h-[25rem] min-w-0 flex-col rounded-[1.5rem] border p-4 sm:rounded-[2rem] sm:p-5">
-                <div className="grid gap-3 sm:flex sm:items-start sm:justify-between sm:gap-4">
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:tracking-[0.35em]">{partner.category}</p>
-                    <h2 className="mt-3 break-words font-sans text-lg font-semibold tracking-tight text-white sm:text-xl">{partner.name}</h2>
-                  </div>
+              <article key={partner.id} className="trm-surface flex min-w-0 flex-col p-6">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <TramasssoIcon name="partners" size="md" />
                   {partner.is_featured ? (
-                    <span className="w-fit shrink-0 rounded-full border border-red-500/35 bg-red-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-red-100 sm:tracking-[0.25em]">
-                      Destacado
+                    <span className="trm-pill">
+                      <TramasssoIcon name="star" size="sm" frame={false} /> Destacado
                     </span>
                   ) : null}
                 </div>
-
-                <PartnerLogo src={partner.logo_url} alt={`Logo de ${partner.name}`} className="mt-6" />
-
-                <p className="mt-5 line-clamp-4 flex-1 text-sm leading-7 text-zinc-400">
-                  {partner.description ?? "Colaborador seleccionado de la comunidad Tramassso."}
+                <p className="trm-kicker mt-6">{partner.category}</p>
+                <h2 className="trm-card-title mt-3 text-2xl leading-tight">{partner.name}</h2>
+                <PartnerLogo src={partner.logo_url} alt={"Logo de " + partner.name} className="mt-6" />
+                <p className="mt-6 line-clamp-4 flex-1 text-sm leading-7 text-zinc-400">
+                  {partner.description ?? "Colaborador de la comunidad Tramassso."}
                 </p>
-
-                <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
-                  <Link href={`/partners/${partner.id}`} className="racing-button inline-flex w-full justify-center rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] transition sm:w-fit sm:tracking-[0.32em]">
-                    Ver perfil
+                <div className="mt-6 flex flex-wrap gap-3 border-t border-white/10 pt-6">
+                  <Link href={"/partners/" + partner.id} className="trm-action-secondary w-full sm:w-auto">
+                    Ver perfil <TramasssoIcon name="arrow" frame={false} size="sm" />
                   </Link>
                   {partner.website_url ? (
-                    <TrackSponsorClick sponsorName={partner.name} websiteUrl={partner.website_url} className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
-                      Visitar web
+                    <TrackSponsorClick sponsorName={partner.name} websiteUrl={partner.website_url}
+                      className="trm-action-secondary w-full sm:w-auto">
+                      Visitar web <TramasssoIcon name="arrow" frame={false} size="sm" />
                     </TrackSponsorClick>
                   ) : null}
                   {partner.instagram_url ? (
-                    <TrackSponsorClick sponsorName={`${partner.name} · Instagram`} websiteUrl={partner.instagram_url} className="inline-flex w-full justify-center rounded-full border border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-zinc-300 transition hover:border-red-500/60 hover:text-white sm:w-fit sm:tracking-[0.32em]">
-                      Instagram
+                    <TrackSponsorClick sponsorName={partner.name + " · Instagram"} websiteUrl={partner.instagram_url}
+                      className="trm-action-secondary w-full sm:w-auto">
+                      <TramasssoIcon name="instagram" frame={false} size="sm" /> Instagram
                     </TrackSponsorClick>
                   ) : null}
                 </div>
@@ -67,11 +65,21 @@ export default async function PartnersPage() {
             ))}
           </div>
         ) : (
-          <div className="racing-panel mt-10 rounded-[2rem] p-10 text-center">
-            <p className="text-xs uppercase tracking-[0.45em] text-zinc-500">Colaboradores en seleccion</p>
-            <p className="mt-3 text-sm text-zinc-400">Pronto agregaremos nuevas marcas.</p>
+          <div className="trm-surface mt-10 flex flex-col items-center p-10 text-center">
+            <TramasssoIcon name="partners" size="lg" />
+            <h2 className="mt-5 font-sans text-2xl font-black uppercase">Colaboradores en selección.</h2>
+            <p className="mt-3 text-sm text-zinc-400">Pronto anunciaremos nuevas marcas.</p>
           </div>
         )}
+        <div className="trm-surface mt-10 flex flex-wrap items-center justify-between gap-5 p-7">
+          <div>
+            <p className="trm-kicker">¿Tienes un negocio del motor?</p>
+            <h2 className="mt-3 font-sans text-2xl font-black uppercase tracking-tight">Pon tu marca en marcha.</h2>
+          </div>
+          <Link href="/anunciarse" className="trm-action">
+            Colaborar con Tramassso <TramasssoIcon name="arrow" frame={false} size="sm" />
+          </Link>
+        </div>
       </section>
     </main>
   );

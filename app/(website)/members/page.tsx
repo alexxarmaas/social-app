@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import type { Metadata } from "next";
 import { prisma } from "@/app/lib/prisma";
 import { buildPremiumMetadata } from "@/app/lib/seo";
@@ -54,63 +55,82 @@ export default async function MembersPage({ searchParams }: {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-14 text-white sm:py-20">
+    <main className="min-h-screen bg-[#08090a] px-4 pb-20 pt-12 text-white sm:pt-16">
       <div className="mx-auto max-w-7xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-400">Tramassso / Personas</p>
-        <h1 className="mt-5 text-5xl font-black uppercase tracking-wide sm:text-7xl">Detrás del volante.</h1>
-        <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400">
-          Descubre a quienes forman la comunidad a través de sus coches y proyectos. Aquí aparecen los perfiles que han publicado al menos un vehículo.
+        <span className="trm-pill"><TramasssoIcon name="members" frame={false} size="sm" /> Tramassso / Miembros</span>
+        <h1 className="mt-5 font-sans text-[clamp(2.7rem,5.8vw,4.8rem)] font-black uppercase leading-[1.04] tracking-[-0.05em]">Detrás del volante.</h1>
+        <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
+          Conoce a la gente detrás de cada proyecto. Encuentra aficionados a través de sus garajes y sus coches.
+          Solo aparecen perfiles que hayan publicado al menos un vehículo.
         </p>
-        <div className="mt-9 flex flex-wrap items-end justify-between gap-4">
-          <form method="get" action="/members" className="flex w-full flex-wrap items-end gap-3 sm:w-auto">
-            <label className="min-w-[220px] flex-1 text-xs font-bold uppercase tracking-wider text-zinc-400">
-              Busca un alias o un coche
+        <div className="trm-surface mt-9 flex flex-wrap items-end justify-between gap-5 p-5 sm:p-6">
+          <form method="get" action="/members" className="flex w-full min-w-0 flex-wrap items-end gap-3 sm:w-auto sm:flex-1">
+            <label className="min-w-[195px] flex-1 text-xs font-bold uppercase tracking-wider text-zinc-400">
+              Alias o coche
               <input name="q" defaultValue={q} maxLength={40} placeholder="Prelude, E30, tu_alias…"
-                className="mt-2 w-full rounded-xl border border-white/15 bg-zinc-900 px-4 py-3 text-base text-white outline-none focus:border-orange-500" />
+                className="mt-2 w-full min-w-0 rounded-xl border border-white/15 bg-black/50 px-4 py-3 text-base text-white outline-none focus:border-orange-500" />
             </label>
-            <button className="rounded-xl bg-orange-500 px-6 py-3.5 text-xs font-black uppercase text-black">Buscar</button>
-            {q ? <Link href="/members" className="rounded-xl border border-white/15 px-4 py-3 text-xs uppercase text-zinc-300">Limpiar</Link> : null}
+            <button type="submit" className="trm-action">
+              <TramasssoIcon name="search" frame={false} size="sm" /> Buscar
+            </button>
+            {q ? <Link href="/members" className="trm-action-secondary">Limpiar</Link> : null}
           </form>
-          <Link href="/garage/new" className="text-xs font-bold uppercase tracking-wider text-orange-400 underline">
-            Publica tu coche para aparecer ↗
+          <Link href="/garage/new" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300">
+            Publica tu coche para aparecer <TramasssoIcon name="arrow" frame={false} size="sm" />
           </Link>
         </div>
+        <div className="mt-10 flex items-center justify-between gap-4">
+          <p className="trm-kicker">{q ? "Resultados de la búsqueda" : "Personas de la comunidad"}</p>
+          <span className="text-xs text-zinc-500">{members.length} perfiles</span>
+        </div>
         {unavailable ? (
-          <p role="alert" className="mt-10 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">
+          <p role="alert" className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">
             El directorio no está disponible en este momento. Los eventos y rutas siguen accesibles.
           </p>
         ) : members.length ? (
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {members.map((member) => (
               <Link href={"/members/" + encodeURIComponent(member.username)} key={member.username}
-                className="group rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6 transition hover:border-orange-500/50">
+                className="trm-discovery-card group flex min-w-0 flex-col p-6">
                 <div className="flex items-center gap-4">
-                  <div aria-hidden="true" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-2xl font-black text-orange-400">
+                  <span aria-hidden="true" className="trm-icon-frame h-14 w-14 shrink-0 rounded-2xl font-sans text-2xl font-black">
                     {member.username.charAt(0).toUpperCase()}
-                  </div>
+                  </span>
                   <div className="min-w-0">
-                    <h2 className="truncate text-xl font-black">@{member.username}</h2>
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <h2 className="truncate font-sans text-xl font-black tracking-tight">@{member.username}</h2>
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-zinc-500">
+                      <TramasssoIcon name="garage" frame={false} size="sm" className="text-orange-400" />
                       {member._count.cars} {member._count.cars === 1 ? "vehículo" : "vehículos"}
-                      {member.location ? " · " + member.location : ""}
                     </p>
                   </div>
                 </div>
                 {member.bio ? <p className="mt-5 line-clamp-2 text-sm leading-6 text-zinc-400">{member.bio}</p> : null}
-                <div className="mt-6 min-h-12 border-t border-white/10 pt-4 text-sm text-zinc-300">
-                  {member.cars.map((car) => <p key={car.make + car.model + car.year} className="truncate">
-                    {car.make} {car.model} · {car.year}
-                  </p>)}
+                {member.location ? <p className="mt-4 inline-flex items-center gap-2 text-xs text-zinc-500">
+                  <TramasssoIcon name="location" frame={false} size="sm" /> {member.location}
+                </p> : null}
+                <div className="mt-auto border-t border-white/10 pt-5 text-sm text-zinc-300">
+                  {member.cars.map((car, index) => (
+                    <p key={index} className="truncate">{car.make} {car.model} · {car.year}</p>
+                  ))}
                 </div>
-                <span className="mt-5 inline-flex text-xs font-black uppercase tracking-wider text-orange-400">Ver su garaje ↗</span>
+                <span className="mt-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-orange-400">
+                  Ver su garaje <TramasssoIcon name="arrow" frame={false} size="sm" />
+                </span>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="mt-10 rounded-3xl border border-white/10 p-10 text-center">
-            <h2 className="text-2xl font-black uppercase">{q ? "No hay coincidencias." : "Sé quien abra el camino."}</h2>
-            <p className="mt-3 text-sm text-zinc-400">{q ? "Prueba con otro alias o marca." : "Publica tu primer vehículo y únete al directorio."}</p>
-            <Link href="/garage" className="mt-5 inline-flex text-sm text-orange-400 underline">Explorar Garage</Link>
+          <div className="trm-surface mt-6 flex flex-col items-center p-10 text-center">
+            <TramasssoIcon name="members" size="lg" />
+            <h2 className="mt-5 font-sans text-2xl font-black uppercase">
+              {q ? "No hay coincidencias." : "Sé quien abra el camino."}
+            </h2>
+            <p className="mt-3 max-w-md text-sm leading-6 text-zinc-400">
+              {q ? "Prueba con otro alias o marca." : "Publica tu primer coche y forma parte de la comunidad."}
+            </p>
+            <Link href={q ? "/members" : "/garage/new"} className="trm-action mt-6">
+              {q ? "Mostrar todos" : "Publicar mi coche"} <TramasssoIcon name="arrow" frame={false} size="sm" />
+            </Link>
           </div>
         )}
       </div>

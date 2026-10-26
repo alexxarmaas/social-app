@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/prisma";
@@ -50,62 +51,94 @@ export default async function CommunityPage({ searchParams }: { searchParams: Pr
     }
   }
   return (
-    <main className="min-h-screen bg-zinc-950 px-4 py-12 text-white sm:py-20">
+    <main className="min-h-screen bg-[#08090a] px-4 pb-20 pt-12 text-white sm:pt-16">
       <div className="mx-auto max-w-6xl">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange-400">Tramassso / Comunidad</p>
-        <h1 className="mt-5 text-5xl font-black uppercase tracking-wide sm:text-7xl">Gente de motor.</h1>
-        <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400">Aquí se comparten los proyectos de verdad: tus avances, tus experiencias y las historias detrás de los coches.</p>
-        {enabled ? <nav aria-label="Filtrar muro" className="mt-9 flex flex-wrap gap-3">
-          <Link href="/community" aria-current={!followingTab ? "page" : undefined}
-            className={"rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider " +
-              (!followingTab ? "bg-orange-500 text-black" : "border border-white/15 text-zinc-300")}>
-            Recientes
-          </Link>
-          <Link href={viewerId ? "/community?tab=siguiendo" : "/login?next=%2Fcommunity%3Ftab%3Dsiguiendo"}
-            aria-current={followingTab ? "page" : undefined}
-            className={"rounded-xl px-5 py-3 text-xs font-black uppercase tracking-wider " +
-              (followingTab ? "bg-orange-500 text-black" : "border border-white/15 text-zinc-300")}>
-            Siguiendo
-          </Link>
-          <Link href="/members" className="rounded-xl border border-white/15 px-5 py-3 text-xs font-bold uppercase tracking-wider text-orange-400">
-            Encontrar miembros ↗
-          </Link>
-        </nav> : null}
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.4fr)]">
-          <div className="space-y-6">
+        <span className="trm-pill"><TramasssoIcon name="community" frame={false} size="sm" /> Tramassso / Comunidad</span>
+        <h1 className="mt-5 font-sans text-[clamp(2.8rem,5.7vw,4.8rem)] font-black uppercase leading-[1.04] tracking-[-0.05em]">Gente de motor.</h1>
+        <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
+          Avances, proyectos y conversaciones de verdad. Comparte tu historia y descubre la de los demás.
+        </p>
+        {enabled ? (
+          <nav aria-label="Filtrar publicaciones" className="mt-9 flex flex-wrap gap-3">
+            <Link href="/community" aria-current={!followingTab ? "page" : undefined}
+              className={!followingTab ? "trm-action" : "trm-action-secondary"}>
+              <TramasssoIcon name="activity" frame={false} size="sm" /> Recientes
+            </Link>
+            <Link href={viewerId ? "/community?tab=siguiendo" : "/login?next=%2Fcommunity%3Ftab%3Dsiguiendo"}
+              aria-current={followingTab ? "page" : undefined}
+              className={followingTab ? "trm-action" : "trm-action-secondary"}>
+              <TramasssoIcon name="members" frame={false} size="sm" /> Siguiendo
+            </Link>
+            <Link href="/members" className="trm-action-secondary">
+              <TramasssoIcon name="search" frame={false} size="sm" /> Buscar miembros
+            </Link>
+          </nav>
+        ) : null}
+        <div className="mt-8 grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(270px,0.43fr)]">
+          <div className="min-w-0 space-y-5">
             {!enabled ? (
-              <div className="rounded-3xl border border-orange-500/20 bg-orange-500/5 p-8">
-                <h2 className="text-2xl font-black uppercase">Comunidad en preparación.</h2>
-                <p className="mt-4 text-sm leading-7 text-zinc-400">Estamos completando las herramientas de moderación. Mientras tanto, puedes explorar los coches y clubes existentes.</p>
-                <Link href="/garage" className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-xs font-bold uppercase text-black">Ir a Garage</Link>
+              <div className="trm-surface p-8">
+                <TramasssoIcon name="community" size="lg" />
+                <h2 className="mt-5 font-sans text-2xl font-black uppercase tracking-tight">Comunidad en preparación.</h2>
+                <p className="mt-4 text-sm leading-7 text-zinc-400">Estamos completando la moderación. Mientras tanto, explora los garajes y clubes.</p>
+                <Link href="/garage" className="trm-action mt-6">Ir a Garage <TramasssoIcon name="arrow" frame={false} size="sm" /></Link>
               </div>
             ) : (
               <>
-                {session?.user?.id ? <PostComposer /> : <div className="rounded-3xl border border-white/10 bg-zinc-900/50 p-6">
-                  <p className="font-bold">¿Quieres compartir tu proyecto?</p>
-                  <p className="mt-3 text-sm text-zinc-400">Únete gratis para publicar, seguir a otros miembros y dar me gusta.</p>
-                  <Link href="/register" className="mt-6 inline-flex rounded-xl bg-orange-500 px-5 py-3 text-xs font-bold uppercase text-black">Crear cuenta</Link>
-                </div>}
+                {session?.user?.id ? <PostComposer /> : (
+                  <div className="trm-surface p-6">
+                    <div className="flex items-center gap-3">
+                      <TramasssoIcon name="community" size="md" />
+                      <h2 className="font-sans text-lg font-black uppercase">¿Tienes algo que contar?</h2>
+                    </div>
+                    <p className="mt-4 text-sm leading-7 text-zinc-400">Únete gratis para publicar, seguir proyectos y dar me gusta.</p>
+                    <Link href="/register" className="trm-action mt-6">
+                      Crear cuenta <TramasssoIcon name="arrow" frame={false} size="sm" />
+                    </Link>
+                  </div>
+                )}
                 {posts.map((post) => <PostCard key={post.id} post={post} signedIn={Boolean(session?.user?.id)} />)}
-                {!posts.length ? <div className="rounded-3xl border border-white/10 p-8 text-center text-sm text-zinc-400">
-                  <p>{followingTab
-                    ? "Todavía no hay publicaciones de personas a las que sigas."
-                    : "Todavía no hay publicaciones aprobadas. Las nuevas publicaciones se revisan antes de aparecer."}</p>
-                  {followingTab ? <Link href="/members" className="mt-5 inline-flex text-orange-400 underline">Descubrir miembros ↗</Link> : null}
-                </div> : null}
+                {!posts.length ? (
+                  <div className="trm-surface p-8 text-center">
+                    <TramasssoIcon name="community" size="lg" />
+                    <p className="mt-5 text-sm leading-7 text-zinc-400">
+                      {followingTab ? "Aún no hay publicaciones de las personas a las que sigues." :
+                        "Todavía no hay publicaciones aprobadas. El contenido pasa por moderación."}
+                    </p>
+                    {followingTab ? (
+                      <Link href="/members" className="mt-5 inline-flex items-center gap-2 text-sm text-orange-400">
+                        Descubrir miembros <TramasssoIcon name="arrow" frame={false} size="sm" />
+                      </Link>
+                    ) : null}
+                  </div>
+                ) : null}
               </>
             )}
           </div>
-          <aside className="rounded-3xl border border-white/10 bg-zinc-900/50 p-7">
-            <p className="text-xs font-bold uppercase tracking-[0.25em] text-orange-400">Un mismo motor</p>
-            <h2 className="mt-4 text-xl font-black uppercase">Tu coche, tu comunidad.</h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-400">El muro no sustituye Instagram. Aquí tus proyectos tienen una ficha permanente y un perfil que puedes compartir.</p>
-            <div className="mt-7 grid gap-3 text-xs font-bold uppercase tracking-wider">
-              <Link href="/garage" className="rounded-xl border border-white/15 px-4 py-3 hover:border-orange-500">Explorar Garage ↗</Link>
-              <Link href="/clubs" className="rounded-xl border border-white/15 px-4 py-3 hover:border-orange-500">Descubrir clubes ↗</Link>
-              <Link href="/events" className="rounded-xl border border-white/15 px-4 py-3 hover:border-orange-500">Próximos eventos ↗</Link>
+          <aside className="trm-surface p-6 lg:sticky lg:top-28">
+            <TramasssoIcon name="members" size="lg" />
+            <p className="trm-kicker mt-6">Un mismo motor</p>
+            <h2 className="mt-3 font-sans text-xl font-black uppercase tracking-tight">Tu coche, tu comunidad.</h2>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              Una ficha para tus coches y un espacio permanente para tus proyectos, más allá de las historias que desaparecen.
+            </p>
+            <div className="mt-6 grid gap-2">
+              {([
+                { href: "/garage", label: "Explorar Garage", icon: "garage" as const },
+                { href: "/clubs", label: "Descubrir clubes", icon: "clubs" as const },
+                { href: "/events", label: "Próximos eventos", icon: "events" as const },
+              ]).map((item) => (
+                <Link key={item.href} href={item.href}
+                  className="flex items-center gap-3 rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-zinc-300 transition-colors hover:border-orange-500/40 hover:text-white">
+                  <TramasssoIcon name={item.icon} frame={false} size="sm" className="text-orange-400" />
+                  <span className="flex-1">{item.label}</span>
+                  <TramasssoIcon name="arrow" frame={false} size="sm" />
+                </Link>
+              ))}
             </div>
-            <p className="mt-7 text-xs leading-6 text-zinc-500">Se moderan publicaciones y denuncias. Evita datos personales, matrículas visibles e imágenes de terceros sin autorización.</p>
+            <p className="mt-6 border-t border-white/10 pt-5 text-xs leading-6 text-zinc-500">
+              Comparte con respeto. Evita matrículas visibles, información personal e imágenes de terceros sin permiso.
+            </p>
           </aside>
         </div>
       </div>

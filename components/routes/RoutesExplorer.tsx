@@ -3,6 +3,7 @@
 import { Fragment, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import type { RouteRecord } from "@/app/lib/tramassso-content";
 import AdBanner from "@/components/ads/AdBanner";
 
@@ -18,29 +19,83 @@ export default function RoutesExplorer({ routes, adSlot }: { routes: RouteRecord
 
   return (
     <>
-      <div className="mt-8 grid gap-3 rounded-3xl border border-zinc-800 bg-black/30 p-4 sm:grid-cols-3">
-        <label className="grid gap-2 text-[10px] uppercase tracking-[0.24em] text-zinc-500">Dificultad<select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-sm text-white"><option value="todas">Todas</option><option value="facil">Fácil</option><option value="media">Media</option><option value="exigente">Exigente</option></select></label>
-        <label className="grid gap-2 text-[10px] uppercase tracking-[0.24em] text-zinc-500">Tipo<select value={type} onChange={(event) => setType(event.target.value)} className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-sm text-white"><option value="todos">Todos</option><option value="carretera">Carretera</option><option value="costa">Costa</option><option value="montana">Montaña</option><option value="nocturna">Nocturna</option><option value="exposicion">Exposición</option></select></label>
-        <label className="grid gap-2 text-[10px] uppercase tracking-[0.24em] text-zinc-500">Distancia<select value={maxDistance} onChange={(event) => setMaxDistance(event.target.value)} className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 text-sm text-white"><option value="todas">Todas</option><option value="50">Hasta 50 km</option><option value="100">Hasta 100 km</option><option value="200">Hasta 200 km</option></select></label>
+      <div className="trm-surface mt-9 grid min-w-0 gap-4 p-5 sm:grid-cols-3 sm:p-6">
+        <label className="grid min-w-0 gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
+          Dificultad
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}
+            className="w-full min-w-0 rounded-xl border border-white/15 bg-black/50 px-3 py-3 text-sm text-white outline-none focus:border-orange-500">
+            <option value="todas">Todas</option><option value="facil">Fácil</option>
+            <option value="media">Media</option><option value="exigente">Exigente</option>
+          </select>
+        </label>
+        <label className="grid min-w-0 gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
+          Tipo de ruta
+          <select value={type} onChange={(e) => setType(e.target.value)}
+            className="w-full min-w-0 rounded-xl border border-white/15 bg-black/50 px-3 py-3 text-sm text-white outline-none focus:border-orange-500">
+            <option value="todos">Todos</option><option value="carretera">Carretera</option>
+            <option value="costa">Costa</option><option value="montana">Montaña</option>
+            <option value="nocturna">Nocturna</option><option value="exposicion">Exposición</option>
+          </select>
+        </label>
+        <label className="grid min-w-0 gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
+          Distancia máxima
+          <select value={maxDistance} onChange={(e) => setMaxDistance(e.target.value)}
+            className="w-full min-w-0 rounded-xl border border-white/15 bg-black/50 px-3 py-3 text-sm text-white outline-none focus:border-orange-500">
+            <option value="todas">Todas</option><option value="50">Hasta 50 km</option>
+            <option value="100">Hasta 100 km</option><option value="200">Hasta 200 km</option>
+          </select>
+        </label>
       </div>
-      <p className="mt-4 text-[10px] uppercase tracking-[0.28em] text-zinc-600">{filtered.length} rutas</p>
-      <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-9 flex items-center justify-between gap-4">
+        <p className="trm-kicker">Rutas disponibles</p>
+        <span className="text-xs text-zinc-500">{filtered.length} rutas</span>
+      </div>
+      <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((route, index) => (
           <Fragment key={route.id}>
-            <article className="racing-card group overflow-hidden rounded-[2rem] border">
-              <div className="relative aspect-[16/11] overflow-hidden bg-zinc-900">
-                {route.cover_image_url ? <Image src={route.cover_image_url} alt={route.title} fill className="object-cover transition duration-700 group-hover:scale-105" sizes="(max-width: 1280px) 100vw, 33vw" /> : <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.4em] text-zinc-600">Sin portada</div>}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                <div className="absolute left-4 top-4 flex gap-2"><span className="rounded-full bg-black/80 px-3 py-1 text-[10px] uppercase text-white">{route.difficulty}</span><span className="rounded-full bg-black/80 px-3 py-1 text-[10px] uppercase text-white">{route.route_type}</span></div>
-                <div className="absolute bottom-0 p-5"><p className="text-[10px] uppercase tracking-[0.28em] text-zinc-400">{route.start_point}</p><h2 className="mt-2 text-xl font-semibold uppercase text-white sm:text-2xl">{route.title}</h2></div>
+            <article className="group flex min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#101113] transition-colors hover:border-orange-500/50">
+              <div className="relative aspect-[16/10] overflow-hidden bg-[#171719]">
+                {route.cover_image_url ? (
+                  <Image src={route.cover_image_url} alt={route.title} fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    sizes="(max-width: 1280px) 100vw, 33vw" />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-[radial-gradient(circle,rgba(255,106,0,.11),transparent_65%)]">
+                    <TramasssoIcon name="routes" size="lg" />
+                  </div>
+                )}
+                <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+                  <span className="trm-pill border-white/10 bg-black/80">{route.difficulty}</span>
+                  <span className="trm-pill border-white/10 bg-black/80">{route.route_type}</span>
+                </div>
               </div>
-              <div className="space-y-4 p-5"><p className="line-clamp-3 text-sm leading-7 text-zinc-400">{route.description}</p><div className="flex flex-wrap gap-2 text-xs text-zinc-500"><span>{route.distance_km} km</span><span>·</span><span>{route.drive_time_minutes} min</span><span>·</span><span>{route.end_point}</span></div><Link href={`/routes/${route.id}`} className="racing-button inline-flex rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.3em]">Ver ruta</Link></div>
+              <div className="flex flex-1 flex-col p-6">
+                <p className="trm-kicker">{route.start_point}</p>
+                <h2 className="trm-card-title mt-3 text-[1.45rem] leading-tight">{route.title}</h2>
+                <p className="mt-3 line-clamp-3 text-sm leading-7 text-zinc-400">{route.description}</p>
+                <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-xs text-zinc-500">
+                  <span className="inline-flex items-center gap-2">
+                    <TramasssoIcon name="routes" frame={false} size="sm" className="text-orange-400" />{route.distance_km} km
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <TramasssoIcon name="activity" frame={false} size="sm" />{route.drive_time_minutes} min
+                  </span>
+                </div>
+                <Link href={"/routes/" + route.id} className="trm-action-secondary mt-6 w-fit">
+                  Ver ruta <TramasssoIcon name="arrow" frame={false} size="sm" />
+                </Link>
+              </div>
             </article>
             {(index + 1) % 4 === 0 ? <AdBanner slot={adSlot} className="md:col-span-2 xl:col-span-3" /> : null}
           </Fragment>
         ))}
       </div>
-      {!filtered.length ? <div className="racing-panel mt-8 rounded-[2rem] p-10 text-center text-zinc-400">No hay rutas que coincidan con esos filtros.</div> : null}
+      {!filtered.length ? (
+        <div className="trm-surface mt-6 flex flex-col items-center p-10 text-center">
+          <TramasssoIcon name="routes" size="lg" />
+          <p className="mt-5 text-sm text-zinc-400">No hay rutas que coincidan con esos filtros.</p>
+        </div>
+      ) : null}
     </>
   );
 }
