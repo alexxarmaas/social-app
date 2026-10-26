@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import TramasssoIcon from "@/components/ui/TramasssoIcon";
 import { getAdsenseSlot, TRAMASSSO_ADSENSE_SLOTS } from "@/app/lib/adsense";
 import { listPublicRoutes } from "@/app/lib/tramassso-content";
 import { buildPremiumMetadata } from "@/app/lib/seo";
@@ -18,11 +19,11 @@ export default async function RoutesGuidePage() {
   const adSlot = getAdsenseSlot(process.env.NEXT_PUBLIC_ADSENSE_SLOT_ROUTES_1, TRAMASSSO_ADSENSE_SLOTS.routes);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-50">
+    <main className="min-h-screen overflow-x-hidden bg-[#08090a] text-white">
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14 lg:px-8">
         <div className="max-w-3xl space-y-4">
-          <p className="racing-eyebrow text-xs uppercase tracking-[0.45em] text-zinc-500">Rutas</p>
-          <h1 className="text-balance text-3xl font-black uppercase tracking-[0.06em] text-white sm:text-4xl sm:tracking-[0.1em] md:text-6xl">Gran Canaria en ruta</h1>
+          <span className="trm-pill"><TramasssoIcon name="routes" frame={false} size="sm" /> Tramassso / Rutas</span>
+          <h1 className="mt-5 font-sans text-[clamp(2.7rem,5.7vw,4.8rem)] font-black uppercase leading-[1.04] tracking-[-0.05em]">Gran Canaria en ruta.</h1>
           <p className="max-w-2xl text-sm leading-7 text-zinc-400 md:text-base">Trazados seleccionados para conducir, grabar y disfrutar.</p>
         </div>
 
